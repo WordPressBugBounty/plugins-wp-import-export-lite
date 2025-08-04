@@ -81,8 +81,8 @@ class WPIE_Upload_Validate {
                 }
 
                 if ( preg_match( '%\W(txt)$%i', trim( $file_name ) ) ) {
-
-                        if ( $fileFormat === false ) {
+    
+                        if ( $fileFormat === false || !in_array( $fileFormat, [ 'csv', 'json', 'xml' ] ) ) {
                                 $fileFormat = isset( $_GET[ 'activeFormat' ] ) && !empty( $_GET[ 'activeFormat' ] ) && in_array( $_GET[ 'activeFormat' ], [ 'csv', 'json', 'xml' ] ) ? wpie_sanitize_field( $_GET[ 'activeFormat' ] ) : "csv";
                         }
 
