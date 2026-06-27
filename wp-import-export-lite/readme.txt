@@ -3,9 +3,9 @@ Contributors: vjinfotech
 Tags: export, import, migrate, csv, schedule
 Donate link: https://1.envato.market/1krom
 Requires at least: 4.4
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 5.6
-Stable tag: 3.9.30
+Stable tag: 3.9.32
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
