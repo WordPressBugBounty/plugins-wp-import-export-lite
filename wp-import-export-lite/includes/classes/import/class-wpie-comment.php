@@ -54,13 +54,13 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
                                 $comment_date = current_time( 'mysql' );
                         }
 
-                        $this->wpie_final_data[ 'comment_date' ] = date( 'Y-m-d H:i:s', strtotime( $comment_date ) );
+                        $this->wpie_final_data[ 'comment_date' ] = gmdate( 'Y-m-d H:i:s', strtotime( $comment_date ) );
                 }
                 if ( $this->is_update_field( "date_gmt" ) ) {
                         $gmt_date = wpie_sanitize_field( $this->get_field_value( 'wpie_item_comment_date_gmt' ) );
 
                         if ( !empty( trim( $gmt_date ) ) && strtotime( $gmt_date ) !== false ) {
-                                $this->wpie_final_data[ 'comment_date_gmt' ] = date( 'Y-m-d H:i:s', strtotime( $gmt_date ) );
+                                $this->wpie_final_data[ 'comment_date_gmt' ] = gmdate( 'Y-m-d H:i:s', strtotime( $gmt_date ) );
                         }
                 }
                 if ( $this->is_update_field( "content" ) ) {
@@ -86,6 +86,7 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                         if ( !empty( trim( $comment_parent ) ) ) {
 
+                                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                                 if ( is_numeric( $comment_parent ) && absint( $comment_parent ) > 0 ) {
 
                                         $comment_id = $wpdb->get_var( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_ID = %d", absint( $comment_parent ) ) );
@@ -108,6 +109,7 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
                                         }
                                         unset( $comment_id, $new_content );
                                 }
+                                // phpcs:enable WordPress.DB.DirectDatabaseQuery
                         }
                         $this->wpie_final_data[ 'comment_parent' ] = $parent_id;
                 }
@@ -158,9 +160,11 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
                         $this->backup_service->create_backup( $this->item_id, true );
                 }
 
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                 $wpdb->update( $wpdb->prefix . "wpie_template", array( 'last_update_date' => current_time( 'mysql' ),
                         'process_log'      => maybe_serialize( $this->process_log ) ), array(
                         'id' => $this->wpie_import_id ) );
+                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                 do_action( 'wpie_after_comment_import', $this->item_id, $this->wpie_final_data, $this->wpie_import_option );
 
@@ -205,7 +209,9 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                         if ( !empty( $content ) ) {
 
+                                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                                 $comment_id = $wpdb->get_var( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_content IN (%s,%s) AND `comment_post_ID` = %d ORDER BY `comment_ID` ASC limit 0,1", $content, preg_replace( '%[ \\t\\n]%', '', $content ), $this->post_id ) );
+                                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                                 if ( $comment_id && $comment_id > 0 ) {
                                         $this->existing_item_id = absint( $comment_id );
@@ -219,32 +225,26 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                         $date = $this->get_field_value( 'wpie_item_comment_date' );
 
-                        $dateQuery    = "";
-                        $contentQuery = "";
-                        if ( !empty( $date ) ) {
+                        if ( ! empty( $content ) && ! empty( $date ) ) {
 
-                                $dateQuery = $wpdb->prepare( " `comment_date` = %s ", trim( $date ) );
-                        }
-                        if ( !empty( $content ) ) {
-
-                                $contentQuery = $wpdb->prepare( " `comment_content` IN (%s,%s) ", trim( $content ), preg_replace( '%[ \\t\\n]%', '', trim( $content ) ) );
-
-                                if ( !empty( $dateQuery ) ) {
-                                        $contentQuery = " AND " . $contentQuery;
-                                }
-                        }
-                        if ( !empty( $contentQuery ) && !empty( $dateQuery ) ) {
-
-                                $postQuery = $wpdb->prepare( " AND `comment_post_ID` = %d ", $this->post_id );
-
-                                $comment_id = $wpdb->get_var( "SELECT `comment_ID` FROM $wpdb->comments WHERE " . $dateQuery . " " . $contentQuery . " " . $postQuery . " ORDER BY `comment_ID` ASC limit 0,1" );
+                                // phpcs:disable WordPress.DB.DirectDatabaseQuery
+                                $comment_id = $wpdb->get_var(
+                                        $wpdb->prepare(
+                                                "SELECT `comment_ID` FROM {$wpdb->comments} WHERE `comment_date` = %s AND `comment_content` IN (%s,%s) AND `comment_post_ID` = %d ORDER BY `comment_ID` ASC LIMIT 0,1",
+                                                trim( $date ),
+                                                trim( $content ),
+                                                preg_replace( '%[ \t\n]%', '', trim( $content ) ),
+                                                $this->post_id
+                                        )
+                                );
+                                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                                 if ( $comment_id && $comment_id > 0 ) {
                                         $this->existing_item_id = absint( $comment_id );
                                 }
                                 unset( $comment_id );
                         }
-                        unset( $content );
+                        unset( $content, $date );
                 } elseif ( $wpie_duplicate_indicator === "cf" ) {
 
                         $meta_key = wpie_sanitize_field( $this->get_field_value( 'wpie_existing_item_search_logic_cf_key' ) );
@@ -253,6 +253,7 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                         if ( !empty( $meta_key ) ) {
 
+                                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
                                 $args = array(
                                         'number'          => 1,
                                         'offset'          => 0,
@@ -266,13 +267,13 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                                 $comments = get_comments( $args );
 
-                                if ( !empty( $comments ) && !is_wp_error( $comments ) ) {
-                                        foreach ( $comments as $comment ) {
-                                                $this->existing_item_id = $comment->comment_ID;
-                                                break;
-                                        }
-                                }
-                                unset( $comments, $args );
+				if ( ! empty( $comments ) && ! is_wp_error( $comments ) ) {
+					foreach ( $comments as $comment ) {
+						$this->existing_item_id = is_object( $comment ) ? absint( $comment->comment_ID ) : absint( $comment );
+						break;
+					}
+				}
+				unset( $comments, $args );
                         }
 
                         unset( $meta_key, $meta_val );
@@ -287,12 +288,30 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                 $this->post_id = 0;
 
-                $post_types = $this->get_field_value( 'wpie_comment_parent_include_post_types' );
+                $raw_post_types = $this->get_field_value( 'wpie_comment_parent_include_post_types' );
+
+                if ( empty( $raw_post_types ) ) {
+
+                        unset( $raw_post_types );
+
+                        return;
+                }
+
+                if ( ! is_array( $raw_post_types ) ) {
+                        $raw_post_types = array( $raw_post_types );
+                }
+
+                $post_types = array();
+                foreach ( $raw_post_types as $pt ) {
+                        $pt = sanitize_key( $pt );
+                        if ( ! empty( $pt ) && ( post_type_exists( $pt ) || in_array( $pt, array( 'post', 'page', 'attachment', 'product' ), true ) ) ) {
+                                $post_types[] = $pt;
+                        }
+                }
+                $post_types = array_values( array_unique( $post_types ) );
 
                 if ( empty( $post_types ) ) {
-
-                        unset( $post_types );
-
+                        unset( $raw_post_types, $post_types );
                         return;
                 }
 
@@ -300,61 +319,78 @@ class WPIE_Comment extends \wpie\import\engine\WPIE_Import_Engine {
 
                 if ( empty( $parent_post ) ) {
 
-                        unset( $parent_post );
+                        unset( $raw_post_types, $post_types, $parent_post );
 
                         return;
                 }
 
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+                $placeholders = implode( ', ', array_fill( 0, count( $post_types ), '%s' ) );
+
                 if ( is_numeric( $parent_post ) && absint( $parent_post ) > 0 ) {
 
-                        $_post = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID = %d AND post_type IN ('" . implode( "','", $post_types ) . "') LIMIT 0,1", absint( $parent_post ) ) );
+                        $query_args = array_merge( array( absint( $parent_post ) ), $post_types );
+
+                        $_post = $wpdb->get_var(
+                                $wpdb->prepare(
+                                        "SELECT ID FROM {$wpdb->posts} WHERE ID = %d AND post_type IN ({$placeholders}) LIMIT 0,1",
+                                        $query_args
+                                )
+                        );
 
                         if ( $_post && absint( $_post ) > 0 ) {
                                 $this->post_id = absint( $_post );
                         }
-                        unset( $_post );
+                        unset( $_post, $query_args );
                 }
 
                 if ( $this->post_id === 0 ) {
 
+                        $query_args = array_merge( $post_types, array( wpie_sanitize_field( $parent_post ) ) );
+
                         $_post = $wpdb->get_var(
                                 $wpdb->prepare(
-                                        "SELECT ID FROM " . $wpdb->posts . "
+                                        "SELECT ID FROM {$wpdb->posts}
                                         WHERE
-                                            post_type IN ('" . implode( "','", $post_types ) . "')
+                                            post_type IN ({$placeholders})
                                             AND ID != 0
                                             AND post_title = %s
                                         LIMIT 0,1
-                                        ", wpie_sanitize_field( $parent_post )
+                                        ",
+                                        $query_args
                                 )
                         );
 
                         if ( $_post && absint( $_post ) > 0 ) {
                                 $this->post_id = absint( $_post );
                         }
-                        unset( $_post );
+                        unset( $_post, $query_args );
                 }
                 if ( $this->post_id === 0 ) {
 
+                        $query_args = array_merge( $post_types, array( wpie_sanitize_field( $parent_post ) ) );
+
                         $_post = $wpdb->get_var(
                                 $wpdb->prepare(
-                                        "SELECT ID FROM " . $wpdb->posts . "
+                                        "SELECT ID FROM {$wpdb->posts}
                                         WHERE
-                                            post_type IN ('" . implode( "','", $post_types ) . "')
+                                            post_type IN ({$placeholders})
                                             AND ID != 0
                                             AND post_name = %s
                                         LIMIT 0,1
-                                        ", wpie_sanitize_field( $parent_post )
+                                        ",
+                                        $query_args
                                 )
                         );
 
                         if ( $_post && absint( $_post ) > 0 ) {
                                 $this->post_id = absint( $_post );
                         }
-                        unset( $_post );
+                        unset( $_post, $query_args );
                 }
+                // phpcs:enable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
-                unset( $parent_post, $post_types );
+                unset( $parent_post, $post_types, $placeholders, $raw_post_types );
         }
 
         public function __destruct() {

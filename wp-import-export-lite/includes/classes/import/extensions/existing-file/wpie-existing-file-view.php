@@ -1,5 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View template scope variables.
 $uploader = new \wpie\import\upload\WPIE_Upload();
 
 $wpie_existing_file_list = $uploader->wpie_get_file_list( WPIE_UPLOAD_MAIN_DIR, false, true );

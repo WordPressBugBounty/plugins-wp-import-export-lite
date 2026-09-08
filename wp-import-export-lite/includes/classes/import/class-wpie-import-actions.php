@@ -60,18 +60,31 @@ class WPIE_Import_Actions extends WPIE_Import {
                 }
         }
 
-        public function wpie_import_validate_uploads() {
+	public function wpie_import_validate_uploads() {
 
-                Security::verify_request( 'wpie_new_import' );
+		Security::verify_request( 'wpie_new_import' );
 
-                parent::wpie_parse_upload_file();
-        }
+		parent::wpie_parse_upload_file();
+	}
 
-        public function wpie_import_get_filtered_records() {
-                Security::verify_request( 'wpie_new_import' );
+	/**
+	 * Handle change file AJAX request.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function wpie_import_change_file() {
 
-                parent::wpie_import_get_filtered_records();
-        }
+		Security::verify_request( 'wpie_new_import' );
+
+		wp_send_json_error( array( 'message' => __( 'Change file is not supported.', 'wp-import-export-lite' ) ) );
+	}
+
+	public function wpie_import_get_filtered_records() {
+		Security::verify_request( 'wpie_new_import' );
+
+		parent::wpie_import_get_filtered_records();
+	}
 
         public function wpie_import_get_fields() {
                 Security::verify_request( 'wpie_new_import' );

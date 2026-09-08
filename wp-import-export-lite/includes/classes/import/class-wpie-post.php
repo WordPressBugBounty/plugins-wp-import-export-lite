@@ -256,11 +256,13 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
 
                 $this->process_log[ 'last_records_status' ] = 'pending';
 
-                $this->process_log[ 'last_activity' ] = date( 'Y-m-d H:i:s' );
+                $this->process_log[ 'last_activity' ] = gmdate( 'Y-m-d H:i:s' );
 
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                 $wpdb->update( $wpdb->prefix . "wpie_template", array( 'last_update_date' => current_time( 'mysql' ),
                         'process_log'      => maybe_serialize( $this->process_log ) ), array(
                         'id' => $this->wpie_import_id ) );
+                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                 do_action( 'wpie_after_post_import', $this->item_id, $this->wpie_final_data, $this->wpie_import_option );
 
@@ -305,7 +307,9 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                         $duplicate_id = absint( wpie_sanitize_field( $this->get_field_value( 'wpie_existing_item_search_logic_id' ) ) );
 
                         if ( $duplicate_id > 0 ) {
+                                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                                 $_post = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID = %d LIMIT 1", $duplicate_id ) );
+                                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                                 if ( $_post && absint( $_post ) > 0 ) {
                                         $this->existing_item_id = absint( $duplicate_id );
@@ -315,39 +319,52 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                         unset( $duplicate_id );
                 } elseif ( $wpie_duplicate_indicator == "title" || $wpie_duplicate_indicator == "content" ) {
 
-                        $wpie_field = 'post_' . $wpie_duplicate_indicator;
-
                         $temp_field = 'wpie_item_' . $wpie_duplicate_indicator;
 
                         $wpie_field_data = $this->get_field_value( $temp_field );
 
                         if ( !empty( $wpie_field_data ) ) {
 
-                                $_post = $wpdb->get_var(
-                                        $wpdb->prepare(
-                                                "SELECT ID FROM " . $wpdb->posts . "
-                                                        WHERE
-                                                            post_type = %s
-                                                            AND ID != 0
-                                                            AND  `" . $wpie_field . "` IN ( %s,%s,%s )
-                                                        LIMIT 1
-                                ", wpie_sanitize_field( $this->get_field_value( 'wpie_import_type', true ) ), html_entity_decode( $wpie_field_data ), htmlentities( $wpie_field_data ), $wpie_field_data
-                                        )
-                                );
+                                $column = ( 'content' === $wpie_duplicate_indicator ) ? 'post_content' : 'post_title';
+
+                                // phpcs:disable WordPress.DB.DirectDatabaseQuery
+                                if ( 'post_content' === $column ) {
+                                        $_post = $wpdb->get_var(
+                                                $wpdb->prepare(
+                                                        "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND ID != 0 AND `post_content` IN ( %s,%s,%s ) LIMIT 1",
+                                                        sanitize_key( $this->get_field_value( 'wpie_import_type', true ) ),
+                                                        html_entity_decode( $wpie_field_data ),
+                                                        htmlentities( $wpie_field_data ),
+                                                        $wpie_field_data
+                                                )
+                                        );
+                                } else {
+                                        $_post = $wpdb->get_var(
+                                                $wpdb->prepare(
+                                                        "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND ID != 0 AND `post_title` IN ( %s,%s,%s ) LIMIT 1",
+                                                        sanitize_key( $this->get_field_value( 'wpie_import_type', true ) ),
+                                                        html_entity_decode( $wpie_field_data ),
+                                                        htmlentities( $wpie_field_data ),
+                                                        $wpie_field_data
+                                                )
+                                        );
+                                }
+                                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                                 if ( $_post && absint( $_post ) > 0 ) {
                                         $this->existing_item_id = absint( $_post );
                                 }
 
-                                unset( $_post );
+                                unset( $_post, $column );
                         }
-                        unset( $wpie_field, $wpie_field_data, $temp_field );
+                        unset( $wpie_field_data, $temp_field );
                 } elseif ( $wpie_duplicate_indicator == "slug" ) {
 
                         $wpie_field_data = $this->get_field_value( "wpie_existing_item_search_logic_slug" );
 
                         if ( !empty( $wpie_field_data ) ) {
 
+                                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                                 $_post = $wpdb->get_var(
                                         $wpdb->prepare(
                                                 "SELECT ID FROM " . $wpdb->posts . "
@@ -356,9 +373,10 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                                                             AND ID != 0
                                                             AND  `post_name` IN ( %s,%s,%s )
                                                         LIMIT 1
-                                ", wpie_sanitize_field( $this->get_field_value( 'wpie_import_type', true ) ), html_entity_decode( $wpie_field_data ), htmlentities( $wpie_field_data ), $wpie_field_data
+                                ", sanitize_key( $this->get_field_value( 'wpie_import_type', true ) ), html_entity_decode( $wpie_field_data ), htmlentities( $wpie_field_data ), $wpie_field_data
                                         )
                                 );
+                                // phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                                 if ( $_post && absint( $_post ) > 0 ) {
                                         $this->existing_item_id = absint( $_post );
@@ -380,20 +398,26 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                         }
 
 
-                        $post_types = wpie_sanitize_field( $this->get_field_value( 'wpie_import_type', true ) );
+                        $raw_import_type = sanitize_key( $this->get_field_value( 'wpie_import_type', true ) );
 
-                        if ( $post_types == "product" ) {
+                        if ( $raw_import_type === "product" ) {
 
                                 if ( strpos( trim( strtolower( $meta_key ) ), "sku" ) !== false ) {
                                         $meta_key = "_sku";
                                 }
 
-                                $post_types = [ "product", "product_variation" ];
+                                $post_types = array( "product", "product_variation" );
                         } else {
-                                $post_types = [ $post_types ];
+                                $clean_type = ( ! empty( $raw_import_type ) && ( post_type_exists( $raw_import_type ) || in_array( $raw_import_type, array( 'post', 'page', 'attachment' ), true ) ) ) ? $raw_import_type : 'post';
+                                $post_types = array( $clean_type );
+                                unset( $clean_type );
                         }
+                        unset( $raw_import_type );
 
-                        $sql_post_type = implode( "','", $post_types );
+                        // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+                        $placeholders = implode( ', ', array_fill( 0, count( $post_types ), '%s' ) );
+
+                        $query_args = array_merge( $post_types, array( $meta_key, $meta_val ) );
 
                         $id = $wpdb->get_var(
                                 $wpdb->prepare(
@@ -401,23 +425,25 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                                                 SELECT posts.ID
                                                 FROM {$wpdb->posts} as posts
                                                 INNER JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id
-                                                WHERE posts.post_type IN ( '{$sql_post_type}' )
+                                                WHERE posts.post_type IN ( {$placeholders} )
                                                 AND posts.post_status NOT IN ('trash','auto-draft' )
                                                 AND postmeta.meta_key = %s                                               
                                                 AND postmeta.meta_value = %s
                                                 ORDER BY posts.ID ASC
                                                 LIMIT 0, 1
                                         ",
-                                        $meta_key,
-                                        $meta_val
+                                        $query_args
                                 )
                         );
 
                         if ( absint( $id ) > 0 ) {
                                 $this->existing_item_id = $id;
                         }
+                        unset( $query_args );
 
                         if ( $this->existing_item_id === 0 ) {
+
+                                $query_args = array_merge( $post_types, array( $meta_key, $meta_val ) );
 
                                 $id = $wpdb->get_var(
                                         $wpdb->prepare(
@@ -425,35 +451,26 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                                                         SELECT posts.ID
                                                         FROM {$wpdb->posts} as posts
                                                         INNER JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id
-                                                        WHERE posts.post_type IN ( '{$sql_post_type}' )
+                                                        WHERE posts.post_type IN ( {$placeholders} )
                                                         AND postmeta.meta_key = %s                                               
                                                         AND postmeta.meta_value = %s
                                                         ORDER BY posts.ID ASC
                                                         LIMIT 0, 1
                                                 ",
-                                                $meta_key,
-                                                $meta_val
+                                                $query_args
                                         )
                                 );
 
                                 if ( absint( $id ) > 0 ) {
                                         $this->existing_item_id = $id;
                                 }
+                                unset( $query_args );
                         }
                         if ( $this->existing_item_id === 0 ) {
 
-                                $id = $wpdb->get_var(
-                                        $wpdb->prepare(
-                                                "
-                                                        SELECT posts.ID
-                                                        FROM {$wpdb->posts} as posts
-                                                        INNER JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id
-                                                        WHERE posts.post_type IN ( '{$sql_post_type}' )
-                                                        AND postmeta.meta_key IN ( %s,%s,%s )                                               
-                                                        AND postmeta.meta_value IN( %s,%s,%s,%s )
-                                                        ORDER BY posts.ID ASC
-                                                        LIMIT 0, 1
-                                                ",
+                                $query_args = array_merge(
+                                        $post_types,
+                                        array(
                                                 $meta_key,
                                                 trim( $meta_key ),
                                                 wpie_sanitize_field( $meta_key ),
@@ -464,12 +481,30 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                                         )
                                 );
 
+                                $id = $wpdb->get_var(
+                                        $wpdb->prepare(
+                                                "
+                                                        SELECT posts.ID
+                                                        FROM {$wpdb->posts} as posts
+                                                        INNER JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id
+                                                        WHERE posts.post_type IN ( {$placeholders} )
+                                                        AND postmeta.meta_key IN ( %s,%s,%s )                                               
+                                                        AND postmeta.meta_value IN( %s,%s,%s,%s )
+                                                        ORDER BY posts.ID ASC
+                                                        LIMIT 0, 1
+                                                ",
+                                                $query_args
+                                        )
+                                );
+
                                 if ( absint( $id ) > 0 ) {
                                         $this->existing_item_id = $id;
                                 }
+                                unset( $query_args );
                         }
+                        // phpcs:enable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
-                        unset( $meta_key, $meta_val, $post_types, $sql_post_type, $id );
+                        unset( $meta_key, $meta_val, $post_types, $placeholders, $id );
                 }
                 unset( $wpie_duplicate_indicator );
         }
@@ -712,6 +747,7 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
 
                 $post_id = 0;
 
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery
                 if ( is_numeric( $post ) && absint( $post ) > 0 ) {
 
                         $_post = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID = %d LIMIT 1", absint( $post ) ) );
@@ -731,7 +767,7 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                                                     AND ID != 0
                                                     AND ( `post_title` IN ( %s,%s,%s ) OR  `post_content` IN ( %s,%s,%s ))
                                                 LIMIT 1
-                                ", wpie_sanitize_field( $this->get_field_value( 'wpie_import_type', true ) ), html_entity_decode( $post ), htmlentities( $post ), $post, html_entity_decode( $post ), htmlentities( $post ), $post
+                                ", sanitize_key( $this->get_field_value( 'wpie_import_type', true ) ), html_entity_decode( $post ), htmlentities( $post ), $post, html_entity_decode( $post ), htmlentities( $post ), $post
                                 )
                         );
 
@@ -739,6 +775,7 @@ class WPIE_Post extends \wpie\import\engine\WPIE_Import_Engine {
                                 $post_id = absint( $_post );
                         }
                 }
+                // phpcs:enable WordPress.DB.DirectDatabaseQuery
                 return $post_id;
         }
 

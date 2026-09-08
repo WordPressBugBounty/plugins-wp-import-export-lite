@@ -29,6 +29,7 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
         private $attach        = [];
         private $gallary       = [];
         private $image_options = [];
+        private $image_meta    = [];
 
         public function __construct( $item_id = 0, $is_new_item = true, $wpie_import_option = array(), $wpie_import_record = array(), $import_type = "post" ) {
 
@@ -213,6 +214,11 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                                 }
                         }
 
+                        // Validate each extension in new_ext list to ensure only safe image extensions are permitted
+                        if ( ! empty( $extList ) && is_array( $extList ) ) {
+                                $extList = array_map( [ $this, 'validate_image_extension' ], $extList );
+                        }
+
                         $this->image_options[ 'new_ext' ] = $extList;
 
                         unset( $new_names );
@@ -327,6 +333,57 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                 return false;
         }
 
+                /**
+         * Validate new image file extension for wpie_item_new_ext.
+         *
+         * Allows only safe, valid image extensions and strictly blocks any executable,
+         * script, or server-parsed file types (e.g. php, phtml, phar, exe, etc.).
+         *
+         * @since 3.9.33
+         * @param string $ext File extension to validate.
+         * @return string Validated safe extension, or empty string if disallowed/invalid.
+         */
+        private function validate_image_extension( $ext = "" ) {
+
+                if ( empty( $ext ) || ! is_scalar( $ext ) ) {
+                        return "";
+                }
+
+                $clean_ext = strtolower( trim( ltrim( (string) $ext, "." ) ) );
+
+                if ( empty( $clean_ext ) ) {
+                        return "";
+                }
+
+                // Strictly block executable, script, or server-parsed extensions
+                if ( preg_match( '/^(php[0-9]?|phtml|phar|inc|cgi|pl|py|sh|bash|exe|bat|cmd|htaccess|htpasswd|ini|conf|svg)/i', $clean_ext ) ) {
+                        return "";
+                }
+
+                // Verify the extension is in WordPress core allowed mime types
+                $allowed_mimes = get_allowed_mime_types();
+                $is_allowed    = false;
+
+                foreach ( array_keys( $allowed_mimes ) as $mime_ext ) {
+                        foreach ( explode( '|', $mime_ext ) as $single_ext ) {
+                                if ( strtolower( $single_ext ) === $clean_ext ) {
+                                        $is_allowed = true;
+                                        break 2;
+                                }
+                        }
+                }
+
+                // Only allow recognized safe image extensions
+                if ( $is_allowed ) {
+                        $image_exts = array( 'jpg', 'jpeg', 'jpe', 'gif', 'png', 'bmp', 'webp', 'ico', 'tiff', 'tif', 'avif', 'heic' );
+                        if ( in_array( $clean_ext, $image_exts, true ) ) {
+                                return $clean_ext;
+                        }
+                }
+
+                return "";
+        }
+
         private function wpie_get_image_from_local( $filename = "", $newName = null, $newExt = null ) {
 
                 if ( (!wp_is_writable( $this->target_dir )) || empty( $filename ) ) {
@@ -350,9 +407,18 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                 }
 
                 if ( !empty( $newExt ) ) {
-                        $filename = sanitize_file_name( pathinfo( $filename, PATHINFO_FILENAME ) . '.' . ltrim( $newExt, "." ) );
+                        $valid_ext = $this->validate_image_extension( $newExt );
+                        if ( !empty( $valid_ext ) ) {
+                                $filename = sanitize_file_name( pathinfo( $filename, PATHINFO_FILENAME ) . '.' . $valid_ext );
+                        }
                 }
 
+                // Security check: validate file type and extension against core allowed mime types
+                $filetype_check = wp_check_filetype_and_ext( $file, $filename, get_allowed_mime_types() );
+                if ( empty( $filetype_check[ 'ext' ] ) || empty( $filetype_check[ 'type' ] ) ) {
+                        $this->import_log[] = '<strong>' . __( 'Warning', 'wp-import-export-lite' ) . '</strong> : ' . $filename . " " . __( 'File type is not allowed', 'wp-import-export-lite' );
+                        return false;
+                }
 
                 $upload_file = wp_upload_bits( $filename, null, file_get_contents( $file ) );
 
@@ -474,7 +540,10 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                 }
 
                 if ( !empty( $newExt ) ) {
-                        $newFileName = sanitize_file_name( pathinfo( $newFileName, PATHINFO_FILENAME ) . '.' . ltrim( $newExt, "." ) );
+                        $valid_ext = $this->validate_image_extension( $newExt );
+                        if ( !empty( $valid_ext ) ) {
+                                $newFileName = sanitize_file_name( pathinfo( $newFileName, PATHINFO_FILENAME ) . '.' . $valid_ext );
+                        }
                 }
 
                 if ( $newFileName !== $fileName ) {
@@ -507,7 +576,7 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                 // If error storing permanently, unlink.
                 if ( \is_wp_error( $id ) ) {
                         if ( \file_exists( $file ) ) {
-                                \unlink( $file );
+                                \wp_delete_file( $file );
                         }
                         $this->import_log[] = '<strong>' . __( 'Warning', 'wp-import-export-lite' ) . '</strong> : ' . $id->get_error_message();
                         return false;
@@ -546,35 +615,39 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
 
                 if ( !empty( $this->attach ) ) {
 
-                        $keep_images = absint( (wpie_sanitize_field( $this->get_field_value( 'wpie_item_keep_images', true ) ) ) === 1 );
+			$keep_images = absint( $this->get_field_value( 'wpie_item_keep_images', true ) ) === 1;
 
-                        $attachments = array_diff( $this->attach, $this->images );
+			$attachments = array_diff( $this->attach, $this->images );
 
-                        if ( !empty( $attachments ) ) {
+			if ( ! empty( $attachments ) ) {
 
-                                foreach ( $attachments as $attach ) {
+				foreach ( $attachments as $attach ) {
 
-                                        if ( ($type === 'files' && !wp_attachment_is_image( $attach )) || ($type === 'images' && wp_attachment_is_image( $attach )) ) {
+					if ( ( $type === 'files' && ! wp_attachment_is_image( $attach ) ) || ( $type === 'images' && wp_attachment_is_image( $attach ) ) ) {
 
-                                                if ( $keep_images === false ) {
-                                                        wp_delete_attachment( $attach, true );
-                                                } else {
-                                                        $ids[] = $attach;
-                                                }
-                                        }
-                                }
-                        }
+						if ( ! $keep_images ) {
+							wp_delete_attachment( $attach, true );
+						} else {
+							$ids[] = $attach;
+						}
+					}
+				}
+			}
                         unset( $attachments, $keep_images );
 
                         global $wpdb;
 
                         if ( !empty( $ids ) ) {
 
-                                $ids_string = implode( ',', array_map( "absint", $ids ) );
-
-                                $wpdb->query( "UPDATE $wpdb->posts SET post_parent = 0 WHERE post_type = 'attachment' AND ID IN ( $ids_string )" );
-
-                                unset( $ids_string );
+                                $placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+                                // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Dynamic placeholders in prepared query.
+                                $wpdb->query(
+                                        $wpdb->prepare(
+                                                "UPDATE {$wpdb->posts} SET post_parent = 0 WHERE post_type = 'attachment' AND ID IN ( {$placeholders} )",
+                                                $ids
+                                        )
+                                );
+                                // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
                                 foreach ( $ids as $att_id ) {
                                         clean_attachment_cache( $att_id );
@@ -715,18 +788,23 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                                 if ( $full_size != $img_url ) {
 
                                         // check if full size image exists
-                                        $image_headers = get_headers( $full_size, true );
+                                        $head_response = wp_safe_remote_head( $full_size, [
+                                                'timeout'     => 10,
+                                                'redirection' => 5,
+                                                'sslverify'   => true,
+                                        ] );
 
-                                        if ( $image_headers !== false && isset( $image_headers[ 'Content-Type' ] ) && !empty( $image_headers[ 'Content-Type' ] ) ) {
-
-                                                $content_type = is_array( $image_headers[ 'Content-Type' ] ) ? end( $image_headers[ 'Content-Type' ] ) : $image_headers[ 'Content-Type' ];
-
-                                                if ( strpos( $content_type, 'image' ) !== false ) {
+                                        if ( ! is_wp_error( $head_response ) && 200 === wp_remote_retrieve_response_code( $head_response ) ) {
+                                                $content_type = wp_remote_retrieve_header( $head_response, 'content-type' );
+                                                if ( is_array( $content_type ) ) {
+                                                        $content_type = end( $content_type );
+                                                }
+                                                if ( ! empty( $content_type ) && strpos( $content_type, 'image' ) !== false ) {
                                                         $img_url = $full_size;
                                                 }
                                         }
 
-                                        unset( $image_headers );
+                                        unset( $head_response );
                                 }
 
                                 unset( $full_size );
@@ -749,6 +827,12 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
                 return $content;
         }
 
+        /**
+         * Upload media file to uploads directory and create attachment.
+         *
+         * Pre-validates file type and extension against WordPress core's get_allowed_mime_types()
+         * before copying to the uploads directory, preventing arbitrary file upload / RCE / XSS.
+         */
         private function media_handle_upload( $file_array, $post_id = 0, $desc = null, $post_data = array() ) {
 
                 $oFileUrl = isset( $file_array[ 'url' ] ) ? $file_array[ 'url' ] : "";
@@ -761,16 +845,33 @@ class WPIE_Images extends \wpie\import\base\WPIE_Import_Base {
 
                 $name = \wp_unique_filename( $uploads[ 'path' ], $oFileName );
 
+                // Security check: validate file type and extension against allowed mime types before copying.
+                $filetype_check = wp_check_filetype_and_ext( $file_array[ 'tmp_name' ], $name, get_allowed_mime_types() );
+
+                if ( empty( $filetype_check[ 'ext' ] ) || empty( $filetype_check[ 'type' ] ) ) {
+                        if ( ! empty( $file_array[ 'tmp_name' ] ) && file_exists( $file_array[ 'tmp_name' ] ) ) {
+                                @wp_delete_file( $file_array[ 'tmp_name' ] );
+                        }
+                        return new \WP_Error( 'wpie_import_error', __( 'Sorry, you are not allowed to upload this file type.', 'wp-import-export-lite' ) );
+                }
+
+                if ( ! empty( $filetype_check[ 'proper_filename' ] ) ) {
+                        $name = \wp_unique_filename( $uploads[ 'path' ], $filetype_check[ 'proper_filename' ] );
+                }
+
                 // Move the file to the uploads dir.
                 $newFile = $uploads[ 'path' ] . "/" . $name;
 
                 if ( !copy( $file_array[ 'tmp_name' ], $newFile ) ) {
+                        if ( ! empty( $file_array[ 'tmp_name' ] ) && file_exists( $file_array[ 'tmp_name' ] ) ) {
+                                @wp_delete_file( $file_array[ 'tmp_name' ] );
+                        }
                         return new \WP_Error( 'wpie_import_error', sprintf( __( "File Download Error : Can't copy File", 'wp-import-export-lite' ), $oFileUrl ) );
                 }
 
-                unlink( $file_array[ 'tmp_name' ] );
+                wp_delete_file( $file_array[ 'tmp_name' ] );
 
-                $fileType = wp_check_filetype( $newFile );
+                $fileType = ! empty( $filetype_check[ 'type' ] ) ? $filetype_check : wp_check_filetype( $newFile );
 
                 $file = [
                         'file' => $newFile,

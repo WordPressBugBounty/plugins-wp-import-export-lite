@@ -25,33 +25,71 @@ class WPIE_Existing_File extends \wpie\import\upload\WPIE_Upload {
                         return new \WP_Error( 'wpie_import_error', __( 'File Name is empty', 'wp-import-export-lite' ) );
                 }
 
-                $filePath = WPIE_UPLOAD_MAIN_DIR . "/" . $fileName;
+                if ( ! defined( 'WPIE_UPLOAD_MAIN_DIR' ) ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'Upload directory is not defined', 'wp-import-export-lite' ) );
+                }
 
-                if ( ! file_exists( $filePath ) ) {
+                $baseDir = realpath( WPIE_UPLOAD_MAIN_DIR );
+                if ( false === $baseDir || ! is_dir( $baseDir ) ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'Upload directory not found', 'wp-import-export-lite' ) );
+                }
 
-                        unset( $fileName, $filePath );
+                $filePath     = WPIE_UPLOAD_MAIN_DIR . '/' . ltrim( $fileName, '/\\' );
+                $realFilePath = realpath( $filePath );
+
+                if ( false === $realFilePath || ! is_file( $realFilePath ) ) {
+
+                        unset( $fileName, $filePath, $realFilePath, $baseDir );
 
                         return new \WP_Error( 'wpie_import_error', __( 'File not exist', 'wp-import-export-lite' ) );
                 }
 
+                // Normalize path separators
+                $normalizedBaseDir  = rtrim( str_replace( '\\', '/', $baseDir ), '/' ) . '/';
+                $normalizedFilePath = str_replace( '\\', '/', $realFilePath );
 
-                chmod( $filePath, 0755 );
+                // Strictly confine to WPIE_UPLOAD_MAIN_DIR
+                $isWindows   = ( DIRECTORY_SEPARATOR === '\\' );
+                $isContained = $isWindows
+                        ? ( 0 === stripos( $normalizedFilePath, $normalizedBaseDir ) )
+                        : ( 0 === strpos( $normalizedFilePath, $normalizedBaseDir ) );
 
-                $newfiledir = parent::wpie_create_safe_dir_name( $fileName );
+                if ( ! $isContained ) {
+                        unset( $fileName, $filePath, $realFilePath, $baseDir, $normalizedBaseDir, $normalizedFilePath );
 
-                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir );
+                        return new \WP_Error( 'wpie_import_error', __( 'Invalid file path', 'wp-import-export-lite' ) );
+                }
 
-                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/original" );
+                // Check allowed extensions BEFORE creating directories or copying
+                $safeFileName = function_exists( 'wp_basename' ) ? wp_basename( $realFilePath ) : basename( $realFilePath );
+                if ( ! preg_match( '%\W(xml|zip|csv|xls|xlsx|ods|txt|json|gz|tar)$%i', trim( $safeFileName ) ) ) {
+                        unset( $fileName, $filePath, $realFilePath, $baseDir, $normalizedBaseDir, $normalizedFilePath, $safeFileName );
 
-                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/parse" );
+                        return new \WP_Error( 'wpie_import_error', __( 'Uploaded file must be XML, CSV, ZIP, XLS, XLSX, ODS, TXT, JSON, GZ, TAR', 'wp-import-export-lite' ) );
+                }
 
-                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/parse/chunks" );
+                $newfiledir = parent::wpie_create_safe_dir_name( $safeFileName );
 
-                copy( $filePath, WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/original/" . $fileName );
+                $destDir = WPIE_UPLOAD_IMPORT_DIR . '/' . $newfiledir . '/original';
 
-                unset( $filePath );
+                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . '/' . $newfiledir );
+                wp_mkdir_p( $destDir );
+                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . '/' . $newfiledir . '/parse' );
+                wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . '/' . $newfiledir . '/parse/chunks' );
 
-                return parent::wpie_manage_import_file( $fileName, $newfiledir, $wpie_import_id );
+                $destFile = $destDir . '/' . $safeFileName;
+
+                if ( file_exists( $destFile ) ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'Destination file already exists', 'wp-import-export-lite' ) );
+                }
+
+                if ( ! copy( $realFilePath, $destFile ) ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'Failed to copy file', 'wp-import-export-lite' ) );
+                }
+
+                unset( $filePath, $realFilePath, $baseDir, $normalizedBaseDir, $normalizedFilePath, $destDir, $destFile );
+
+                return $this->wpie_manage_import_file( $safeFileName, $newfiledir, $wpie_import_id );
         }
 
 }

@@ -1,6 +1,6 @@
 ﻿WP Import Export Lite
 
-Copyright 2020 by the VJinfotech 
+Copyright 2026 by the VJinfotech 
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,69 +1,95 @@
 <?php
-
+/**
+ * WPIE Yoast SEO Export Extension Bootstrap
+ *
+ * @package    WPIE
+ * @subpackage WPIE/Export/Extensions/Yoast_SEO
+ */
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Class WPIE_Yoast_SEO_Export_Extension
+ *
+ * Checks Yoast SEO availability and binds field filter hooks.
+ */
 class WPIE_Yoast_SEO_Export_Extension {
 
-        public function __construct() {
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
 
-                if ( $this->isActiveYoastSEO() ) {
+		if ( $this->is_active_yoast_seo() ) {
 
-                        add_filter( 'wpie_prepare_post_fields', array( $this, 'prepare_yoast_addon' ), 10, 2 );
+			add_filter( 'wpie_prepare_post_fields', array( $this, 'prepare_yoast_addon' ), 10, 2 );
 
-                        add_filter( 'wpie_prepare_taxonomy_fields', array( $this, 'prepare_yoast_addon' ), 10, 2 );
+			add_filter( 'wpie_prepare_taxonomy_fields', array( $this, 'prepare_yoast_addon' ), 10, 2 );
 
-                        add_filter( 'wpie_prepare_export_addons', array( $this, 'prepare_yoast_addon' ), 10, 2 );
-                }
-        }
+			add_filter( 'wpie_prepare_export_addons', array( $this, 'prepare_yoast_addon' ), 10, 2 );
+		}
+	}
 
-        public function prepare_yoast_addon( $addons = [], $export_type = "post" ) {
+	/**
+	 * Register Yoast SEO exporter class in addons list.
+	 *
+	 * @param array        $addons      Active addon classes.
+	 * @param array|string $export_type Export post type or taxonomy.
+	 * @return array
+	 */
+	public function prepare_yoast_addon( $addons = array(), $export_type = 'post' ) {
 
-                $export_type = is_array( $export_type ) && isset( $export_type[ 0 ] ) ? $export_type[ 0 ] : $export_type;
+		$export_type = is_array( $export_type ) && isset( $export_type[0] ) ? $export_type[0] : $export_type;
 
-                if ( in_array( $export_type, [ "shop_coupon", "comments", "product_reviews", "shop_order", "users", "shop_customer", "product_attributes" ] ) ) {
-                        return $addons;
-                }
+		if ( in_array( $export_type, array( 'shop_coupon', 'comments', 'product_reviews', 'shop_order', 'users', 'shop_customer', 'product_attributes' ), true ) ) {
+			return $addons;
+		}
 
-                if ( $export_type === "taxonomies" ) {
+		if ( 'taxonomies' === $export_type ) {
 
-                        $fileName = WPIE_EXPORT_CLASSES_DIR . '/extensions/yoast-seo/class-wpie-yoast-seo_taxonomy.php';
+			$file_name = WPIE_EXPORT_CLASSES_DIR . '/extensions/yoast-seo/class-wpie-yoast-seo_taxonomy.php';
 
-                        $class = '\wpie\export\yoast_seo\WPIE_Yoast_SEO_Taxonomy_Export';
-                } else {
-                        $fileName = WPIE_EXPORT_CLASSES_DIR . '/extensions/yoast-seo/class-wpie-yoast-seo.php';
+			$class = '\wpie\export\yoast_seo\WPIE_Yoast_SEO_Taxonomy_Export';
+		} else {
+			$file_name = WPIE_EXPORT_CLASSES_DIR . '/extensions/yoast-seo/class-wpie-yoast-seo.php';
 
-                        $class = '\wpie\export\yoast_seo\WPIE_Yoast_SEO_Export';
-                }
+			$class = '\wpie\export\yoast_seo\WPIE_Yoast_SEO_Export';
+		}
 
-                if ( file_exists( $fileName ) ) {
+		if ( file_exists( $file_name ) ) {
+			require_once $file_name;
+		}
 
-                        require_once($fileName);
-                }
+		if ( '' !== $class && ! in_array( $class, $addons, true ) ) {
+			$addons[] = $class;
+		}
 
-                if ( $class != "" && !in_array( $class, $addons ) ) {
-                        $addons[] = $class;
-                }
+		unset( $class, $file_name );
 
-                unset( $class, $fileName );
+		return $addons;
+	}
 
-                return $addons;
-        }
+	/**
+	 * Check if Yoast SEO plugin is currently active.
+	 *
+	 * @return bool
+	 */
+	private function is_active_yoast_seo() {
 
-        private function isActiveYoastSEO() {
+		if ( defined( 'WPSEO_VERSION' ) ) {
+			return true;
+		}
 
-                if ( defined( "WPSEO_VERSION" ) ) {
-                        return true;
-                }
+		if ( ! function_exists( 'is_plugin_active' ) && defined( 'ABSPATH' ) && file_exists( ABSPATH . 'wp-admin/includes/plugin.php' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
 
-                if ( function_exists( 'is_plugin_active' ) && (is_plugin_active( "wordpress-seo/wp-seo.php" ) || is_plugin_active( "wordpress-seo-premium/wp-seo-premium.php" ) ) ) {
+		if ( function_exists( 'is_plugin_active' ) && ( is_plugin_active( 'wordpress-seo/wp-seo.php' ) || is_plugin_active( 'wordpress-seo-premium/wp-seo-premium.php' ) ) ) {
+			return true;
+		}
 
-                        return true;
-                }
-
-                return false;
-        }
-
+		return false;
+	}
 }
 
 new WPIE_Yoast_SEO_Export_Extension();

@@ -17,6 +17,16 @@ class File_Header {
 
         public function get_filename() {
 
+                if ( empty( $this->url ) ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is empty', 'wp-import-export-lite' ) );
+                }
+
+                $validated_url = \wp_http_validate_url( $this->url );
+                if ( false === $validated_url ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is not valid', 'wp-import-export-lite' ) );
+                }
+                $this->url = $validated_url;
+
                 $headers = $this->get_headers();
 
                 if ( is_wp_error( $headers ) ) {
@@ -28,93 +38,83 @@ class File_Header {
 
         private function get_headers() {
 
-                $headers = @get_headers( $this->url, 1 );
-
-                if ( empty( $headers ) || !is_array( $headers ) || (isset( $headers[ 0 ] ) && strpos( $headers[ 0 ], "403" ) !== false) ) {
-                        return $this->get_headers_by_wp_request();
-                }
-
-                $data   = [];
-                $status = "";
-
-                foreach ( $headers as $key => $value ) {
-                        if ( is_int( $key ) ) {
-                                $status = $value;
-                                continue;
-                        } elseif ( is_array( $value ) ) {
-                                $value = end( $value );
-                        }
-                        $key = strtolower( $key );
-
-                        preg_replace( '#(\s+)#i', ' ', $value );
-
-                        $data[ $key ] = $value;
-                }
-
-                $status_code = 0;
-                if ( preg_match( '#^HTTP/(1\.\d)[ \t]+(\d+)#i', $status, $matches ) ) {
-                        $status_code = isset( $matches[ 2 ] ) && !empty( $matches[ 2 ] ) ? intval( $matches[ 2 ] ) : 0;
-                }
-
-                $data[ "status" ] = $status_code;
-
-                if ( $status_code !== 200 ) {
-                        $error = get_status_header_desc( $status_code );
-                        if ( empty( $error ) ) {
-                                $error = sprintf( __( "File Download Error : %s invalid http response status code", 'wp-import-export-lite' ), $status_code );
-                        }
-                        return new \WP_Error( 'wpie_error', $error );
-                }
-
-                return $data;
+                return $this->get_headers_by_wp_request();
         }
 
         private function get_headers_by_wp_request() {
 
-                $response = wp_safe_remote_head( $this->url, [ 'timeout' => 30, 'redirection' => 10, 'sslverify' => false ] );
+                $response = wp_safe_remote_head( $this->url, [
+                        'timeout'     => 30,
+                        'redirection' => 10,
+                        'sslverify'   => true,
+                ] );
 
                 if ( is_wp_error( $response ) ) {
-
-                        $headers = $this->get_headers_by_guzzle_request();
-
-                        if ( !is_wp_error( $headers ) ) {
-                                return $headers;
-                        }
-
                         return $response;
                 }
 
-                if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+                $response_code = wp_remote_retrieve_response_code( $response );
 
-                        return new \WP_Error( 'http_404', trim( wp_remote_retrieve_response_message( $response ) ) );
+                // Some servers do not support HEAD requests (e.g. 405 Method Not Allowed or 501 Not Implemented).
+                // Safely retry using a ranged GET request via WordPress HTTP API without downloading the entire body.
+                if ( 405 === $response_code || 501 === $response_code ) {
+                        $response = wp_safe_remote_get( $this->url, [
+                                'timeout'     => 30,
+                                'redirection' => 10,
+                                'sslverify'   => true,
+                                'headers'     => [ 'Range' => 'bytes=0-0' ],
+                        ] );
+
+                        if ( is_wp_error( $response ) ) {
+                                return $response;
+                        }
+
+                        $response_code = wp_remote_retrieve_response_code( $response );
                 }
 
-                return wp_remote_retrieve_headers( $response );
-        }
-
-        private function get_headers_by_guzzle_request() {
-
-                \wpie_load_vendor_autoloader();
-
-                try {
-                        $client = new \GuzzleHttp\Client();
-
-                        $response = $client->request( 'HEAD', $this->url, [ 'verify' => false ] );
-                } catch ( \Exception $e ) {
-                        return new \WP_Error( 'download_error', $e->getMessage() );
+                if ( 200 !== $response_code && 206 !== $response_code ) {
+                        $message = trim( wp_remote_retrieve_response_message( $response ) );
+                        if ( empty( $message ) ) {
+                                /* translators: %s: HTTP response status code. */
+                                $message = sprintf( __( "File Download Error : %s invalid http response status code", 'wp-import-export-lite' ), $response_code );
+                        }
+                        return new \WP_Error( 'http_' . $response_code, $message );
                 }
 
-                if ( 200 != $response->getStatusCode() ) {
+                $raw_headers = wp_remote_retrieve_headers( $response );
+                $data        = [];
 
-                        return new \WP_Error( 'download_error', __( "File Download Error : Invalid Status Code", 'wp-import-export-lite' ) );
+                if ( is_iterable( $raw_headers ) || is_array( $raw_headers ) ) {
+                        foreach ( $raw_headers as $key => $value ) {
+                                if ( is_array( $value ) ) {
+                                        $value = end( $value );
+                                }
+                                $data[ strtolower( $key ) ] = $value;
+                        }
                 }
 
-                return $response->getHeaders();
+                if ( ! isset( $data[ 'content-type' ] ) ) {
+                        $ct = wp_remote_retrieve_header( $response, 'content-type' );
+                        if ( ! empty( $ct ) ) {
+                                $data[ 'content-type' ] = is_array( $ct ) ? end( $ct ) : $ct;
+                        }
+                }
+
+                if ( ! isset( $data[ 'content-disposition' ] ) ) {
+                        $cd = wp_remote_retrieve_header( $response, 'content-disposition' );
+                        if ( ! empty( $cd ) ) {
+                                $data[ 'content-disposition' ] = is_array( $cd ) ? end( $cd ) : $cd;
+                        }
+                }
+
+                $data[ 'status' ] = $response_code;
+
+                return $data;
         }
 
         private function generate_filename( $headers = [] ) {
 
-                $url_data  = parse_url( urldecode( $this->url ) );
+                $url_data  = wp_parse_url( urldecode( $this->url ) );
                 $url_path  = isset( $url_data[ 'path' ] ) ? $url_data[ 'path' ] : "";
                 $path_info = trim( $url_path ) !== "" ? pathinfo( $url_path ) : pathinfo( urldecode( $this->url ) );
                 $url_ext   = isset( $path_info[ 'extension' ] ) && !empty( $path_info[ 'extension' ] ) ? strtolower( trim( $path_info[ 'extension' ] ) ) : "";

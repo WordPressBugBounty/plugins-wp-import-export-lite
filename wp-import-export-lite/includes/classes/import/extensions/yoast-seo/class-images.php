@@ -189,7 +189,7 @@ class WPIE_Images {
                 // If error storing permanently, unlink.
                 if ( \is_wp_error( $id ) ) {
                         if ( \file_exists( $file ) ) {
-                                \unlink( $file );
+                                \wp_delete_file( $file );
                         }
                         return new \WP_Error( 'imageDownloadError', '<strong>' . __( 'Warning', 'wp-import-export-lite' ) . '</strong> : ' . $id->get_error_message() );
                 }

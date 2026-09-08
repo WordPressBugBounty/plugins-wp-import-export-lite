@@ -13,14 +13,179 @@ if ( file_exists( WPIE_IMPORT_CLASSES_DIR . '/class-wpie-import-engine.php' ) ) 
 class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
         protected $import_type = "user";
-        private $login_user_id = false;
+        protected $login_user_id = false;
 
-        private function get_login_user_id() {
+        protected function get_login_user_id() {
 
-                if ( $this->login_user_id === false ) {
-                        $this->login_user_id = \get_current_user_id();
+                $current_id = \get_current_user_id();
+                if ( $current_id > 0 ) {
+                        return $current_id;
                 }
-                return $this->login_user_id;
+                return ( $this->login_user_id !== false ) ? $this->login_user_id : 0;
+        }
+
+        public function get_importer() {
+                $user_id = $this->get_login_user_id();
+                if ( $user_id > 0 ) {
+                        $user = \get_user_by( 'id', $user_id );
+                        if ( $user ) {
+                                return $user;
+                        }
+                }
+                if ( ! empty( $this->import_username ) ) {
+                        $user = \get_user_by( 'login', $this->import_username );
+                        if ( $user ) {
+                                return $user;
+                        }
+                }
+                return false;
+        }
+
+        public function can_manage_superior_users() {
+                $importer = $this->get_importer();
+                if ( ! $importer ) {
+                        return false;
+                }
+
+                if ( \is_multisite() && \is_super_admin( $importer->ID ) ) {
+                        return true;
+                }
+
+                if ( \user_can( $importer, 'wpie_update_superior_users' ) || \user_can( $importer, 'wpie_update_superior_user' ) ) {
+                        return true;
+                }
+
+                if ( ! \is_multisite() && ( \user_can( $importer, 'administrator' ) || \user_can( $importer, 'manage_options' ) ) ) {
+                        return true;
+                }
+
+                return false;
+        }
+
+        public function is_superior_user( $target_user ) {
+                if ( ! $target_user ) {
+                        return false;
+                }
+
+                $importer = $this->get_importer();
+                if ( ! $importer ) {
+                        return true;
+                }
+
+                if ( \is_multisite() && \is_super_admin( $target_user->ID ) ) {
+                        if ( ! \is_super_admin( $importer->ID ) ) {
+                                return true;
+                        }
+                }
+
+                if ( \user_can( $target_user, 'administrator' ) || \user_can( $target_user, 'manage_options' ) ) {
+                        if ( ! \user_can( $importer, 'administrator' ) && ! \user_can( $importer, 'manage_options' ) ) {
+                                return true;
+                        }
+                }
+
+                if ( ! empty( $target_user->allcaps ) && is_array( $target_user->allcaps ) ) {
+                        foreach ( $target_user->allcaps as $cap => $grant ) {
+                                if ( $grant && ! \user_can( $importer, $cap ) ) {
+                                        return true;
+                                }
+                        }
+                }
+
+                return false;
+        }
+
+        public function is_superior_role( $role_slug ) {
+                if ( empty( $role_slug ) || ! is_string( $role_slug ) ) {
+                        return false;
+                }
+
+                $importer = $this->get_importer();
+                if ( ! $importer ) {
+                        return true;
+                }
+
+                $role_obj = \get_role( $role_slug );
+                if ( ! $role_obj ) {
+                        return true;
+                }
+
+                if ( $role_slug === 'administrator' && ! \user_can( $importer, 'administrator' ) && ! \user_can( $importer, 'manage_options' ) ) {
+                        return true;
+                }
+
+                if ( ! empty( $role_obj->capabilities ) && is_array( $role_obj->capabilities ) ) {
+                        foreach ( $role_obj->capabilities as $cap => $grant ) {
+                                if ( $grant && ! \user_can( $importer, $cap ) ) {
+                                        return true;
+                                }
+                        }
+                }
+
+                return false;
+        }
+
+        protected function is_safe_user_meta_key( $meta_key = "" ) {
+                if ( empty( $meta_key ) || ! is_string( $meta_key ) ) {
+                        return false;
+                }
+
+                $clean_key = strtolower( trim( $meta_key ) );
+
+                if ( strpos( $clean_key, "\0" ) !== false ) {
+                        return false;
+                }
+
+                if ( $clean_key === 'capabilities' || preg_match( '/(^|_)capabilities$/i', $clean_key ) ) {
+                        return false;
+                }
+
+                if ( $clean_key === 'user_level' || preg_match( '/(^|_)user_level$/i', $clean_key ) ) {
+                        return false;
+                }
+
+                $blocked_keys = array(
+                        'session_tokens',
+                        'primary_blog',
+                        'source_domain',
+                        'wp_user_avatar',
+                        'default_password_nag',
+                        'account_status',
+                        'user_pass',
+                        'user_activation_key'
+                );
+
+                if ( in_array( $clean_key, $blocked_keys, true ) ) {
+                        return false;
+                }
+
+                return true;
+        }
+
+        protected function update_meta( $meta_key = "", $meta_val = "" ) {
+                if ( ! $this->is_safe_user_meta_key( $meta_key ) ) {
+                        return false;
+                }
+                return parent::update_meta( $meta_key, $meta_val );
+        }
+
+        protected function remove_meta( $meta_key = "" ) {
+                if ( ! $this->is_safe_user_meta_key( $meta_key ) ) {
+                        return false;
+                }
+                return parent::remove_meta( $meta_key );
+        }
+
+        protected function get_meta( $meta_key = "", $is_single = false ) {
+                $metas = parent::get_meta( $meta_key, $is_single );
+                if ( empty( $meta_key ) && is_array( $metas ) ) {
+                        foreach ( array_keys( $metas ) as $k ) {
+                                if ( ! $this->is_safe_user_meta_key( $k ) ) {
+                                        unset( $metas[ $k ] );
+                                }
+                        }
+                }
+                return $metas;
         }
 
         public function process_import_data() {
@@ -36,6 +201,8 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                         $this->wpie_final_data[ 'last_name' ] = wpie_sanitize_field( $this->get_field_value( 'wpie_item_last_name' ) );
                 }
                 $roles = [];
+                $superior_role_attempted = false;
+                $attempted_role_name = "";
 
                 if ( $this->is_update_field( "role" ) ) {
 
@@ -57,6 +224,16 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
                                 $roles = $this->get_valid_roles( $userRoles );
 
+                                if ( ! $this->can_manage_superior_users() ) {
+                                        foreach ( $roles as $r_check ) {
+                                                if ( $this->is_superior_role( $r_check ) ) {
+                                                        $superior_role_attempted = true;
+                                                        $attempted_role_name = $r_check;
+                                                        break;
+                                                }
+                                        }
+                                }
+
                                 $role = isset( $roles[ 0 ] ) ? $roles[ 0 ] : "";
 
                                 if ( count( $roles ) <= 1 ) {
@@ -67,7 +244,21 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                         }
 
                         $this->wpie_final_data[ 'role' ] = apply_filters( 'wpie_import_user_role', $role );
+
+                        if ( ! $this->can_manage_superior_users() && ! empty( $this->wpie_final_data[ 'role' ] ) && $this->is_superior_role( $this->wpie_final_data[ 'role' ] ) ) {
+                                $superior_role_attempted = true;
+                                $attempted_role_name = $this->wpie_final_data[ 'role' ];
+                        }
                 }
+
+                if ( $superior_role_attempted && ! $this->can_manage_superior_users() ) {
+                        /* translators: %s: User role name. */
+                        $this->set_log( '<strong>' . __( 'ERROR', 'wp-import-export-lite' ) . '</strong> : ' . sprintf( __( 'You do not have permission to assign the superior role "%s".', 'wp-import-export-lite' ), esc_html( $attempted_role_name ) ) );
+                        $this->process_log[ 'imported' ]++;
+                        $this->process_log[ 'skipped' ]++;
+                        return true;
+                }
+
                 if ( $this->is_update_field( "nickname" ) ) {
 
                         $this->wpie_final_data[ 'nickname' ] = wpie_sanitize_field( $this->get_field_value( 'wpie_item_nickname' ) );
@@ -87,7 +278,11 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
                         $this->wpie_final_data[ 'user_pass' ] = wpie_sanitize_field( $this->get_field_value( 'wpie_item_user_pass' ) );
 
-                        $is_hashed_wp_password = ( absint( wpie_sanitize_field( $this->get_field_value( 'wpie_item_set_hashed_password' ) ) ) == 1);
+                        $is_hashed_wp_password = ( absint( wpie_sanitize_field( $this->get_field_value( 'wpie_item_set_hashed_password' ) ) ) == 1 );
+
+                        if ( $is_hashed_wp_password && ! $this->can_manage_superior_users() ) {
+                                $is_hashed_wp_password = false;
+                        }
                 }
 
                 if ( $this->is_update_field( "nicename" ) ) {
@@ -106,7 +301,7 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                                 $user_registered = current_time( 'mysql' );
                         }
 
-                        $this->wpie_final_data[ 'user_registered' ] = date( 'Y-m-d H:i:s', strtotime( $user_registered ) );
+                        $this->wpie_final_data[ 'user_registered' ] = gmdate( 'Y-m-d H:i:s', strtotime( $user_registered ) );
                 }
                 if ( $this->is_update_field( "display_name" ) ) {
 
@@ -139,6 +334,17 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                                 return true;
                         }
 
+                        if ( ! $this->can_manage_superior_users() ) {
+                                $assigned_role = isset( $this->wpie_final_data[ 'role' ] ) && ! empty( $this->wpie_final_data[ 'role' ] ) ? $this->wpie_final_data[ 'role' ] : \get_option( 'default_role' );
+                                if ( $this->is_superior_role( $assigned_role ) ) {
+                                        /* translators: %s: User role name. */
+                                        $this->set_log( '<strong>' . __( 'ERROR', 'wp-import-export-lite' ) . '</strong> : ' . sprintf( __( 'You do not have permission to assign the superior role "%s".', 'wp-import-export-lite' ), esc_html( $assigned_role ) ) );
+                                        $this->process_log[ 'imported' ]++;
+                                        $this->process_log[ 'skipped' ]++;
+                                        return true;
+                                }
+                        }
+
                         $this->item_id = wp_insert_user( $this->wpie_final_data );
                 } else {
 
@@ -152,6 +358,15 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
                                 return true;
                         }
+
+                        $target_user = \get_user_by( 'id', $this->existing_item_id );
+                        if ( $target_user && $this->is_superior_user( $target_user ) && ! $this->can_manage_superior_users() ) {
+                                $this->set_log( '<strong>' . __( 'Warning', 'wp-import-export-lite' ) . '</strong> : ' . __( 'You do not have permission to update superior users.', 'wp-import-export-lite' ) );
+                                $this->process_log[ 'skipped' ]++;
+                                $this->process_log[ 'imported' ]++;
+                                return true;
+                        }
+
                         $this->wpie_final_data[ 'ID' ] = $this->existing_item_id;
 
                         $this->item_id = wp_update_user( $this->wpie_final_data );
@@ -186,21 +401,24 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
                 $this->process_log[ 'last_records_status' ] = 'pending';
 
-                $this->process_log[ 'last_activity' ] = date( 'Y-m-d H:i:s' );
+                $this->process_log[ 'last_activity' ] = gmdate( 'Y-m-d H:i:s' );
 
                 $wpdb->update( $wpdb->prefix . "wpie_template", array( 'last_update_date' => current_time( 'mysql' ),
                         'process_log'      => maybe_serialize( $this->process_log ) ), array(
                         'id' => $this->wpie_import_id ) );
 
-                if ( $is_hashed_wp_password ) {
+                if ( $is_hashed_wp_password && $this->can_manage_superior_users() ) {
 
-                        $wpdb->query( $wpdb->prepare(
-                                        "
-				UPDATE `" . $wpdb->prefix . 'users' . "`
-				SET `user_pass` = %s
-				WHERE `ID` = %d
-				", $this->wpie_final_data[ 'user_pass' ], $this->item_id
-                                ) );
+                        $pass_hash = trim( (string) $this->wpie_final_data[ 'user_pass' ] );
+                        if ( preg_match( '/^(\$P\$|\$2y\$|\$argon2[a-z]*\$|[a-f0-9]{32})/i', $pass_hash ) ) {
+                                $wpdb->query( $wpdb->prepare(
+                                                "
+                                UPDATE `" . $wpdb->prefix . 'users' . "`
+                                SET `user_pass` = %s
+                                WHERE `ID` = %d
+                                ", $pass_hash, $this->item_id
+                                        ) );
+                        }
                 }
 
                 if ( empty( $send_notifications ) || absint( $send_notifications ) !== 1 ) {
@@ -221,6 +439,9 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                 if ( !empty( $roles ) ) {
 
                         foreach ( $roles as $role ) {
+                                if ( ! $this->can_manage_superior_users() && $this->is_superior_role( $role ) ) {
+                                        continue;
+                                }
                                 $this->item->add_role( $role );
                         }
                 }
@@ -258,9 +479,8 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
         protected function search_duplicate_item() {
 
-                global $wpdb;
-
-                $wpie_duplicate_indicator = empty( $this->get_field_value( 'wpie_existing_item_search_logic', true ) ) ? 'title' : wpie_sanitize_field( $this->get_field_value( 'wpie_existing_item_search_logic', true ) );
+		$raw_indicator = $this->get_field_value( 'wpie_existing_item_search_logic', true );
+		$wpie_duplicate_indicator = empty( $raw_indicator ) ? 'email' : wpie_sanitize_field( $raw_indicator );
 
                 if ( $wpie_duplicate_indicator == "id" ) {
 

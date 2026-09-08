@@ -17,19 +17,22 @@ if ( file_exists( WPIE_IMPORT_CLASSES_DIR . '/class-wpie-import-base.php' ) ) {
 
 abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
 
-        abstract function process_import_data();
+	abstract public function process_import_data();
 
-        abstract protected function search_duplicate_item();
+	abstract protected function search_duplicate_item();
 
         public function wpie_import_data( $template_data = null ) {
 
-                global $importTemplate, $importOptions, $wpieImportType, $wpieImportRecords;
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Legacy globals maintained for add-on compatibility.
+		global $importTemplate, $importOptions, $wpieImportType, $wpieImportRecords;
 
-                $importTemplate = $template_data;
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Legacy global maintained for add-on compatibility.
+		$importTemplate = $template_data;
 
-                $this->wpie_import_id = $wpie_import_id       = isset( $template_data->id ) ? $template_data->id : 0;
+		$this->wpie_import_id = $wpie_import_id       = isset( $template_data->id ) ? $template_data->id : 0;
 
-                $this->wpie_import_option = $importOptions            = isset( $template_data->options ) && trim( $template_data->options ) != "" ? maybe_unserialize( $template_data->options ) : array();
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Legacy global maintained for add-on compatibility.
+		$this->wpie_import_option = $importOptions            = isset( $template_data->options ) && trim( $template_data->options ) != "" ? maybe_unserialize( $template_data->options ) : array();
 
                 $wpieImportType = $field_data     = isset( $importOptions[ "wpie_import_type" ] ) ? $importOptions[ "wpie_import_type" ] : "";
 
@@ -223,29 +226,33 @@ abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
 
         private function init_import_process() {
 
-                global $wpdb;
+		global $wpdb;
 
-                $is_search_duplicates = true;
+		$is_search_duplicates = true;
 
-                $this->set_log( "<strong>" . __( 'Record', 'wp-import-export-lite' ) . "</strong>" . " #" . ( $this->process_log[ 'imported' ] + 1) );
+		$process_last_records = false;
 
-                if ( isset( $this->process_log[ 'last_records_status' ] ) && $this->process_log[ 'last_records_status' ] == 'pending' && isset( $this->process_log[ 'last_records_id' ] ) ) {
+		$this->set_log( "<strong>" . __( 'Record', 'wp-import-export-lite' ) . "</strong>" . " #" . ( $this->process_log[ 'imported' ] + 1 ) );
 
-                        $_post = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID = %d LIMIT 1", intval( $this->process_log[ 'last_records_id' ] ) ) );
+		if ( isset( $this->process_log[ 'last_records_status' ] ) && $this->process_log[ 'last_records_status' ] == 'pending' && isset( $this->process_log[ 'last_records_id' ] ) ) {
 
-                        if ( $_post ) {
+			$_post = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID = %d LIMIT 1", intval( $this->process_log[ 'last_records_id' ] ) ) );
 
-                                $this->is_new_item = false;
+			if ( $_post ) {
 
-                                $is_search_duplicates = false;
+				$this->is_new_item = false;
 
-                                $this->existing_item_id = intval( $this->process_log[ 'last_records_id' ] );
+				$is_search_duplicates = false;
 
-                                $this->set_log( __( 'Complete Pending Last Records', 'wp-import-export-lite' ) . " #" . $this->existing_item_id );
-                        }
+				$this->existing_item_id = intval( $this->process_log[ 'last_records_id' ] );
 
-                        unset( $_post );
-                }
+				$process_last_records = true;
+
+				$this->set_log( __( 'Complete Pending Last Records', 'wp-import-export-lite' ) . " #" . $this->existing_item_id );
+			}
+
+			unset( $_post );
+		}
 
                 if ( !empty( $this->addons ) ) {
 
@@ -376,7 +383,7 @@ abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
 
                 $this->process_log[ 'last_records_status' ] = 'completed';
 
-                $this->process_log[ 'last_activity' ] = date( 'Y-m-d H:i:s' );
+                $this->process_log[ 'last_activity' ] = gmdate( 'Y-m-d H:i:s' );
         }
 
         protected function wpie_import_images() {
@@ -503,6 +510,10 @@ abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
                                 if ( in_array( $meta_key, array( '_thumbnail_id', '_product_image_gallery', '_wpie_order_number' ) ) ) {
                                         continue;
                                 }
+
+                                if ( ( $this->import_type === "user" || $this->import_type === "shop_customer" ) && ( preg_match( '/(^|_)capabilities$/i', $meta_key ) || preg_match( '/(^|_)user_level$/i', $meta_key ) || in_array( strtolower( $meta_key ), array( 'session_tokens', 'primary_blog', 'source_domain', 'user_pass', 'user_activation_key' ), true ) ) ) {
+                                        continue;
+                                }
                                 if ( ($not_add_empty === 1 && ((is_scalar( $meta_value ) && trim( ( string ) $meta_value ) !== "") || (!empty( $meta_value ))) ) || $not_add_empty !== 1 ) {
 
                                         $this->update_meta( $meta_key, $meta_value );
@@ -510,13 +521,13 @@ abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
                         }
                 }
 
-                if ( !empty( $existing_metas ) ) {
-                        foreach ( $existing_metas as $meta ) {
-                                $this->remove_meta( $meta );
-                        }
-                }
-                unset( $existing_metas, $exclude_metas, $includes_metas, $cf );
-        }
+		if ( ! empty( $existing_metas ) && is_array( $existing_metas ) ) {
+			foreach ( array_keys( $existing_metas ) as $meta_key ) {
+				$this->remove_meta( $meta_key );
+			}
+		}
+		unset( $existing_metas, $exclude_metas, $includes_metas, $cf );
+	}
 
         private function get_cf_list( $wpie_item_cf ) {
 
@@ -648,7 +659,7 @@ abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
 
         private function prepare_log( $log = "" ) {
 
-                $data = "[" . date( 'h:i:s' ) . "] " . $log;
+                $data = "[" . gmdate( 'h:i:s' ) . "] " . $log;
 
                 $this->import_log[] = "<p>" . $data . "</p>";
 
@@ -657,9 +668,30 @@ abstract class WPIE_Import_Engine extends \wpie\import\base\WPIE_Import_Base {
                 unset( $log, $data );
         }
 
-        private function remove_current_item() {
-                wp_delete_post( $this->item_id, true );
-        }
+	/**
+	 * Remove current item when import fails or encounters fatal errors.
+	 *
+	 * Safely invokes appropriate deletion mechanism depending on import type.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	private function remove_current_item() {
+		if ( ! empty( $this->item_id ) ) {
+			if ( $this->import_type === "taxonomy" || $this->import_type === "product_attribute" ) {
+				$taxonomy = $this->get_field_value( 'wpie_taxonomy_type', true );
+				if ( ! empty( $taxonomy ) ) {
+					wp_delete_term( $this->item_id, $taxonomy );
+				}
+			} elseif ( $this->import_type === "user" || $this->import_type === "shop_customer" ) {
+				wp_delete_user( $this->item_id );
+			} elseif ( $this->import_type === "comment" ) {
+				wp_delete_comment( $this->item_id, true );
+			} else {
+				wp_delete_post( $this->item_id, true );
+			}
+		}
+	}
 
         public function __destruct() {
                 parent::__destruct();

@@ -1,131 +1,139 @@
-﻿=== WP Import Export Lite ===
+=== WP Import Export Lite ===
 Contributors: vjinfotech
 Tags: export, import, migrate, csv, schedule
 Donate link: https://1.envato.market/1krom
 Requires at least: 4.4
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 3.9.32
-License: GPLv3
-License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Stable tag: 3.9.33
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Complete Import & Export solution for Posts, Pages, Custom Post, Users, Taxonomies, Comments etc.
+Complete Import & Export solution for Posts, Pages, Custom Posts, Users, Taxonomies, Comments, and more.
 
 == Description ==
 
-WordPress Import Export Plugin is an easy, quick and advanced Import & Export site data.
+WordPress Import Export Plugin is an easy, fast, and advanced tool to import and export your WordPress site data.
 
-WordPress Import Export gives you ability to export you site data into Multiple file format and you can import those file in any of your site. All type of your Posts, Pages, Custom Post Types, Taxonomies, Comments and Users import/export in just one click. A great way to manage WordPress Site data between multiple sites. 
+WP Import Export gives you the ability to export your site data into multiple file formats and import those files into any WordPress site. All types of Posts, Pages, Custom Post Types, Taxonomies, Comments, and Users can be imported or exported with just a few clicks. It is an effective way to manage and migrate data across multiple WordPress installations.
 
-= WordPress Import Export Main Features =
+= Main Features =
 
-- Pause, Resume & Stop process for import & export
-- Background import & export
-- Scheduled import & export ( Premium )
-- Powerful Filter available for import & export
-- Drag & Drop Field mapping
-- 19+ Freemium AddOns for multiple plugin support
-- Multiple File Format support for import export
-- Import process Log
+- Pause, resume, and stop active imports and exports
+- Background processing for large imports and exports
+- Scheduled import & export (Available in Pro)
+- Powerful data filtering options
+- Drag-and-drop field mapping
+- Add-on integrations for popular WordPress plugins
+- Support for multiple file formats
+- Detailed import process logs
 
 = Pause, Resume & Stop =
-- import & export can be Pause, Resume & Stop.
-- plugin supports Pause and Resume with Background import & export
-- you can anytime stop any import & export processing
+- Imports and exports can be paused, resumed, and stopped at any stage.
+- Supports pause and resume functionality with background processing.
+- Cancel or stop any processing task whenever needed.
 
-= Background import & export =
-- import & export processing in background.
-- Background import & export can be pause, resume and stop.
-- multiple import & export can be process same time.
-- simple import & export can be converted to Background import & export
+= Background Import & Export =
+- Run import and export tasks asynchronously in the background.
+- Background jobs can be monitored, paused, resumed, and stopped.
+- Process multiple import and export tasks concurrently.
+- Convert standard import/export jobs into background processes with ease.
 
 = Powerful Filters =
-- you can filter any data when you export like post id is greater then 50.
-- for import, filter available for filtering your uploaded file data
+- Apply precise filter rules during export (e.g., export posts where Post ID is greater than 50).
+- Advanced filtering rules for uploaded source data during import.
 
 = Field Management =
-- for export, you can rearrange and edit fields in just one click.
-- for import,drag and drop field mapping facility available.
+- Rearrange and edit fields quickly before exporting.
+- Intuitive drag-and-drop field mapping for incoming import data.
 
-= Multiple File Format =
-- multiple file format support for import and export both.
-- supports zip archives
-- supports format csv, xls, xlsx, json, txt, ods and xml
+= Multiple File Formats =
+- Full support for both import and export across multiple formats.
+- Supports ZIP archives.
+- Supports CSV, XLS, XLSX, JSON, TXT, ODS, and XML file formats.
 
-= Schedule import & export ( Premium ) =
-- automatic schedule import export 
-- schedule import export management
-- support with auto background import export
+= Scheduled Import & Export (Pro) =
+- Set up automatic cron-scheduled imports and exports.
+- Centralized schedule management interface.
+- Runs reliably alongside background processing.
 
-= import Process Log =
-- complete process log available
-- step by step import each record log available
+= Import Process Log =
+- Comprehensive process and execution logs.
+- Step-by-step logging for each individual record.
 
-= 19+ Freemium AddOns =
+= Supported Add-Ons =
 - Yoast SEO Import & Export
-- ACF, ACF Pro Import & Export
+- ACF & ACF Pro Import & Export
 - WPML Import & Export
 - Polylang Import & Export
-- WooCommerce import & export 
-- Schedule import & export 
-- Attribute import & export 
-- Google Drive Import
-- Onedrive Import
-- DropBox Import
-- FTP/SFTP Import
-- Background Import Export
-- And much more
+- WooCommerce Import & Export (Pro)
+- Schedule Import & Export (Pro)
+- Attributes Import & Export
+- Google Drive Import (Pro)
+- Microsoft OneDrive Import (Pro)
+- Dropbox Import (Pro)
+- FTP / SFTP Import (Pro)
+- Background Import & Export
 
-== WP Import Export Professional Edition ==
-[youtube https://youtu.be/GZfjyFz1HzM /]
+= WP Import Export Professional Edition =
+[youtube https://www.youtube.com/watch?v=GZfjyFz1HzM]
 
-= Export Premium Addons =
+= Export Premium Add-Ons =
 - ACF / ACF Pro Export
-- Schedule Export
+- Scheduled Export
 - WooCommerce Export
 - WPML Export
-- Attribute export
+- Attributes Export
 - Polylang Export
 
-= Import Premium Addons =
+= Import Premium Add-Ons =
 - ACF / ACF Pro Import
 - Dropbox File Import
 - Upload From FTP/SFTP
 - Google Drive File Import
-- Microsoft Onedrive Import
-- Schedule Import
+- Microsoft OneDrive Import
+- Scheduled Import
 - WooCommerce Import
 - WPML Import
-- Attribute Import
+- Attributes Import
 - Polylang Import
 
 [Upgrade to the Pro edition of WP Import Export](https://1.envato.market/1krom)
 
 = Live Demo =
+[Try the WP Import Export Live Demo](https://demo.vjinfotech.com/wp-import-export/)
 
-[Try WP Import Export](https://demo.vjinfotech.com/wp-import-export/)
-
-= Documentation  =
-
-[documentation and video tutorials](https://plugins.vjinfotech.com/wordpress-import-export/documentation/)
+= Documentation =
+[Documentation and Video Tutorials](https://plugins.vjinfotech.com/wordpress-import-export/documentation/)
 
 == Installation ==
 
-= Automatic installation =
+= Automatic Installation =
 
-Automatic installation is the easiest way to install WordPress Import Export plugin.
+Automatic installation is the easiest way to install the WP Import Export plugin.
 
-To do it, log in to your WordPress admin panel and go to : Plugin -> Add New and click on Upload Plugin.
+1. Log in to your WordPress admin dashboard.
+2. Navigate to **Plugins -> Add New Plugin**.
+3. Click **Upload Plugin** at the top.
+4. Select the plugin ZIP file and click **Install Now**.
+5. Once installed, click **Activate Plugin**.
 
-Select the zip file and click on Install Now. After clicking that link, you will be asked if you are sure you want to install the plugin. Click yes and WordPress will automatically complete the installation process
+= Manual Installation =
 
-= Manual installation =
+1. Unzip the downloaded plugin archive.
+2. Upload the `wp-import-export-lite` folder to the `/wp-content/plugins/` directory on your web server via SFTP/FTP.
+3. Log in to your WordPress dashboard, navigate to **Plugins -> Installed Plugins**, and activate **WP Import Export Lite**.
 
-The manual installation involves uploading all the files to your web server through a FTP software.
+== Frequently Asked Questions ==
 
-Unzip the archive, then upload the wp-import-export-lite folder to wp-content/plugins directory.
+= Does this plugin support PHP 8.x? =
+Yes, WP Import Export Lite is fully compatible with PHP 5.6 through PHP 8.5+.
 
-Finally activate the plugin through your WordPress admin. 
+= Can I import data in the background? =
+Yes, you can enable background processing to allow large imports or exports to run asynchronously without timing out your browser.
+
+= Where can I get support or view documentation? =
+Documentation and tutorials are available at [VJInfotech Documentation](https://plugins.vjinfotech.com/wordpress-import-export/documentation/).
 
 == Screenshots ==
 1. Plugin Comparison
@@ -138,4 +146,51 @@ Finally activate the plugin through your WordPress admin.
 
 == Changelog ==
 
-[Full Changelog](https://plugins.vjinfotech.com/wordpress-import-export/change-log/)
+= 3.9.33 =
+* Fix: Maintenance update and compatibility verification with latest WordPress and PHP versions.
+* Fix: Minor UI and stability fixes.
+
+= 3.9.30 =
+* Fix: Security vulnerability reported by Wordfence related to file type upload by logged-in users.
+
+= 3.9.29 =
+* Fix: Security vulnerability reported by Wordfence related to file type upload by logged-in users.
+* Fix: Text domain loading too early.
+
+= 3.9.28 =
+* Fix: Security vulnerability reported by Wordfence related to sanitizing export preview data.
+
+= 3.9.27 =
+* Improvement: Limit the number of records in the managed import/export page.
+* Fix: Vulnerability of unserialization in import templates (Reported by Patchstack).
+* Fix: Export JSON file errors in specific environments.
+
+= 3.9.26 =
+* Fix: Prevent user creation without email when email field is empty.
+* Fix: Minor stability fixes.
+
+= 3.9.25 =
+* Fix: Background processing warning.
+* Tweak: Updated internal libraries.
+
+= 3.9.24 =
+* Fix: Post taxonomies not saved in settings.
+
+= 3.9.23 =
+* Fix: Import taxonomy package mapping issue.
+
+= 3.9.22 =
+* Fix: Import variable parsing and gallery image overwrite issues.
+
+= 3.9.21 =
+* Improvement: Product and ACF dedicated field updates.
+* Fix: Product out of stock status and auto-generated SKU ignore settings.
+
+= 3.9.20 =
+* Improvement: Comment import functionality.
+* Fix: WPML and Polylang translation updates for selected fields.
+
+== Upgrade Notice ==
+
+= 3.9.33 =
+Recommended update for full compatibility with modern WordPress and PHP environments, including latest security patches.

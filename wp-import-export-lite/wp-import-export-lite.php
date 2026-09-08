@@ -1,228 +1,281 @@
 <?php
-
-/*
-  Plugin Name: WP Import Export Lite
-  Description: The Advanced and powerful solution for importing and exporting data to WordPress. Import and Export to Posts, Pages, and Custom Post Types. Ability to update existing data, and much more.
-  Version: 3.9.32
-  Author: VJInfotech
-  Author URI: http://www.vjinfotech.com
-  Text Domain: wp-import-export-lite
-  Domain Path: /languages/
+/**
+ * Plugin Name:       WP Import Export Lite
+ * Plugin URI:        https://www.vjinfotech.com/
+ * Description:       The Advanced and powerful solution for importing and exporting data to WordPress. Import and Export to Posts, Pages, and Custom Post Types. Ability to update existing data, and much more.
+ * Version:           3.9.33
+ * Requires at least: 4.4
+ * Tested up to:      7.1
+ * Requires PHP:      5.6
+ * Author:            VJInfotech
+ * Author URI:        https://www.vjinfotech.com/
+ * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       wp-import-export-lite
+ * Domain Path:       /languages/
+ *
+ * @package WP_Import_Export_Lite
  */
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
-if (file_exists(realpath(plugin_dir_path(__FILE__)) . '/deactivate-plugins.php')) {
-        require_once(realpath(plugin_dir_path(__FILE__)) . '/deactivate-plugins.php');
-        add_action('admin_init', 'wpie_auto_deactivate_pro_plugins');
+// Auto deactivation of conflicting Pro/Lite plugins.
+if ( file_exists( dirname( __FILE__ ) . '/deactivate-plugins.php' ) ) {
+	require_once dirname( __FILE__ ) . '/deactivate-plugins.php';
+	add_action( 'admin_init', 'wpie_auto_deactivate_pro_plugins' );
 }
 
-// Plugin version
-if (!defined('WPIE_PLUGIN_VERSION')) {
-        define('WPIE_PLUGIN_VERSION', '3.9.32');
-}
-// Plugin version
-if (!defined('WPIE_DB_VERSION')) {
-        define('WPIE_DB_VERSION', '1.0.0');
+// Plugin version.
+if ( ! defined( 'WPIE_PLUGIN_VERSION' ) ) {
+	define( 'WPIE_PLUGIN_VERSION', '3.9.33' );
 }
 
-// Plugin base name
-if (!defined('WPIE_PLUGIN_FILE')) {
-        define('WPIE_PLUGIN_FILE', __FILE__);
+// Database schema version.
+if ( ! defined( 'WPIE_DB_VERSION' ) ) {
+	define( 'WPIE_DB_VERSION', '1.0.0' );
 }
 
-// Plugin Folder Path
-if (!defined('WPIE_PLUGIN_DIR')) {
-        define('WPIE_PLUGIN_DIR', realpath(plugin_dir_path(WPIE_PLUGIN_FILE)) . '/');
+// Plugin main file path.
+if ( ! defined( 'WPIE_PLUGIN_FILE' ) ) {
+	define( 'WPIE_PLUGIN_FILE', __FILE__ );
 }
 
-$plugin_url = plugin_dir_url(WPIE_PLUGIN_FILE);
-
-if (is_ssl()) {
-        $plugin_url = str_replace('http://', 'https://', $plugin_url);
-}
-if (!defined('WPIE_PLUGIN_URL')) {
-        define('WPIE_PLUGIN_URL', untrailingslashit($plugin_url));
+// Plugin directory path with normalized slashes.
+if ( ! defined( 'WPIE_PLUGIN_DIR' ) ) {
+	define( 'WPIE_PLUGIN_DIR', wp_normalize_path( plugin_dir_path( WPIE_PLUGIN_FILE ) ) );
 }
 
-// Plugin site path
-if (!defined('WPIE_PLUGIN_SITE')) {
-        define('WPIE_PLUGIN_SITE', 'http://www.vjinfotech.com');
-}
-if (!defined('WPIE_PLUGIN_API')) {
-        define('WPIE_PLUGIN_API', 'http://api.vjinfotech.com/');
-}
-if (!defined('WPIE_DOC_URL')) {
-        define('WPIE_DOC_URL', 'http://plugins.vjinfotech.com/wordpress-import-export/documentation/');
-}
-if (!defined('WPIE_SUPPORT_URL')) {
-        define('WPIE_SUPPORT_URL', 'http://www.vjinfotech.com/support/');
+// Plugin URL with correct scheme.
+if ( ! defined( 'WPIE_PLUGIN_URL' ) ) {
+	$wpie_plugin_url = untrailingslashit( plugin_dir_url( WPIE_PLUGIN_FILE ) );
+	if ( is_ssl() ) {
+		$wpie_plugin_url = set_url_scheme( $wpie_plugin_url, 'https' );
+	}
+	define( 'WPIE_PLUGIN_URL', $wpie_plugin_url );
+	unset( $wpie_plugin_url );
 }
 
-$wpupload_dir = wp_upload_dir();
-
-$wpie_upload_dir = $wpupload_dir['basedir'] . '/wp-import-export-lite';
-
-$wpie_upload_url = $wpupload_dir['baseurl'] . '/wp-import-export-lite';
-
-if (!defined('WPIE_SITE_UPLOAD_DIR')) {
-        define('WPIE_SITE_UPLOAD_DIR', $wpupload_dir['basedir']);
+// External resource URLs (using HTTPS).
+if ( ! defined( 'WPIE_PLUGIN_SITE' ) ) {
+	define( 'WPIE_PLUGIN_SITE', 'https://www.vjinfotech.com' );
+}
+if ( ! defined( 'WPIE_PLUGIN_API' ) ) {
+	define( 'WPIE_PLUGIN_API', 'https://api.vjinfotech.com/' );
+}
+if ( ! defined( 'WPIE_DOC_URL' ) ) {
+	define( 'WPIE_DOC_URL', 'https://plugins.vjinfotech.com/wordpress-import-export/documentation/' );
+}
+if ( ! defined( 'WPIE_SUPPORT_URL' ) ) {
+	define( 'WPIE_SUPPORT_URL', 'https://www.vjinfotech.com/support/' );
 }
 
-unset($wpupload_dir);
+// Upload directory paths and URLs.
+$wpie_upload_dir = wp_upload_dir();
 
-if (!defined('WPIE_UPLOAD_DIR')) {
-        define('WPIE_UPLOAD_DIR', $wpie_upload_dir);
+if ( ! defined( 'WPIE_SITE_UPLOAD_DIR' ) ) {
+	define( 'WPIE_SITE_UPLOAD_DIR', ! empty( $wpie_upload_dir['basedir'] ) ? wp_normalize_path( $wpie_upload_dir['basedir'] ) : '' );
 }
 
-if (!defined('WPIE_UPLOAD_URL')) {
-        define('WPIE_UPLOAD_URL', $wpie_upload_url);
-}
-unset($wpie_upload_url);
-
-if (!defined('WPIE_ASSETS_URL')) {
-        define('WPIE_ASSETS_URL', WPIE_PLUGIN_URL . '/assets');
+if ( ! defined( 'WPIE_UPLOAD_DIR' ) ) {
+	define( 'WPIE_UPLOAD_DIR', WPIE_SITE_UPLOAD_DIR . '/wp-import-export-lite' );
 }
 
-if (!defined('WPIE_UPLOAD_EXPORT_DIR')) {
-        define('WPIE_UPLOAD_EXPORT_DIR', WPIE_UPLOAD_DIR . "/export");
+if ( ! defined( 'WPIE_UPLOAD_URL' ) ) {
+	$wpie_base_url = ! empty( $wpie_upload_dir['baseurl'] ) ? $wpie_upload_dir['baseurl'] . '/wp-import-export-lite' : '';
+	if ( is_ssl() && ! empty( $wpie_base_url ) ) {
+		$wpie_base_url = set_url_scheme( $wpie_base_url, 'https' );
+	}
+	define( 'WPIE_UPLOAD_URL', $wpie_base_url );
+	unset( $wpie_base_url );
+}
+unset( $wpie_upload_dir );
+
+if ( ! defined( 'WPIE_ASSETS_URL' ) ) {
+	define( 'WPIE_ASSETS_URL', WPIE_PLUGIN_URL . '/assets' );
 }
 
-if (!defined('WPIE_UPLOAD_IMPORT_DIR')) {
-        define('WPIE_UPLOAD_IMPORT_DIR', WPIE_UPLOAD_DIR . "/import");
+if ( ! defined( 'WPIE_UPLOAD_EXPORT_DIR' ) ) {
+	define( 'WPIE_UPLOAD_EXPORT_DIR', WPIE_UPLOAD_DIR . '/export' );
 }
 
-if (!defined('WPIE_UPLOAD_TEMP_DIR')) {
-        define('WPIE_UPLOAD_TEMP_DIR', WPIE_UPLOAD_DIR . "/temp");
-}
-if (!defined('WPIE_UPLOAD_MAIN_DIR')) {
-        define('WPIE_UPLOAD_MAIN_DIR', WPIE_UPLOAD_DIR . "/upload");
+if ( ! defined( 'WPIE_UPLOAD_IMPORT_DIR' ) ) {
+	define( 'WPIE_UPLOAD_IMPORT_DIR', WPIE_UPLOAD_DIR . '/import' );
 }
 
-wp_mkdir_p($wpie_upload_dir);
-
-unset($wpie_upload_dir);
-
-if (!is_dir(WPIE_UPLOAD_EXPORT_DIR)) {
-        wp_mkdir_p(WPIE_UPLOAD_EXPORT_DIR);
+if ( ! defined( 'WPIE_UPLOAD_TEMP_DIR' ) ) {
+	define( 'WPIE_UPLOAD_TEMP_DIR', WPIE_UPLOAD_DIR . '/temp' );
 }
 
-if (!is_dir(WPIE_UPLOAD_IMPORT_DIR)) {
-        wp_mkdir_p(WPIE_UPLOAD_IMPORT_DIR);
-}
-if (!is_dir(WPIE_UPLOAD_TEMP_DIR)) {
-        wp_mkdir_p(WPIE_UPLOAD_TEMP_DIR);
-}
-if (!is_dir(WPIE_UPLOAD_MAIN_DIR)) {
-        wp_mkdir_p(WPIE_UPLOAD_MAIN_DIR);
+if ( ! defined( 'WPIE_UPLOAD_MAIN_DIR' ) ) {
+	define( 'WPIE_UPLOAD_MAIN_DIR', WPIE_UPLOAD_DIR . '/upload' );
 }
 
-if (wp_is_writable(WPIE_UPLOAD_DIR) && is_dir(WPIE_UPLOAD_DIR)) {
-        @touch(WPIE_UPLOAD_DIR . '/index.php');
+if ( ! function_exists( 'wpie_setup_upload_dirs' ) ) {
+	/**
+	 * Ensure plugin upload and working directories exist with security index files.
+	 *
+	 * Creates the base, import, export, temp, and upload directories if they do not exist,
+	 * and writes an index.php / .htaccess to prevent directory indexing and unauthorized direct access.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	function wpie_setup_upload_dirs() {
+		$upload_dirs = array(
+			WPIE_UPLOAD_DIR,
+			WPIE_UPLOAD_EXPORT_DIR,
+			WPIE_UPLOAD_IMPORT_DIR,
+			WPIE_UPLOAD_TEMP_DIR,
+			WPIE_UPLOAD_MAIN_DIR,
+		);
+
+		foreach ( $upload_dirs as $dir ) {
+			if ( ! is_dir( $dir ) ) {
+				wp_mkdir_p( $dir );
+			}
+			if ( is_dir( $dir ) && wp_is_writable( $dir ) ) {
+				$index_file = $dir . '/index.php';
+				if ( ! file_exists( $index_file ) ) {
+					@file_put_contents( $index_file, "<?php\n// Silence is golden.\n" );
+				}
+			}
+		}
+
+		// Protect export and temp folders on Apache/LiteSpeed.
+		$protected_dirs = array( WPIE_UPLOAD_EXPORT_DIR, WPIE_UPLOAD_TEMP_DIR );
+		foreach ( $protected_dirs as $pdir ) {
+			if ( is_dir( $pdir ) && wp_is_writable( $pdir ) ) {
+				$htaccess_file = $pdir . '/.htaccess';
+				if ( ! file_exists( $htaccess_file ) ) {
+					@file_put_contents( $htaccess_file, "<IfModule !mod_authz_core.c>\nOrder deny,allow\nDeny from all\n</IfModule>\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n" );
+				}
+			}
+		}
+	}
 }
 
-if (wp_is_writable(WPIE_UPLOAD_EXPORT_DIR) && is_dir(WPIE_UPLOAD_EXPORT_DIR)) {
-        @touch(WPIE_UPLOAD_EXPORT_DIR . '/index.php');
+// Ensure upload directories are initialized on activation or lazily if missing.
+register_activation_hook( WPIE_PLUGIN_FILE, 'wpie_setup_upload_dirs' );
+if ( ! is_dir( WPIE_UPLOAD_DIR ) ) {
+	wpie_setup_upload_dirs();
 }
 
-if (wp_is_writable(WPIE_UPLOAD_IMPORT_DIR) && is_dir(WPIE_UPLOAD_IMPORT_DIR)) {
-        @touch(WPIE_UPLOAD_IMPORT_DIR . '/index.php');
+// Addon and asset URLs.
+if ( ! defined( 'WPIE_IMPORT_ADDON_URL' ) ) {
+	define( 'WPIE_IMPORT_ADDON_URL', WPIE_PLUGIN_URL . '/includes/classes/import/extensions' );
 }
-if (wp_is_writable(WPIE_UPLOAD_TEMP_DIR) && is_dir(WPIE_UPLOAD_TEMP_DIR)) {
-        @touch(WPIE_UPLOAD_TEMP_DIR . '/index.php');
-}
-if (wp_is_writable(WPIE_UPLOAD_MAIN_DIR) && is_dir(WPIE_UPLOAD_MAIN_DIR)) {
-        @touch(WPIE_UPLOAD_MAIN_DIR . '/index.php');
+if ( ! defined( 'WPIE_EXPORT_ADDON_URL' ) ) {
+	define( 'WPIE_EXPORT_ADDON_URL', WPIE_PLUGIN_URL . '/includes/classes/export/extensions' );
 }
 
-if (!defined('WPIE_IMPORT_ADDON_URL')) {
-        define('WPIE_IMPORT_ADDON_URL', WPIE_PLUGIN_URL . '/includes/classes/import/extensions');
-}
-if (!defined('WPIE_EXPORT_ADDON_URL')) {
-        define('WPIE_EXPORT_ADDON_URL', WPIE_PLUGIN_URL . '/includes/classes/export/extensions');
+if ( ! defined( 'WPIE_CSS_URL' ) ) {
+	define( 'WPIE_CSS_URL', WPIE_ASSETS_URL . '/css' );
 }
 
-if (!defined('WPIE_CSS_URL')) {
-        define('WPIE_CSS_URL', WPIE_ASSETS_URL . '/css');
+if ( ! defined( 'WPIE_JS_URL' ) ) {
+	define( 'WPIE_JS_URL', WPIE_ASSETS_URL . '/js' );
 }
 
-if (!defined('WPIE_JS_URL')) {
-        define('WPIE_JS_URL', WPIE_ASSETS_URL . '/js');
+if ( ! defined( 'WPIE_IMAGES_URL' ) ) {
+	define( 'WPIE_IMAGES_URL', WPIE_ASSETS_URL . '/images' );
 }
 
-if (!defined('WPIE_IMAGES_URL')) {
-        define('WPIE_IMAGES_URL', WPIE_ASSETS_URL . '/images');
+// Internal directories.
+if ( ! defined( 'WPIE_INCLUDES_DIR' ) ) {
+	define( 'WPIE_INCLUDES_DIR', WPIE_PLUGIN_DIR . 'includes' );
 }
 
-if (!defined('WPIE_INCLUDES_DIR')) {
-        define('WPIE_INCLUDES_DIR', WPIE_PLUGIN_DIR . '/includes');
+if ( ! defined( 'WPIE_LIBRARIES_DIR' ) ) {
+	define( 'WPIE_LIBRARIES_DIR', WPIE_PLUGIN_DIR . 'libraries' );
+}
+if ( ! defined( 'WPIE_CLASSES_DIR' ) ) {
+	define( 'WPIE_CLASSES_DIR', WPIE_INCLUDES_DIR . '/classes' );
 }
 
-if (!defined('WPIE_LIBRARIES_DIR')) {
-        define('WPIE_LIBRARIES_DIR', WPIE_PLUGIN_DIR . '/libraries');
-}
-if (!defined('WPIE_CLASSES_DIR')) {
-        define('WPIE_CLASSES_DIR', WPIE_INCLUDES_DIR . '/classes');
+if ( ! defined( 'WPIE_HELPERS_DIR' ) ) {
+	define( 'WPIE_HELPERS_DIR', WPIE_CLASSES_DIR . '/helpers' );
 }
 
-if (!defined('WPIE_IMPORT_CLASSES_DIR')) {
-        define('WPIE_IMPORT_CLASSES_DIR', WPIE_CLASSES_DIR . '/import');
+// Helper dependencies.
+if ( file_exists( WPIE_HELPERS_DIR . '/Sanitizer.php' ) ) {
+	require_once WPIE_HELPERS_DIR . '/Sanitizer.php';
+}
+if ( file_exists( WPIE_HELPERS_DIR . '/Param.php' ) ) {
+	require_once WPIE_HELPERS_DIR . '/Param.php';
+}
+if ( file_exists( WPIE_HELPERS_DIR . '/SafeFunction.php' ) ) {
+	require_once WPIE_HELPERS_DIR . '/SafeFunction.php';
 }
 
-if (!defined('WPIE_EXPORT_CLASSES_DIR')) {
-        define('WPIE_EXPORT_CLASSES_DIR', WPIE_CLASSES_DIR . '/export');
+if ( ! defined( 'WPIE_IMPORT_CLASSES_DIR' ) ) {
+	define( 'WPIE_IMPORT_CLASSES_DIR', WPIE_CLASSES_DIR . '/import' );
 }
 
-if (!defined('WPIE_VIEW_DIR')) {
-        define('WPIE_VIEW_DIR', WPIE_INCLUDES_DIR . '/views');
+if ( ! defined( 'WPIE_EXPORT_CLASSES_DIR' ) ) {
+	define( 'WPIE_EXPORT_CLASSES_DIR', WPIE_CLASSES_DIR . '/export' );
 }
 
-if (file_exists(WPIE_CLASSES_DIR . '/class-wpie-schedule.php')) {
-        require_once(WPIE_CLASSES_DIR . '/class-wpie-schedule.php');
-
-        new \wpie\WPIE_Schedule();
-}
-if (file_exists(WPIE_PLUGIN_DIR . '/support/support.php')) {
-        require_once(WPIE_PLUGIN_DIR . '/support/support.php');
+if ( ! defined( 'WPIE_VIEW_DIR' ) ) {
+	define( 'WPIE_VIEW_DIR', WPIE_INCLUDES_DIR . '/views' );
 }
 
-if (file_exists(WPIE_CLASSES_DIR . '/function.php')) {
-        require_once(WPIE_CLASSES_DIR . '/function.php');
+// Schedule class.
+if ( file_exists( WPIE_CLASSES_DIR . '/class-wpie-schedule.php' ) ) {
+	require_once WPIE_CLASSES_DIR . '/class-wpie-schedule.php';
+	new \wpie\WPIE_Schedule();
 }
 
-add_action('init', 'wpie_init_addons');
-
-if (!function_exists('wpie_init_addons')) {
-
-        function wpie_init_addons()
-        {
-                if (file_exists(WPIE_CLASSES_DIR . '/class-wpie-extensions.php')) {
-                        require_once(WPIE_CLASSES_DIR . '/class-wpie-extensions.php');
-
-                        $wpie_ext = new \wpie\addons\WPIE_Extension();
-
-                        $wpie_ext->wpie_init_extensions();
-
-                        unset($wpie_ext);
-                }
-        }
-
+// Compatibility support.
+if ( file_exists( WPIE_PLUGIN_DIR . 'support/support.php' ) ) {
+	require_once WPIE_PLUGIN_DIR . 'support/support.php';
 }
 
-
-if (file_exists(WPIE_CLASSES_DIR . '/class-updates.php')) {
-        require_once(WPIE_CLASSES_DIR . '/class-updates.php');
-
-        new \wpie\Updates();
+// Helper functions.
+if ( file_exists( WPIE_CLASSES_DIR . '/function.php' ) ) {
+	require_once WPIE_CLASSES_DIR . '/function.php';
 }
 
-if (is_admin() && defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['action']) && substr(wpie_sanitize_field($_REQUEST['action']), 0, 4) == 'wpie') {
+add_action( 'init', 'wpie_init_addons' );
 
-        if (file_exists(WPIE_CLASSES_DIR . '/class-wpie-action.php')) {
-                require_once(WPIE_CLASSES_DIR . '/class-wpie-action.php');
-        }
-} elseif (file_exists(WPIE_CLASSES_DIR . '/class-wpie-general.php')) {
-        require_once(WPIE_CLASSES_DIR . '/class-wpie-general.php');
+if ( ! function_exists( 'wpie_init_addons' ) ) {
+	/**
+	 * Initialize plugin extensions and add-ons.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	function wpie_init_addons() {
+		if ( file_exists( WPIE_CLASSES_DIR . '/class-wpie-extensions.php' ) ) {
+			require_once WPIE_CLASSES_DIR . '/class-wpie-extensions.php';
 
-        new \wpie\core\WPIE_General();
+			$wpie_ext = new \wpie\addons\WPIE_Extension();
+			$wpie_ext->wpie_init_extensions();
+			unset( $wpie_ext );
+		}
+	}
+}
+
+// Plugin updates handler.
+if ( file_exists( WPIE_CLASSES_DIR . '/class-updates.php' ) ) {
+	require_once WPIE_CLASSES_DIR . '/class-updates.php';
+	new \wpie\Updates();
+}
+
+// Safely retrieve request action with class check fallback.
+$wpie_request_action = '';
+if ( class_exists( '\WpieApp\Core\Helpers\Param' ) ) {
+	$wpie_request_action = \WpieApp\Core\Helpers\Param::requestSanitized( 'action', 'key', '' );
+} elseif ( isset( $_REQUEST['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$wpie_request_action = sanitize_key( wp_unslash( $_REQUEST['action'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+}
+
+$wpie_is_doing_ajax = function_exists( 'wp_doing_ajax' ) ? wp_doing_ajax() : ( defined( 'DOING_AJAX' ) && DOING_AJAX );
+
+if ( is_admin() && $wpie_is_doing_ajax && '' !== $wpie_request_action && strpos( $wpie_request_action, 'wpie' ) === 0 ) {
+	if ( file_exists( WPIE_CLASSES_DIR . '/class-wpie-action.php' ) ) {
+		require_once WPIE_CLASSES_DIR . '/class-wpie-action.php';
+	}
+} elseif ( file_exists( WPIE_CLASSES_DIR . '/class-wpie-general.php' ) ) {
+	require_once WPIE_CLASSES_DIR . '/class-wpie-general.php';
+	new \wpie\core\WPIE_General();
 }

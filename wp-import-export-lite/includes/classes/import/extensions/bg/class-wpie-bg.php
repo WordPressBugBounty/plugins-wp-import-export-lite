@@ -2,6 +2,8 @@
 
 namespace wpie\import\bg;
 
+use WpieApp\Core\Helpers\Param;
+
 defined( 'ABSPATH' ) || exit;
 
 if ( file_exists( WPIE_IMPORT_CLASSES_DIR . '/class-wpie-import.php' ) ) {
@@ -46,7 +48,14 @@ class WPIE_BG_Import extends \wpie\import\WPIE_Import {
 
                 global $wpdb;
 
-                $id = $wpdb->get_var( "SELECT `id` FROM " . $wpdb->prefix . "wpie_template where `opration` in ('import','schedule_import') and status LIKE '%background%' and process_lock = 0 ORDER BY `id` ASC limit 0,1" );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		$id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT `id` FROM {$wpdb->prefix}wpie_template WHERE `opration` IN ('import','schedule_import') AND `status` LIKE %s AND `process_lock` = 0 ORDER BY `id` ASC LIMIT 0,1",
+				'%background%'
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
                 return $id;
         }
@@ -59,7 +68,9 @@ class WPIE_BG_Import extends \wpie\import\WPIE_Import {
 
                         $cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
 
-                        if ( $cronMethod !== "external" || !isset( $_GET[ 'wpie_cron_token' ] ) ) {
+                        $cron_token = Param::getSanitized( 'wpie_cron_token', 'text', '' );
+
+                        if ( $cronMethod !== "external" || empty( $cron_token ) ) {
                                 return true;
                         }
 
@@ -111,159 +122,206 @@ class WPIE_BG_Import extends \wpie\import\WPIE_Import {
 
                 \update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
 
-                $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 1 WHERE `id` = %d ", $templateId ) );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 1 WHERE `id` = %d ", $templateId ) );
 
-                parent::wpie_import_process_data( $templateId );
+		parent::wpie_import_process_data( $templateId );
 
-                $wpieProcess[ 'processing' ][ 'import' ] = array_diff( $wpieProcess[ 'processing' ][ 'import' ], [ $templateId ] );
+		$wpieProcess[ 'processing' ][ 'import' ] = array_diff( $wpieProcess[ 'processing' ][ 'import' ], [ $templateId ] );
 
-                \update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
+		\update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
 
-                $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `id` = %d ", $templateId ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `id` = %d ", $templateId ) );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
-                $this->setCronMsg( $templateId );
-        }
+		$this->setCronMsg( $templateId );
+	}
 
-        public function getTemplate( $excludes = [] ) {
+	public function getTemplate( $excludes = [] ) {
 
-                global $wpdb;
+		global $wpdb;
 
-                $idQuery = "";
+		$clean_excludes = ( ! empty( $excludes ) && is_array( $excludes ) ) ? array_values( array_filter( array_map( 'absint', array_unique( $excludes ) ) ) ) : array();
 
-                if ( !empty( $excludes ) ) {
-                        $idQuery = " AND `id` NOT IN (" . implode( ",", array_map( "absint", array_unique( $excludes ) ) ) . ") ";
-                }
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		if ( ! empty( $clean_excludes ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $clean_excludes ), '%d' ) );
+			$template     = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}wpie_template WHERE `opration` IN ('import','schedule_import') AND `status` LIKE %s AND `process_lock` = 0 AND `id` NOT IN ({$placeholders}) ORDER BY `id` ASC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+					array_merge( array( '%background%' ), $clean_excludes )
+				)
+			);
+		} else {
+			$template = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}wpie_template WHERE `opration` IN ('import','schedule_import') AND `status` LIKE %s AND `process_lock` = 0 ORDER BY `id` ASC LIMIT 1",
+					'%background%'
+				)
+			);
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
-                $template = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "wpie_template where `opration` in ('import','schedule_import') and `status` LIKE '%background%' and `process_lock` = 0 " . $idQuery . " ORDER BY `id` ASC limit 1" );
+		if ( isset( $template->id ) && absint( $template->id ) > 0 ) {
+			return $template;
+		}
+		unset( $template );
 
-                if ( isset( $template->id ) && absint( $template->id ) > 0 ) {
+		return false;
+	}
 
-                        return $template;
-                }
-                unset( $template );
+	private function unlockTemplate() {
 
-                return false;
-        }
+		global $wpdb;
 
-        private function unlockTemplate() {
+		$wpieProcess = \maybe_unserialize( \get_option( "wpie_bg_process" ) );
 
-                global $wpdb;
+		if ( ! $wpieProcess || empty( $wpieProcess ) ) {
+			$wpieProcess = [];
+		}
 
-                $wpieProcess = \maybe_unserialize( \get_option( "wpie_bg_process" ) );
+		$wpieProcess[ 'processing' ] = isset( $wpieProcess[ 'processing' ] ) ? $wpieProcess[ 'processing' ] : [];
 
-                if ( !$wpieProcess || empty( $wpieProcess ) ) {
-                        $wpieProcess = [];
-                }
+		$processingIds = ! empty( $wpieProcess[ 'processing' ] ) && isset( $wpieProcess[ 'processing' ][ 'import' ] ) ? $wpieProcess[ 'processing' ][ 'import' ] : [];
 
-                $wpieProcess[ 'processing' ] = isset( $wpieProcess[ 'processing' ] ) ? $wpieProcess[ 'processing' ] : [];
+		if ( empty( $processingIds ) ) {
+			$this->updateTemplateLock();
+			return;
+		}
 
-                $processingIds = !empty( $wpieProcess[ 'processing' ] ) && isset( $wpieProcess[ 'processing' ][ 'import' ] ) ? $wpieProcess[ 'processing' ][ 'import' ] : [];
+		$idList = array_values( array_filter( array_map( 'absint', $processingIds ) ) );
 
-                if ( empty( $processingIds ) ) {
-                        $this->updateTemplateLock();
-                        return;
-                }
+		if ( empty( $idList ) ) {
+			$this->updateTemplateLock();
+			return;
+		}
 
-                $idList = array_map( "absint", $processingIds );
+		$placeholders = implode( ',', array_fill( 0, count( $idList ), '%d' ) );
 
-                $templates = $wpdb->get_results( "SELECT `id`,`process_log`,`process_lock`,`last_update_date` FROM " . $wpdb->prefix . "wpie_template where `id` IN (" . implode( ",", $idList ) . ") ORDER BY `id` ASC" );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		$templates = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT `id`,`process_log`,`process_lock`,`last_update_date` FROM {$wpdb->prefix}wpie_template WHERE `id` IN ({$placeholders}) ORDER BY `id` ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				$idList
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
-                $updateIds = [];
+		$updateIds = [];
 
-                foreach ( $templates as $template ) {
+		foreach ( $templates as $template ) {
 
-                        $id = isset( $template->id ) ? $template->id : 0;
+			$id = isset( $template->id ) ? $template->id : 0;
 
-                        if ( intval( $template->process_lock ) === 0 ) {
-                                $updateIds[] = $id;
-                                continue;
-                        }
+			if ( intval( $template->process_lock ) === 0 ) {
+				$updateIds[] = $id;
+				continue;
+			}
 
-                        $currentTime = strtotime( current_time( "mysql" ) );
+			$currentTime = strtotime( current_time( "mysql" ) );
 
-                        $allowTime = 60 * 5;
+			$allowTime = 60 * 5;
 
-                        $last_update_date = isset( $template->last_update_date ) ? $template->last_update_date : "";
+			$last_update_date = isset( $template->last_update_date ) ? $template->last_update_date : "";
 
-                        if ( $currentTime >= (strtotime( $last_update_date ) + $allowTime) ) {
-                                $updateIds[] = $id;
-                                continue;
-                        }
-                }
+			if ( $currentTime >= ( strtotime( $last_update_date ) + $allowTime ) ) {
+				$updateIds[] = $id;
+				continue;
+			}
+		}
 
-                $this->updateTemplateLock( $updateIds );
+		$this->updateTemplateLock( $updateIds );
 
-                $wpieProcess[ 'processing' ][ 'import' ] = array_diff( $processingIds, $updateIds );
+		$wpieProcess[ 'processing' ][ 'import' ] = array_diff( $processingIds, $updateIds );
 
-                \update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
-        }
+		\update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
+	}
 
-        private function updateTemplateLock( $ids = [] ) {
+	private function updateTemplateLock( $ids = [] ) {
 
-                $ids = !empty( $ids ) ? array_map( "absint", $ids ) : [];
+		$clean_ids = ( ! empty( $ids ) && is_array( $ids ) ) ? array_values( array_filter( array_map( 'absint', $ids ) ) ) : array();
 
-                $ids = !empty( $ids ) ? implode( ",", array_unique( $ids ) ) : "";
+		global $wpdb;
 
-                $idQuery = "";
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		if ( ! empty( $clean_ids ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $clean_ids ), '%d' ) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `process_lock` = 1 AND `opration` IN ('import','schedule_import') AND `id` IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+					$clean_ids
+				)
+			);
+		} else {
+			$wpdb->query( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `process_lock` = 1 AND `opration` IN ('import','schedule_import')" );
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
+	}
 
-                if ( !empty( $ids ) ) {
-                        $idQuery = " AND `id` IN (" . $ids . ")";
-                }
+	/**
+	 * Validate external cron request token using constant-time hash comparison.
+	 *
+	 * @since 1.0.0
+	 * @return bool True if request is valid, false otherwise.
+	 */
+	private function isValidRequest() {
 
-                global $wpdb;
+		$wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing", "" ) );
 
-                $wpdb->query( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `process_lock` = 1 and `opration` in ('import','schedule_import') " . $idQuery );
-        }
+		$cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
 
-        private function isValidRequest() {
+		if ( $cronMethod !== "external" ) {
+			return true;
+		}
 
-                $wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing", "" ) );
+		$token = Param::getSanitized( 'wpie_cron_token', 'text', '' );
 
-                $cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
+		$siteToken = isset( $wpie_bg_and_cron_processing[ 'token' ] ) ? (string) $wpie_bg_and_cron_processing[ 'token' ] : "";
 
-                if ( $cronMethod !== "external" ) {
-                        return true;
-                }
+		if ( empty( $siteToken ) || empty( $token ) ) {
+			return false;
+		}
 
-                $token = isset( $_GET[ 'wpie_cron_token' ] ) ? \sanitize_textarea_field( $_GET[ 'wpie_cron_token' ] ) : "";
+		if ( function_exists( 'hash_equals' ) ) {
+			return hash_equals( $siteToken, (string) $token );
+		}
 
-                $siteToken = isset( $wpie_bg_and_cron_processing[ 'token' ] ) ? $wpie_bg_and_cron_processing[ 'token' ] : "";
+		return $siteToken === (string) $token;
+	}
 
-                if ( ( string ) $siteToken !== ( string ) $token ) {
-                        return false;
-                }
+	/**
+	 * Send JSON response for external cron invocation.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $templateId Template ID.
+	 * @return void
+	 */
+	private function setCronMsg( $templateId = 0 ) {
 
-                return true;
-        }
+		$wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing" ) );
 
-        private function setCronMsg( $templateId = 0 ) {
+		$cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
 
-                $wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing" ) );
+		if ( $cronMethod !== "external" ) {
+			return;
+		}
 
-                $cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
+		if ( absint( $templateId ) > 0 ) {
+			$response = [
+				"status"  => "success",
+				"plugin"  => "WP Import Export",
+				"message" => "WP Import Export : Import #" . $templateId . " Processing"
+			];
+		} else {
+			$response = [
+				"status"  => "success",
+				"plugin"  => "WP Import Export",
+				"message" => "WP Import Export : No More pending schedules"
+			];
+		}
 
-                if ( $cronMethod !== "external" ) {
-                        return true;
-                }
-
-                if ( absint( $templateId ) > 0 ) {
-
-                        $respons = [
-                                "status"  => "success",
-                                "plugin"  => "WP Import Export",
-                                "message" => "WP Import Export : Import #" . $templateId . " Processing"
-                        ];
-                } else {
-                        $respons = [
-                                "status"  => "success",
-                                "plugin"  => "WP Import Export",
-                                "message" => "WP Import Export : No More pending schedules"
-                        ];
-                }
-
-                echo json_encode( $respons );
-
-                die();
-        }
+		wp_send_json( $response );
+	}
 
 }

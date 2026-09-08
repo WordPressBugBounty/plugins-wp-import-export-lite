@@ -25,6 +25,13 @@ class WPIE_URL_Upload extends \wpie\import\upload\WPIE_Upload {
                 if ( empty( $file_url ) ) {
                         return new \WP_Error( 'wpie_import_error', __( 'File URL is empty', 'wp-import-export-lite' ) );
                 }
+
+                $valid_url = \wp_http_validate_url( $file_url );
+                if ( false === $valid_url ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is not valid', 'wp-import-export-lite' ) );
+                }
+                $file_url = $valid_url;
+
                 $download_manager = new Downloader();
                 $file = $download_manager->download( $file_url );
                 unset( $download_manager );
@@ -48,13 +55,12 @@ class WPIE_URL_Upload extends \wpie\import\upload\WPIE_Upload {
 
                 wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/parse/chunks" );
 
-                $filePath = WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/original/" . $fileName;
-
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod -- Adjust directory permissions for import file.
                 chmod( WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/original/", 0755 );
 
                 if ( \file_exists( $file ) ) {
                         copy( $file, WPIE_UPLOAD_IMPORT_DIR . "/" . $newfiledir . "/original/" . $fileName );
-                        unlink( $file );
+                        wp_delete_file( $file );
                 }
 
                 unset( $file_url, $filePath );

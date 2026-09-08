@@ -1,140 +1,149 @@
 <?php
-
+/**
+ * Remote File Downloader
+ *
+ * @package   wpie\import\Downloader
+ * @author    WP Import Export
+ * @copyright 2026 WP Import Export
+ * @license   GPL-2.0+
+ */
 
 namespace wpie\import\Downloader;
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
-class Download
-{
+/**
+ * Class Download
+ *
+ * Safely streams remote files to a temporary location using WordPress HTTP APIs.
+ *
+ * @since 1.0.0
+ */
+class Download {
 
-        private $url = "";
-        private $sslverify = false;
-        private $redirection = 5;
-        private $timeout = 3000;
+	/**
+	 * Remote download URL.
+	 *
+	 * @var string
+	 */
+	private $url = "";
 
-        public function __construct()
-        {
+	/**
+	 * Verify SSL certificate.
+	 *
+	 * @var bool
+	 */
+	private $sslverify = true;
 
-        }
+	/**
+	 * Maximum HTTP redirects.
+	 *
+	 * @var int
+	 */
+	private $redirection = 5;
 
-        public function download_file($url = "")
-        {
+	/**
+	 * Download request timeout in seconds.
+	 *
+	 * @var int
+	 */
+	private $timeout = 3000;
 
-                if (empty($url)) {
-                        return new \WP_Error('wpie_import_error', __('File Download Error : File URL is empty', 'wp-import-export-lite'));
-                }
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+	}
 
-                $this->url = \wp_http_validate_url($url);
+	/**
+	 * Download remote file to local temporary storage.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $url Target remote URL.
+	 * @return string|\WP_Error Path to downloaded temporary file, or WP_Error on failure.
+	 */
+	public function download_file( $url = "" ) {
 
-                if (false === $this->url) {
-                        return new \WP_Error('wpie_import_error', __('File Download Error : File URL is not valid', 'wp-import-export-lite'));
-                }
+		if ( empty( $url ) ) {
+			return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is empty', 'wp-import-export-lite' ) );
+		}
 
-                $wp_file = $this->wp_download();
+		$this->url = \wp_http_validate_url( $url );
 
-                if (is_wp_error($wp_file)) {
+		if ( false === $this->url ) {
+			return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is not valid', 'wp-import-export-lite' ) );
+		}
 
-                        $guzzle_file = $this->guzzle_download();
+		$wp_file = $this->wp_download();
 
-                        if (!is_wp_error($guzzle_file)) {
-                                $wp_file = $guzzle_file;
-                        }
-                }
+		return $wp_file;
+	}
 
-                return $wp_file;
-        }
+	/**
+	 * Execute download using wp_safe_remote_get.
+	 *
+	 * @since 1.0.0
+	 * @return string|\WP_Error
+	 */
+	private function wp_download() {
 
-        private function wp_download()
-        {
+		$filename = time() . wp_rand() . ".tmp";
 
-                $filename = time() . rand() . ".tmp";
+		$file = get_temp_dir() . $filename;
 
-                $file = get_temp_dir() . $filename;
+		$response = wp_safe_remote_get( $this->url, [
+			'timeout'     => $this->timeout,
+			'stream'      => true,
+			'filename'    => $file,
+			'sslverify'   => $this->sslverify,
+			'redirection' => $this->redirection,
+		] );
 
-                $response = wp_safe_remote_get($this->url, ['timeout' => $this->timeout, 'stream' => true, 'filename' => $file, 'sslverify' => $this->sslverify]);
+		if ( is_wp_error( $response ) ) {
 
-                if (is_wp_error($response)) {
+			if ( file_exists( $file ) ) {
+				@wp_delete_file( $file );
+			}
+			return $response;
+		}
 
-                        if (file_exists($file)) {
-                                unlink($file);
-                        }
-                        return $response;
-                }
+		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
 
-                if (200 != wp_remote_retrieve_response_code($response)) {
+			if ( file_exists( $file ) ) {
+				@wp_delete_file( $file );
+			}
+			return new \WP_Error( 'http_404', trim( wp_remote_retrieve_response_message( $response ) ) );
+		}
 
-                        if (file_exists($file)) {
-                                unlink($file);
-                        }
-                        return new \WP_Error('http_404', trim(wp_remote_retrieve_response_message($response)));
-                }
+		$content_md5 = wp_remote_retrieve_header( $response, 'content-md5' );
 
-                $content_md5 = wp_remote_retrieve_header($response, 'content-md5');
+		if ( $content_md5 ) {
 
-                if ($content_md5) {
+			if ( ! function_exists( 'verify_file_md5' ) ) {
+				require_once( ABSPATH . 'wp-admin/includes/file.php' );
+			}
 
-                        $md5_check = verify_file_md5($file, $content_md5);
+			if ( function_exists( 'verify_file_md5' ) ) {
+				$md5_check = verify_file_md5( $file, $content_md5 );
+			} else {
+				$md5_check = md5_file( $file ) === $content_md5 ? true : new \WP_Error( 'md5_mismatch', __( 'Checksum mismatch', 'wp-import-export-lite' ) );
+			}
 
-                        if (is_wp_error($md5_check)) {
+			if ( is_wp_error( $md5_check ) ) {
 
-                                if (file_exists($file)) {
-                                        unlink($file);
-                                }
-                                return $md5_check;
-                        }
+				if ( file_exists( $file ) ) {
+					@wp_delete_file( $file );
+				}
+				return $md5_check;
+			}
 
-                        unset($md5_check);
-                }
+			unset( $md5_check );
+		}
 
-
-                return $file;
-        }
-
-        private function guzzle_download()
-        {
-
-                $filename = time() . rand() . ".tmp";
-
-                $file = get_temp_dir() . $filename;
-
-                \wpie_load_vendor_autoloader();
-
-                try {
-                        $client = new \GuzzleHttp\Client();
-
-                        $response = $client->request('GET', $this->url, ['sink' => $file, 'verify' => false]);
-                } catch (\Exception $e) {
-                        return new \WP_Error('download_error', $e->getMessage());
-                }
-
-                if (200 != $response->getStatusCode()) {
-
-                        if (file_exists($file)) {
-                                unlink($file);
-                        }
-                        return new \WP_Error('download_error', __("File Download Error : Invalid Status Code", 'wp-import-export-lite'));
-                }
-
-                $content_md5 = $response->getHeaderLine('content-type');
-
-                if ($content_md5) {
-
-                        $md5_check = verify_file_md5($file, $content_md5);
-
-                        if (is_wp_error($md5_check)) {
-
-                                if (file_exists($file)) {
-                                        unlink($file);
-                                }
-                                return $md5_check;
-                        }
-
-                        unset($md5_check);
-                }
-
-
-                return $file;
-        }
+		return $file;
+	}
 
 }

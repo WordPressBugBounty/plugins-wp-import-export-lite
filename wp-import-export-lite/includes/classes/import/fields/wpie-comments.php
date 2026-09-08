@@ -46,11 +46,11 @@ if ( !function_exists( "wpie_import_comment_mapping_fields" ) ) {
                                 'shop_order_refund'
                         ];
                         
-                        $exclude_types =[];
+			$exclude_types = $hidden_posts;
 
-                        if ( \class_exists( '\WooCommerce' ) ) {
-                                $exclude_types = array_merge( [ "product", "shop_order", "shop_coupon" ], $hidden_posts );
-                        }
+			if ( \class_exists( '\WooCommerce' ) ) {
+				$exclude_types = array_merge( [ "product", "shop_order", "shop_coupon" ], $exclude_types );
+			}
                         foreach ( $post_types as $key => $ct ) {
                                 if ( in_array( $key, $exclude_types ) ) {
                                         unset( $post_types[ $key ] );

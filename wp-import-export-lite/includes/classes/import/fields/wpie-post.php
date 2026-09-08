@@ -318,12 +318,18 @@ if ( !function_exists( "wpie_import_post_mapping_fields" ) ) {
                                                                         </div>
                                                                         <?php if ( $tax->hierarchical ) { ?>
                                                                                 <div class="wpie_cat_inner_data_wrapper wpie_cat_group_sep_wrapper wpie_cat_sep_wrapper">
-                                                                                        <div class="wpie_field_mapping_image_separator"><?php echo esc_html( sprintf( __( 'Separate %s hierarchy (parent/child) via symbol (i.e. Clothing > Men > TShirts)', 'wp-import-export-lite' ), $name ) ); ?></div>
+                                                                                        <div class="wpie_field_mapping_image_separator"><?php
+                                                                                                /* translators: %s: Taxonomy name. */
+                                                                                                echo esc_html( sprintf( __( 'Separate %s hierarchy (parent/child) via symbol (i.e. Clothing > Men > TShirts)', 'wp-import-export-lite' ), $name ) );
+                                                                                        ?></div>
                                                                                         <input type="text" class="wpie_content_data_input wpie_field_mapping_input_separator wpie_item_taxonomy_hierarchical_delim wpie_item_taxonomy_hierarchical_delim_<?php echo esc_attr( $slug ); ?>" name="wpie_item_taxonomy_hierarchical_delim[<?php echo esc_attr( $slug ); ?>]" placeholder=">" value=">"/>
                                                                                 </div>
                                                                                 <div class="wpie_cat_inner_data_wrapper">
                                                                                         <input type="checkbox" class="wpie_checkbox wpie_item_taxonomy_child_only_<?php echo esc_attr( $slug ); ?>"  name="wpie_item_taxonomy_child_only[<?php echo esc_attr( $slug ); ?>]" id="wpie_item_taxonomy_child_only_<?php echo esc_attr( $slug ); ?>" value="1"/>
-                                                                                        <label for="wpie_item_taxonomy_child_only_<?php echo esc_attr( $slug ); ?>" class="wpie_checkbox_label"><?php echo esc_html( sprintf( __( 'Only assign %s to the bottom level term in the hierarchy', 'wp-import-export-lite' ), $name ) ); ?></label>                                            
+                                                                                        <label for="wpie_item_taxonomy_child_only_<?php echo esc_attr( $slug ); ?>" class="wpie_checkbox_label"><?php
+                                                                                                /* translators: %s: Taxonomy name. */
+                                                                                                echo esc_html( sprintf( __( 'Only assign %s to the bottom level term in the hierarchy', 'wp-import-export-lite' ), $name ) );
+                                                                                        ?></label>                                            
                                                                                 </div>
                                                                         <?php } ?>
                                                                 </div>
@@ -514,7 +520,7 @@ if ( !function_exists( "wpie_import_post_mapping_fields" ) ) {
                                                         <input type="radio" class="wpie_radio wpie_field_mapping_other_option_radio wpie_item_parent wpie_item_parent_manually" name="wpie_item_parent" id="wpie_item_parent" value="manually"/>
                                                         <label for="wpie_item_parent" class="wpie_radio_label"><?php esc_html_e( 'Select page parent', 'wp-import-export-lite' ); ?></label>
                                                         <div class="wpie_field_mapping_option_wrapper" style="display: block;">
-                                                                <?php wp_dropdown_pages( array( 'post_type' => 'page', 'selected' => '', 'class' => 'wpie_content_data_select', 'name' => 'wpie_item_parent_data', 'show_option_none' => __( '(no parent)', 'wp-import-export-lite' ), 'sort_column' => 'menu_order, post_title', 'number' => 500 ) ); ?>
+                                                                <?php wp_dropdown_pages( array( 'post_type' => 'page', 'selected' => '', 'class' => 'wpie_content_data_select', 'name' => 'wpie_item_parent_data', 'show_option_none' => esc_html__( '(no parent)', 'wp-import-export-lite' ), 'sort_column' => 'menu_order, post_title', 'number' => 500 ) ); ?>
                                                         </div>
                                                 </div>
                                         <?php } ?>

@@ -4,6 +4,9 @@
 namespace wpie\import\upload\local;
 
 use WP_Error;
+use WpieApp\Core\Helpers\Param;
+use WpieApp\Core\Helpers\Sanitizer;
+
 defined( 'ABSPATH' ) || exit;
 
 if ( file_exists( WPIE_IMPORT_CLASSES_DIR . '/class-wpie-upload.php' ) ) {
@@ -23,7 +26,8 @@ class WPIE_Local_Upload extends \wpie\import\upload\WPIE_Upload {
                         return new \WP_Error( 'wpie_import_error', __( 'Uploads folder is not writable', 'wp-import-export-lite' ) );
                 }
 
-                $fileName = isset( $_POST[ "name" ] ) && !empty( $_POST[ "name" ] ) ? sanitize_file_name( wpie_sanitize_field( preg_replace( "/[^a-z0-9\_\-\.]/i", '', $_POST[ "name" ] ) ) ) : '';
+                $raw_name = Param::post( 'name', '' );
+                $fileName = ! empty( $raw_name ) ? Sanitizer::clean( preg_replace( "/[^a-z0-9\_\-\.]/i", '', $raw_name ), 'filename' ) : '';
 
                 if ( !preg_match( '%\W(zip|csv|xls|xlsx|xml|txt|json|ods|tar|gz)$%i', trim( basename( $fileName ) ) ) ) {
 
@@ -32,13 +36,13 @@ class WPIE_Local_Upload extends \wpie\import\upload\WPIE_Upload {
                         return new \WP_Error( 'wpie_import_error', __( 'Uploaded file must be CSV, ZIP, XLS, XLSX, XML, TXT, JSON, ODS, TAR, GZ', 'wp-import-export-lite' ) );
                 }
 
-                $wpie_import_id = isset( $_POST[ "wpie_import_id" ] ) ? intval( wpie_sanitize_field( $_POST[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::postSanitized( 'wpie_import_id', 'int', 0 );
 
                 $maxFileAge = 5 * 3600;
 
-                $chunk = isset( $_POST[ "chunk" ] ) ? intval( wpie_sanitize_field( $_POST[ "chunk" ] ) ) : 0;
+                $chunk = Param::postSanitized( 'chunk', 'int', 0 );
 
-                $chunks = isset( $_POST[ "chunks" ] ) ? intval( wpie_sanitize_field( $_POST[ "chunks" ] ) ) : 0;
+                $chunks = Param::postSanitized( 'chunks', 'int', 0 );
 
                 if ( $chunks < 2 && file_exists( WPIE_UPLOAD_TEMP_DIR . '/' . $fileName ) ) {
 
@@ -71,7 +75,7 @@ class WPIE_Local_Upload extends \wpie\import\upload\WPIE_Upload {
                                 $tmpfilePath = WPIE_UPLOAD_TEMP_DIR . '/' . $file;
 
                                 if ( preg_match( '/\.part$/', $file ) && (filemtime( $tmpfilePath ) < time() - $maxFileAge) && ($tmpfilePath != "{$filePath}.part") && file_exists( $tmpfilePath ) ) {
-                                        unlink( $tmpfilePath );
+                                        wp_delete_file( $tmpfilePath );
                                 }
 
                                 unset( $tmpfilePath );
@@ -84,12 +88,12 @@ class WPIE_Local_Upload extends \wpie\import\upload\WPIE_Upload {
                 }
                 unset( $maxFileAge );
 
-                if ( isset( $_SERVER[ "CONTENT_TYPE" ] ) ) {
-                        $contentType = wpie_sanitize_field( $_SERVER[ "CONTENT_TYPE" ] );
-                } elseif ( isset( $_SERVER[ "HTTP_CONTENT_TYPE" ] ) ) {
-                        $contentType = wpie_sanitize_field( $_SERVER[ "HTTP_CONTENT_TYPE" ] );
+                $contentType = Param::server( 'CONTENT_TYPE', '' );
+                if ( empty( $contentType ) ) {
+                        $contentType = Param::server( 'HTTP_CONTENT_TYPE', '' );
                 }
 
+                // phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.WP.AlternativeFunctions.file_system_operations_fclose, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified in caller WPIE_Local_Upload_Extension::upload_local_file(). Stream operations required for chunked upload assembly.
                 if ( strpos( $contentType, "multipart" ) !== false ) {
 
                         unset( $contentType );
@@ -162,13 +166,16 @@ class WPIE_Local_Upload extends \wpie\import\upload\WPIE_Upload {
                                 return new \WP_Error( 'wpie_import_error', __( 'Failed to open output stream.', 'wp-import-export-lite' ) );
                         }
                 }
+                // phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.WP.AlternativeFunctions.file_system_operations_fclose, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
                 $newfiledir = "";
 
                 if ( !$chunks || $chunk == $chunks - 1 ) {
 
+                        // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Rename assembled chunked file.
                         rename( "{$filePath}.part", $filePath );
 
+                        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod -- Adjust assembled file permissions.
                         chmod( $filePath, 0755 );
 
                         $newfiledir = parent::wpie_create_safe_dir_name( $fileName );
@@ -186,7 +193,7 @@ class WPIE_Local_Upload extends \wpie\import\upload\WPIE_Upload {
                         copy( $filePath, $newFilePath . "/original/" . $fileName );
 
                         if ( file_exists( $filePath ) ) {
-                                unlink( $filePath );
+                                wp_delete_file( $filePath );
                         }
                         unset( $newFilePath, $filePath, $chunk, $chunks );
 

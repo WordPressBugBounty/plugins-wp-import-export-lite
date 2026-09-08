@@ -322,52 +322,55 @@ class WPIE_Yoast_SEO_Import extends \wpie\import\base\WPIE_Import_Base {
                 }
         }
 
-        private function get_schema_fields() {
+	private function get_schema_fields() {
 
-                if ( $this->import_type === "taxonomy" ) {
-                        return;
-                }
+		if ( $this->import_type === "taxonomy" ) {
+			return array();
+		}
 
-                $fields = [ '_yoast_wpseo_schema_page_type' ];
+		$fields = [ '_yoast_wpseo_schema_page_type' ];
 
-                if ( $this->import_type === "post" ) {
-                        $fields[] = '_yoast_wpseo_schema_article_type';
-                }
+		if ( $this->import_type === "post" ) {
+			$fields[] = '_yoast_wpseo_schema_article_type';
+		}
 
-                return $fields;
-        }
+		return $fields;
+	}
 
-        private function downloadImage( $method, $data ) {
+	private function downloadImage( $method, $data ) {
 
-                if ( empty( $data ) ) {
-                        return "";
-                }
+		if ( empty( $data ) ) {
+			return "";
+		}
 
-                if ( file_exists( __DIR__ . '/class-images.php' ) ) {
-                        require_once(__DIR__ . '/class-images.php');
-                }
+		if ( file_exists( __DIR__ . '/class-images.php' ) ) {
+			require_once( __DIR__ . '/class-images.php' );
+		}
 
-                return WPIE_Images::download_images( $method, $data, $this->item_id );
-        }
+		return WPIE_Images::download_images( $method, $data, $this->item_id );
+	}
 
-        private function update_seo_meta( $key, $val ) {
+	private function update_seo_meta( $key, $val ) {
 
-                if ( $this->import_type === "taxonomy" ) {
-                        $this->seo_meta[ $key ] = $val;
-                } else {
-                        $this->update_meta( $key, $val );
-                }
-        }
+		if ( $this->import_type === "taxonomy" ) {
+			$this->seo_meta[ $key ] = $val;
+		} else {
+			$this->update_meta( $key, $val );
+		}
+	}
 
-        private function save() {
+	private function save() {
 
-                if ( $this->import_type === "taxonomy" ) {
+		if ( $this->import_type === "taxonomy" ) {
 
-                        $taxonomy = \wpie_sanitize_field( $this->get_field_value( 'wpie_taxonomy_type', true ) );
+			$taxonomy = \wpie_sanitize_field( $this->get_field_value( 'wpie_taxonomy_type', true ) );
 
-                        \WPSEO_Taxonomy_Meta::set_values( $this->item_id, $taxonomy, array_merge( \WPSEO_Taxonomy_Meta::$defaults_per_term, $this->seo_meta ) );
-                }
-        }
+			if ( class_exists( '\WPSEO_Taxonomy_Meta' ) && method_exists( '\WPSEO_Taxonomy_Meta', 'set_values' ) ) {
+				$defaults = isset( \WPSEO_Taxonomy_Meta::$defaults_per_term ) && is_array( \WPSEO_Taxonomy_Meta::$defaults_per_term ) ? \WPSEO_Taxonomy_Meta::$defaults_per_term : array();
+				\WPSEO_Taxonomy_Meta::set_values( $this->item_id, $taxonomy, array_merge( $defaults, (array) $this->seo_meta ) );
+			}
+		}
+	}
 
         private function isJSON( $string ) {
                 return is_string( $string ) && is_array( json_decode( $string, true ) ) && (json_last_error() == JSON_ERROR_NONE) ? true : false;

@@ -33,7 +33,7 @@ class WPIE_Yoast_SEO_Import_Extension {
         public function enqueue_scripts() {
 
 
-                wp_enqueue_script( 'wpie-yoast-seo-js', WPIE_IMPORT_ADDON_URL . '/yoast-seo/yoast-seo.min.js', [ 'jquery' ], WPIE_PLUGIN_VERSION );
+                wp_enqueue_script( 'wpie-yoast-seo-js', WPIE_IMPORT_ADDON_URL . '/yoast-seo/yoast-seo.min.js', [ 'jquery' ], WPIE_PLUGIN_VERSION, true );
 
                 $fileName = WPIE_IMPORT_CLASSES_DIR . '/extensions/yoast-seo/class-wpie-yoast-seo.php';
 

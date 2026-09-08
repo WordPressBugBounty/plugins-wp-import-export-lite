@@ -43,26 +43,40 @@ class WPIE_Taxonomy extends \wpie\import\engine\WPIE_Import_Engine {
 
                 if ( $this->is_update_field( "parent" ) ) {
 
-                        $parent = $this->get_field_value( 'wpie_item_term_parent' );
+			$parent = $this->get_field_value( 'wpie_item_term_parent' );
 
-                        $parent_term = get_term_by( 'slug', $parent, $this->wpie_final_data[ 'taxonomy_type' ] ) or $parent_term = get_term_by( 'name', $parent, $this->wpie_final_data[ 'taxonomy_type' ] ) or ( ctype_digit( $parent ) and $parent_term = get_term_by( 'id', $parent, $this->wpie_final_data[ 'taxonomy_type' ] ));
+			$tax = $this->wpie_final_data[ 'taxonomy_type' ];
 
-                        if ( !empty( $parent_term ) && !is_wp_error( $parent_term ) ) {
-                                $this->wpie_final_data[ 'parent' ] = $parent_term->term_id;
-                        }
+			$parent_term = get_term_by( 'slug', $parent, $tax );
+			if ( empty( $parent_term ) || is_wp_error( $parent_term ) ) {
+				$parent_term = get_term_by( 'name', $parent, $tax );
+			}
+			if ( ( empty( $parent_term ) || is_wp_error( $parent_term ) ) && is_numeric( $parent ) ) {
+				$parent_term = get_term_by( 'id', absint( $parent ), $tax );
+			}
 
-                        unset( $parent, $parent_term );
-                }
+			if ( ! empty( $parent_term ) && ! is_wp_error( $parent_term ) && isset( $parent_term->term_id ) ) {
+				$this->wpie_final_data[ 'parent' ] = $parent_term->term_id;
+			}
 
-                $this->wpie_final_data = apply_filters( 'wpie_before_term_import', $this->wpie_final_data, $this->wpie_import_option );
+			unset( $parent, $parent_term, $tax );
+		}
 
-                if ( $this->is_new_item ) {
+		$this->wpie_final_data = apply_filters( 'wpie_before_term_import', $this->wpie_final_data, $this->wpie_import_option );
 
-                        $term = wp_insert_term( $this->wpie_final_data[ 'name' ], $this->wpie_final_data[ 'taxonomy_type' ], $this->wpie_final_data );
-                } else {
+		if ( ! taxonomy_exists( $this->wpie_final_data[ 'taxonomy_type' ] ) ) {
+			$this->set_log( '<strong>' . __( 'ERROR', 'wp-import-export-lite' ) . '</strong> : ' . __( 'Taxonomy does not exist.', 'wp-import-export-lite' ) );
+			$this->process_log[ 'skipped' ]++;
+			return true;
+		}
 
-                        $term = wp_update_term( $this->existing_item_id, $this->wpie_final_data[ 'taxonomy_type' ], $this->wpie_final_data );
-                }
+		if ( $this->is_new_item ) {
+
+			$term = wp_insert_term( $this->wpie_final_data[ 'name' ], $this->wpie_final_data[ 'taxonomy_type' ], $this->wpie_final_data );
+		} else {
+
+			$term = wp_update_term( $this->existing_item_id, $this->wpie_final_data[ 'taxonomy_type' ], $this->wpie_final_data );
+		}
 
                 $this->process_log[ 'imported' ]++;
 
@@ -101,7 +115,7 @@ class WPIE_Taxonomy extends \wpie\import\engine\WPIE_Import_Engine {
 
                 $this->process_log[ 'last_records_status' ] = 'pending';
 
-                $this->process_log[ 'last_activity' ] = date( 'Y-m-d H:i:s' );
+                $this->process_log[ 'last_activity' ] = gmdate( 'Y-m-d H:i:s' );
 
                 $wpdb->update( $wpdb->prefix . "wpie_template", array( 'last_update_date' => current_time( 'mysql' ), 'process_log' => maybe_serialize( $this->process_log ) ), array( 'id' => $this->wpie_import_id ) );
 
@@ -192,8 +206,8 @@ class WPIE_Taxonomy extends \wpie\import\engine\WPIE_Import_Engine {
 
                                 global $wp_version;
 
-                                if ( version_compare( $wp_version, '4.5.0', '<' ) ) {
-
+                                if ( ! empty( $wp_version ) && version_compare( strval( $wp_version ), '4.5.0', '<' ) ) {
+                                        // phpcs:ignore WordPress.WP.DeprecatedParameters.Get_termsParam2Found -- Compatibility fallback for WordPress < 4.5.0.
                                         $terms = get_terms( $taxonomy_type, $args );
                                 } else {
                                         $terms = get_terms( $args );

@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * XML File Chunker
+ *
+ * @package   wpie\import\chunk
+ * @author    WP Import Export
+ * @copyright 2026 WP Import Export
+ * @license   GPL-2.0+
+ */
 
 namespace wpie\import\chunk;
 
@@ -8,130 +15,170 @@ use DOMXPath;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Class WPIE_Chunk
+ *
+ * Splits large XML files into manageable chunks for iterative processing.
+ *
+ * @since 1.0.0
+ */
 class WPIE_Chunk {
 
-        private $wpie_fileName = "wpie-import-data-";
+	/**
+	 * Output chunk filename prefix.
+	 *
+	 * @var string
+	 */
+	private $wpie_fileName = "wpie-import-data-";
 
-        public function __construct() {
-                
-        }
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+	}
 
-        public function process_data( $template_options = array() ) {
+	/**
+	 * Process XML data into chunked files.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $template_options Template import options.
+	 * @return bool True if chunks processed, false on failure.
+	 */
+	public function process_data( $template_options = array() ) {
 
-                $xpath = isset( $template_options[ "xpath" ] ) ? "/" . wp_unslash( $template_options[ "xpath" ] ) : "";
+		$xpath = isset( $template_options[ "xpath" ] ) ? "/" . wp_unslash( $template_options[ "xpath" ] ) : "";
 
-                $activeFile = isset( $template_options[ 'activeFile' ] ) ? $template_options[ 'activeFile' ] : "";
+		$activeFile = isset( $template_options[ 'activeFile' ] ) ? $template_options[ 'activeFile' ] : "";
 
-                $importFile = isset( $template_options[ 'importFile' ] ) ? $template_options[ 'importFile' ] : array();
+		$importFile = isset( $template_options[ 'importFile' ] ) ? $template_options[ 'importFile' ] : array();
 
-                $fileData = isset( $importFile[ $activeFile ] ) ? $importFile[ $activeFile ] : "";
+		$fileData = isset( $importFile[ $activeFile ] ) ? $importFile[ $activeFile ] : "";
 
-                $file_name = $fileData[ 'fileName' ] ? $fileData[ 'fileName' ] : "";
+		$baseDir = ! empty( $fileData[ 'baseDir' ] ) ? $fileData[ 'baseDir' ] : "";
 
-                $baseDir = $fileData[ 'baseDir' ] ? $fileData[ 'baseDir' ] : "";
+		$wpie_file_processing_type = isset( $template_options[ "wpie_file_processing_type" ] ) ? sanitize_text_field( $template_options[ "wpie_file_processing_type" ] ) : "iterative";
 
-                $wpie_file_processing_type = isset( $template_options[ "wpie_file_processing_type" ] ) ? intval( wpie_sanitize_field( $template_options[ "wpie_file_processing_type" ] ) ) : "iterative";
+		$split_file = 0;
 
-                $split_file = 0;
+		if ( $wpie_file_processing_type === "iterative" || $wpie_file_processing_type === "1" || $wpie_file_processing_type === 1 ) {
+			$split_file = isset( $template_options[ "wpie_import_split_file" ] ) ? absint( wpie_sanitize_field( $template_options[ "wpie_import_split_file" ] ) ) : 1;
+		}
 
-                if ( $wpie_file_processing_type == "iterative" ) {
-                        $split_file = isset( $template_options[ "wpie_import_split_file" ] ) ? absint( wpie_sanitize_field( $template_options[ "wpie_import_split_file" ] ) ) : 1;
-                }
+		$file_count = 1;
 
-                $file_count = 1;
+		$newFile = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/" . $this->wpie_fileName . $file_count . '.xml';
 
-                $newFile = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/" . $this->wpie_fileName . $file_count . '.xml';
+		if ( ! file_exists( $newFile ) || ! is_readable( $newFile ) ) {
+			return false;
+		}
 
-                $dom = new \DOMDocument( '1.0', "UTF-8" );
+		$chunks_dir = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks";
+		if ( ! is_dir( $chunks_dir ) ) {
+			wp_mkdir_p( $chunks_dir );
+		}
 
-                $dom->formatOutput = true;
+		$dom = new \DOMDocument( '1.0', "UTF-8" );
 
-                $dom->strictErrorChecking = false;
+		$dom->formatOutput = true;
 
-                $dom->recover = true;
+		$dom->strictErrorChecking = false;
 
-                $dom->preserveWhiteSpace = false;
+		$dom->recover = true;
 
-                $old = libxml_use_internal_errors( true );
+		$dom->preserveWhiteSpace = false;
 
-                $new_xml_data = file_get_contents( $newFile );
+		$old = libxml_use_internal_errors( true );
 
-                if ( !empty( $new_xml_data ) ) {
-                        $new_xml_data = preg_replace( '%xmlns\s*=\s*([\'"]).*\1%sU', '', $new_xml_data );
-                }
+		$new_xml_data = @file_get_contents( $newFile );
 
-                $dom->loadXML( $new_xml_data );
+		if ( ! empty( $new_xml_data ) ) {
+			$new_xml_data = preg_replace( '%xmlns\s*=\s*([\'"]).*\1%sU', '', $new_xml_data );
+			$dom->loadXML( $new_xml_data );
+		}
 
-                libxml_use_internal_errors( $old );
+		libxml_use_internal_errors( $old );
 
-                $domxpath = new \DOMXPath( $dom );
+		$domxpath = new \DOMXPath( $dom );
 
-                $elements = $domxpath->query( $xpath );
+		$elements = $domxpath->query( $xpath );
 
-                $file_root = "wpiedata";
+		$file_root = "wpiedata";
 
-                unset( $importFile, $activeFile, $fileData, $newFile, $domxpath, $dom );
+		unset( $importFile, $activeFile, $fileData, $newFile, $domxpath, $dom, $new_xml_data );
 
-                if ( $elements !== false && $elements->length > 0 ) {
+		if ( $elements !== false && $elements->length > 0 ) {
 
-                        $fileDom = new \DOMDocument( '1.0', "UTF-8" );
+			$fileDom = new \DOMDocument( '1.0', "UTF-8" );
 
-                        $fileDom->formatOutput = true;
+			$fileDom->formatOutput = true;
 
-                        $fileDom->strictErrorChecking = false;
+			$fileDom->strictErrorChecking = false;
 
-                        $fileDom->recover = true;
+			$fileDom->recover = true;
 
-                        $fileDom->preserveWhiteSpace = false;
+			$fileDom->preserveWhiteSpace = false;
 
-                        $rootElement = $fileDom->createElement( $file_root );
+			$rootElement = $fileDom->createElement( $file_root );
 
-                        $rootChild = $fileDom->appendChild( $rootElement );
+			$rootChild = $fileDom->appendChild( $rootElement );
 
-                        $filecount = 1;
+			$filecount = 1;
 
-                        for ( $i = 0; $i < $elements->length; $i++ ) {
+			for ( $i = 0; $i < $elements->length; $i++ ) {
 
-                                $rootChild->appendChild( $fileDom->importNode( $elements->item( $i ), true ) );
+				$item = $elements->item( $i );
+				if ( $item ) {
+					$rootChild->appendChild( $fileDom->importNode( $item, true ) );
+				}
 
-                                if ( $split_file == 1 && ($i + 1) % 1000 == 0 ) {
+				if ( $split_file == 1 && ( $i + 1 ) % 1000 == 0 ) {
 
-                                        $fileDom->save( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $filecount . '.xml' );
+					$fileDom->save( $chunks_dir . "/" . $this->wpie_fileName . $filecount . '.xml' );
 
-                                        $filecount++;
+					$filecount++;
 
-                                        unset( $fileDom );
+					unset( $fileDom );
 
-                                        $fileDom = new \DOMDocument( '1.0', "UTF-8" );
+					$fileDom = new \DOMDocument( '1.0', "UTF-8" );
 
-                                        $fileDom->formatOutput = true;
+					$fileDom->formatOutput = true;
 
-                                        $fileDom->strictErrorChecking = false;
+					$fileDom->strictErrorChecking = false;
 
-                                        $fileDom->recover = true;
+					$fileDom->recover = true;
 
-                                        $fileDom->preserveWhiteSpace = false;
+					$fileDom->preserveWhiteSpace = false;
 
-                                        $rootElement = $fileDom->createElement( $file_root );
+					$rootElement = $fileDom->createElement( $file_root );
 
-                                        $rootChild = $fileDom->appendChild( $rootElement );
+					$rootChild = $fileDom->appendChild( $rootElement );
 
-                                        unset( $rootElement );
-                                }
-                        }
+					unset( $rootElement );
+				}
+			}
 
-                        $fileDom->save( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $filecount . '.xml' );
+			$fileDom->save( $chunks_dir . "/" . $this->wpie_fileName . $filecount . '.xml' );
 
-                        unset( $fileDom );
-                }
+			unset( $fileDom );
+		}
 
-                unset( $file_count, $file_root, $elements );
-        }
+		unset( $file_count, $file_root, $elements, $chunks_dir );
 
-        public function __destruct() {
-                foreach ( $this as $key => $value ) {
-                        unset( $this->$key );
-                }
-        }
+		return true;
+	}
+
+	/**
+	 * Destructor.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __destruct() {
+		foreach ( $this as $key => $value ) {
+			unset( $this->$key );
+		}
+	}
 
 }

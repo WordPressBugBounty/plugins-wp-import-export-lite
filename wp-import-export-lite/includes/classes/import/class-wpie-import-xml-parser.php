@@ -7,6 +7,7 @@ use DOMDocument;
 use XMLReader;
 use DOMXPath;
 use DOMElement;
+use WpieApp\Core\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -16,6 +17,7 @@ class WPIE_XML_Parser {
         private $wpie_filtering_element = array();
         private $wpie_element_data = array();
         private $wpie_element_length = 0;
+        private $wpie_cdata = array();
 
         public function __construct() {
                 
@@ -23,13 +25,14 @@ class WPIE_XML_Parser {
 
         public function wpie_get_xml_filtered_records( $template_data = null ) {
 
-                $xpath = isset( $_POST[ "xpath" ] ) ? "/" . wpie_sanitize_field( wp_unslash( $_POST[ "xpath" ] ) ) : "";
+                $raw_xpath = Param::postSanitized( 'xpath', 'text', '' );
+                $xpath     = ! empty( $raw_xpath ) ? '/' . ltrim( $raw_xpath, '/' ) : '';
 
-                $root = isset( $_POST[ "root" ] ) ? wpie_sanitize_field( wp_unslash( $_POST[ "root" ] ) ) : "";
+                $root = Param::postSanitized( 'root', 'text', '' );
 
-                $start = isset( $_POST[ "start" ] ) ? intval( wpie_sanitize_field( $_POST[ "start" ] ) ) : 0;
+                $start = Param::postSanitized( 'start', 'int', 0 );
 
-                $length = isset( $_POST[ "length" ] ) ? intval( wpie_sanitize_field( $_POST[ "length" ] ) ) : 1;
+                $length = Param::postSanitized( 'length', 'int', 1 );
 
                 $template_options = maybe_unserialize( $template_data->options );
 
@@ -466,40 +469,45 @@ class WPIE_XML_Parser {
                 unset( $domxpath );
         }
 
-        private function wpie_write_final_data( $baseDir = "", $split_file = false, $is_final_data = false ) {
+	private function wpie_write_final_data( $baseDir = "", $split_file = false, $is_final_data = false ) {
 
-                if ( $is_final_data || count( $this->wpie_element_data ) % 1000 == 0 ) {
+		if ( $is_final_data || count( $this->wpie_element_data ) % 1000 == 0 ) {
 
-                        $new_xml = implode( "", $this->wpie_element_data );
+			$chunks_dir = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks";
+			if ( ! is_dir( $chunks_dir ) ) {
+				wp_mkdir_p( $chunks_dir );
+			}
 
-                        $this->wpie_element_data = array();
+			$new_xml = implode( "", $this->wpie_element_data );
 
-                        $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><wpiexmlwrapper>";
+			$this->wpie_element_data = array();
 
-                        $xml_header_end = "</wpiexmlwrapper>";
+			$xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><wpiexmlwrapper>";
 
-                        $filecount = 1;
+			$xml_header_end = "</wpiexmlwrapper>";
 
-                        if ( $split_file ) {
+			$filecount = 1;
 
-                                while ( file_exists( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $filecount . '.xml' ) ) {
+			if ( $split_file ) {
 
-                                        $filecount++;
-                                }
-                                file_put_contents( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $filecount . '.xml', $xml_header . $new_xml . $xml_header_end );
-                        } else {
+				while ( file_exists( $chunks_dir . "/" . $this->wpie_fileName . $filecount . '.xml' ) ) {
 
-                                if ( file_exists( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $filecount . '.xml' ) ) {
-                                        $xml_header = "";
-                                }
+					$filecount++;
+				}
+				file_put_contents( $chunks_dir . "/" . $this->wpie_fileName . $filecount . '.xml', $xml_header . $new_xml . $xml_header_end );
+			} else {
 
-                                file_put_contents( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $filecount . '.xml', $xml_header . $new_xml, FILE_APPEND );
-                        }
+				if ( file_exists( $chunks_dir . "/" . $this->wpie_fileName . $filecount . '.xml' ) ) {
+					$xml_header = "";
+				}
 
-                        unset( $xml_header );
+				file_put_contents( $chunks_dir . "/" . $this->wpie_fileName . $filecount . '.xml', $xml_header . $new_xml, FILE_APPEND );
+			}
 
-                        unset( $new_xml );
-                }
+			unset( $xml_header, $chunks_dir );
+
+			unset( $new_xml );
+		}
         }
 
         private function wpie_validate_rss_string( $feed = "" ) {
@@ -549,6 +557,7 @@ class WPIE_XML_Parser {
 
                 $this->wpie_cdata = array();
 
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Backwards compatibility hook.
                 $is_preprocess_enabled = apply_filters( 'is_xml_preprocess_enabled', true );
 
                 if ( $is_preprocess_enabled ) {
@@ -627,49 +636,49 @@ class WPIE_XML_Parser {
 
                 $start = (isset( $process_data[ 'imported' ] ) && $process_data[ 'imported' ] != "") ? $process_data[ 'imported' ] : 0;
 
-                $wpie_file_processing_type = isset( $template_options[ "wpie_file_processing_type" ] ) ? intval( wpie_sanitize_field( $template_options[ "wpie_file_processing_type" ] ) ) : "iterative";
+		$wpie_file_processing_type = isset( $template_options[ "wpie_file_processing_type" ] ) ? sanitize_text_field( $template_options[ "wpie_file_processing_type" ] ) : "iterative";
 
-                $split_file = "";
+		$split_file = "";
 
-                $length = -1;
+		$length = -1;
 
-                if ( $wpie_file_processing_type == "iterative" ) {
-                        $length = isset( $template_options[ "wpie_records_per_request" ] ) ? intval( wpie_sanitize_field( $template_options[ "wpie_records_per_request" ] ) ) : 20;
-                        $split_file = isset( $template_options[ "wpie_import_split_file" ] ) ? wpie_sanitize_field( $template_options[ "wpie_import_split_file" ] ) : "";
-                }
+		if ( $wpie_file_processing_type === "iterative" || $wpie_file_processing_type === "1" || $wpie_file_processing_type === 1 ) {
+			$length = isset( $template_options[ "wpie_records_per_request" ] ) ? intval( wpie_sanitize_field( $template_options[ "wpie_records_per_request" ] ) ) : 20;
+			$split_file = isset( $template_options[ "wpie_import_split_file" ] ) ? wpie_sanitize_field( $template_options[ "wpie_import_split_file" ] ) : "";
+		}
 
-                $activeFile = isset( $template_options[ 'activeFile' ] ) ? $template_options[ 'activeFile' ] : "";
+		$activeFile = isset( $template_options[ 'activeFile' ] ) ? $template_options[ 'activeFile' ] : "";
 
-                $importFile = isset( $template_options[ 'importFile' ] ) ? $template_options[ 'importFile' ] : array();
+		$importFile = isset( $template_options[ 'importFile' ] ) ? $template_options[ 'importFile' ] : array();
 
-                $fileData = isset( $importFile[ $activeFile ] ) ? $importFile[ $activeFile ] : "";
+		$fileData = isset( $importFile[ $activeFile ] ) ? $importFile[ $activeFile ] : "";
 
-                $file_name = $fileData[ 'fileName' ] ? $fileData[ 'fileName' ] : "";
+		$file_name = isset( $fileData[ 'fileName' ] ) ? $fileData[ 'fileName' ] : "";
 
-                $fileDir = $fileData[ 'fileDir' ] ? $fileData[ 'fileDir' ] : "";
+		$fileDir = isset( $fileData[ 'fileDir' ] ) ? $fileData[ 'fileDir' ] : "";
 
-                $baseDir = $fileData[ 'baseDir' ] ? $fileData[ 'baseDir' ] : "";
+		$baseDir = isset( $fileData[ 'baseDir' ] ) ? $fileData[ 'baseDir' ] : "";
 
-                $type = explode( '.', $file_name );
+		$type = explode( '.', $file_name );
 
-                $fileType = end( $type );
+		$fileType = end( $type );
 
-                if ( $split_file == 1 ) {
+		if ( $split_file == 1 ) {
 
-                        $chunks = 1000;
+			$chunks = 1000;
 
-                        if ( $start > $chunks ) {
-                                $start_file = ($start / $chunks) + 1;
-                                $start = $start % $chunks;
-                        } else {
-                                $start_file = 1;
-                                $start = $start;
-                        }
+			if ( $start >= $chunks ) {
+				$start_file = floor( $start / $chunks ) + 1;
+				$start = $start % $chunks;
+			} else {
+				$start_file = 1;
+				$start = $start;
+			}
 
-                        $newFile = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $start_file . '.xml';
-                } else {
-                        $newFile = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . '1.xml';
-                }
+			$newFile = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . $start_file . '.xml';
+		} else {
+			$newFile = WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" . $this->wpie_fileName . '1.xml';
+		}
                 $this->wpie_element_data = array();
 
                 $this->wpie_element_length = 0;

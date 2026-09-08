@@ -3,6 +3,8 @@
 
 namespace wpie\import\base;
 
+use WpieApp\Core\Helpers\SafeFunction;
+
 defined( 'ABSPATH' ) || exit;
 
 abstract class WPIE_Import_Base {
@@ -259,15 +261,15 @@ abstract class WPIE_Import_Base {
                         unset( $attr[ 'custom_function' ] );
                 }
 
-                if ( empty( $custom_function ) ) {
-                        foreach ( $attr as $key => $value ) {
-                                if ( strtotime( trim( $custom_function ) ) === "custom_function" ) {
-                                        $custom_function = $value;
-                                        unset( $attr[ $key ] );
-                                        break;
-                                }
-                        }
-                }
+		if ( empty( $custom_function ) ) {
+			foreach ( $attr as $key => $value ) {
+				if ( strtolower( trim( $key ) ) === 'custom_function' ) {
+					$custom_function = $value;
+					unset( $attr[ $key ] );
+					break;
+				}
+			}
+		}
 
                 if ( empty( $custom_function ) || !is_callable( $custom_function ) ) {
                         return "";
@@ -282,7 +284,22 @@ abstract class WPIE_Import_Base {
                         }
                 }
 
-                return call_user_func( $custom_function, $attr, $content );
+                return SafeFunction::execute( $custom_function, $new_attr, $content, 'import' );
+        }
+
+        /**
+         * Apply safe user function to data.
+         *
+         * @since 3.9.33
+         *
+         * @param mixed  $data       Input data.
+         * @param bool   $is_enabled Whether user function is enabled.
+         * @param string $php_fun    Function name.
+         *
+         * @return mixed
+         */
+        protected function apply_user_function( $data = "", $is_enabled = false, $php_fun = "" ) {
+                return SafeFunction::apply( $data, $is_enabled, $php_fun, 'import' );
         }
 
         protected function is_update_field( $field = "" ) {
@@ -351,20 +368,45 @@ abstract class WPIE_Import_Base {
                 do_action( 'wpie_after_update_meta', $this->item_id, $meta_key, $meta_val, $this->import_type );
         }
 
-        protected function get_meta( $meta_key = "", $is_single = false ) {
+	/**
+	 * Get item metadata.
+	 *
+	 * When $meta_key is empty or omitted, returns all metadata as an associative array.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $meta_key  Optional. Meta key name. Default empty.
+	 * @param bool   $is_single Optional. Whether to return a single value. Default false.
+	 * @return mixed Meta value or array of all metadata.
+	 */
+	protected function get_meta( $meta_key = "", $is_single = false ) {
 
-                if ( !empty( $meta_key ) && !empty( $this->item_id ) ) {
-                        if ( $this->import_type == "taxonomy" || $this->import_type == "product_attribute" ) {
-                                return get_term_meta( $this->item_id, $meta_key, $is_single );
-                        } elseif ( $this->import_type == "user" ) {
-                                return get_user_meta( $this->item_id, $meta_key, $is_single );
-                        } elseif ( $this->import_type == "comment" ) {
-                                return get_comment_meta( $this->item_id, $meta_key, $is_single );
-                        } else {
-                                return get_post_meta( $this->item_id, $meta_key, $is_single );
-                        }
-                }
-        }
+		if ( ! empty( $this->item_id ) ) {
+			if ( ! empty( $meta_key ) ) {
+				if ( $this->import_type == "taxonomy" || $this->import_type == "product_attribute" ) {
+					return get_term_meta( $this->item_id, $meta_key, $is_single );
+				} elseif ( $this->import_type == "user" ) {
+					return get_user_meta( $this->item_id, $meta_key, $is_single );
+				} elseif ( $this->import_type == "comment" ) {
+					return get_comment_meta( $this->item_id, $meta_key, $is_single );
+				} else {
+					return get_post_meta( $this->item_id, $meta_key, $is_single );
+				}
+			} else {
+				if ( $this->import_type == "taxonomy" || $this->import_type == "product_attribute" ) {
+					return get_term_meta( $this->item_id );
+				} elseif ( $this->import_type == "user" ) {
+					return get_user_meta( $this->item_id );
+				} elseif ( $this->import_type == "comment" ) {
+					return get_comment_meta( $this->item_id );
+				} else {
+					return get_post_meta( $this->item_id );
+				}
+			}
+		}
+
+		return array();
+	}
 
         protected function remove_meta( $meta_key = "" ) {
                 if ( !empty( $meta_key ) && !empty( $this->item_id ) ) {
@@ -388,7 +430,7 @@ abstract class WPIE_Import_Base {
         protected function get_date( $date = "", $format = "" ) {
 
                 if ( empty( $date ) ) {
-                        $date = date( "Y-m-d H:i:s" );
+                        $date = gmdate( "Y-m-d H:i:s" );
                 }
 
                 $format = empty( trim( $format ) ) ? "Y-m-d H:i:s" : $format;
@@ -402,7 +444,7 @@ abstract class WPIE_Import_Base {
                         return false;
                 }
 
-                return date( $format, strtotime( $date ) );
+                return gmdate( $format, strtotime( $date ) );
         }
 
         private function get_valid_date( $date = "" ) {

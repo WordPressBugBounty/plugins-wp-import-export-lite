@@ -251,7 +251,7 @@ class WPIE_Attachments extends \wpie\import\base\WPIE_Import_Base {
                 // If error storing permanently, unlink.
                 if ( \is_wp_error( $id ) ) {
                         if ( \file_exists( $file ) ) {
-                                \unlink( $file );
+                                \wp_delete_file( $file );
                         }
                         $this->import_log[] = '<strong>' . __( 'Warning', 'wp-import-export-lite' ) . '</strong> : ' . $id->get_error_message();
                         return false;
@@ -330,6 +330,12 @@ class WPIE_Attachments extends \wpie\import\base\WPIE_Import_Base {
                 return false;
         }
 
+        /**
+         * Upload media file to uploads directory and create attachment.
+         *
+         * Pre-validates file type and extension against WordPress core's get_allowed_mime_types()
+         * before copying to the uploads directory, preventing arbitrary file upload.
+         */
         private function media_handle_upload( $file_array, $post_id = 0, $desc = null, $post_data = array() ) {
 
                 $oFileUrl = isset( $file_array[ 'url' ] ) ? $file_array[ 'url' ] : "";
@@ -340,19 +346,35 @@ class WPIE_Attachments extends \wpie\import\base\WPIE_Import_Base {
 
                 $uploads = wp_upload_dir( $time );
 
-                $name = $oFileName;
+                $name = \wp_unique_filename( $uploads[ 'path' ], $oFileName );
+
+                // Security check: validate file type and extension against allowed mime types before copying.
+                $filetype_check = wp_check_filetype_and_ext( $file_array[ 'tmp_name' ], $name, get_allowed_mime_types() );
+
+                if ( empty( $filetype_check[ 'ext' ] ) || empty( $filetype_check[ 'type' ] ) ) {
+                        if ( ! empty( $file_array[ 'tmp_name' ] ) && file_exists( $file_array[ 'tmp_name' ] ) ) {
+                                @wp_delete_file( $file_array[ 'tmp_name' ] );
+                        }
+                        return new \WP_Error( 'wpie_import_error', __( 'Sorry, you are not allowed to upload this file type.', 'wp-import-export-lite' ) );
+                }
+
+                if ( ! empty( $filetype_check[ 'proper_filename' ] ) ) {
+                        $name = \wp_unique_filename( $uploads[ 'path' ], $filetype_check[ 'proper_filename' ] );
+                }
 
                 // Move the file to the uploads dir.
                 $newFile = $uploads[ 'path' ] . "/" . $name;
 
                 if ( !copy( $file_array[ 'tmp_name' ], $newFile ) ) {
-                        return new \WP_Error( 'wpie_import_error', sprintf( __( "File Download Error : Can't copy File", 'wp-import-export-lite' ), $url ) );
+                        if ( ! empty( $file_array[ 'tmp_name' ] ) && file_exists( $file_array[ 'tmp_name' ] ) ) {
+                                @wp_delete_file( $file_array[ 'tmp_name' ] );
+                        }
+                        return new \WP_Error( 'wpie_import_error', sprintf( __( "File Download Error : Can't copy File", 'wp-import-export-lite' ), $oFileUrl ) );
                 }
 
+                wp_delete_file( $file_array[ 'tmp_name' ] );
 
-                unlink( $file_array[ 'tmp_name' ] );
-
-                $fileType = wp_check_filetype( $newFile );
+                $fileType = ! empty( $filetype_check[ 'type' ] ) ? $filetype_check : wp_check_filetype( $newFile );
 
                 $file = [
                         'file' => $newFile,

@@ -25,12 +25,19 @@ class Manager {
                 }
 
                 if ( !preg_match( '%^(http|ftp)s?://%i', $url ) ) {
+                        /* translators: %s: File URL. */
                         return new \WP_Error( 'wpie_import_error', sprintf( __( 'File Download Error : URL `%s` is not valid.', 'wp-import-export-lite' ), $url ) );
                 }
 
                 $this->original_url = $url;
 
                 $this->url = $this->process_url( $url );
+
+                $valid_url = \wp_http_validate_url( $this->url );
+                if ( false === $valid_url ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is not valid', 'wp-import-export-lite' ) );
+                }
+                $this->url = $valid_url;
 
                 $header = new File_Header( $this->url, $type );
 
@@ -55,6 +62,16 @@ class Manager {
                                 return $filename;
                         }
                 }
+
+                if ( empty( $this->url ) ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is empty', 'wp-import-export-lite' ) );
+                }
+
+                $valid_url = \wp_http_validate_url( $this->url );
+                if ( false === $valid_url ) {
+                        return new \WP_Error( 'wpie_import_error', __( 'File Download Error : File URL is not valid', 'wp-import-export-lite' ) );
+                }
+                $this->url = $valid_url;
 
                 if ( is_readable( WPIE_IMPORT_CLASSES_DIR . '/downloader/download.php' ) ) {
                         require_once(WPIE_IMPORT_CLASSES_DIR . '/downloader/download.php');
@@ -81,13 +98,14 @@ class Manager {
                         $error = new \WP_Error( 'wpie_import_error', __( 'File Download Error : File is not readable', 'wp-import-export-lite' ) );
                 } elseif ( filesize( $file ) === false || filesize( $file ) < 1 ) {
                         $error = new \WP_Error( 'invalid_image', __( 'File Download Error : Empty File', 'wp-import-export-lite' ) );
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Rename downloaded temp file to target destination.
                 } elseif ( !rename( $file, $new_file ) ) {
                         $error = new \WP_Error( 'wpie_import_error', __( 'File Download Error : Something Wrong, File rename not work.', 'wp-import-export-lite' ) );
                 }
 
                 if ( $error !== null ) {
                         if ( file_exists( $file ) ) {
-                                unlink( $file );
+                                wp_delete_file( $file );
                         }
                         return $error;
                 }
@@ -107,7 +125,7 @@ class Manager {
                         $type = null;
                 }
 
-                $parse  = parse_url( $url );
+                $parse  = wp_parse_url( $url );
                 $domain = isset( $parse[ 'host' ] ) ? $parse[ 'host' ] : '';
                 unset( $match, $parse );
 

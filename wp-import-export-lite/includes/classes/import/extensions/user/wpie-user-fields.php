@@ -35,7 +35,7 @@ if ( !function_exists( "wpie_import_user_mapping_fields" ) ) {
                                 <div class="wpie_field_mapping_container_element">
                                         <div class="wpie_field_mapping_inner_title"><?php esc_html_e( 'Role', 'wp-import-export-lite' ); ?><i class="far fa-question-circle wpie_data_tipso" data-tipso="<?php echo esc_attr( $role_hint ); ?>"></i></div>
                                         <div class="wpie_field_mapping_other_option_wrapper">
-                                                <input type="text" class="wpie_content_data_input wpie_item_user_role" name="wpie_item_user_role" value="<?php echo $role; ?>"/>
+                                                <input type="text" class="wpie_content_data_input wpie_item_user_role" name="wpie_item_user_role" value="<?php echo esc_attr( $role ); ?>"/>
                                         </div>
                                 </div>
                                 <div class="wpie_field_mapping_container_element">

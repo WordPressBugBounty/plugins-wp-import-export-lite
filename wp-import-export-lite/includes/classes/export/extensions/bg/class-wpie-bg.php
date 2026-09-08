@@ -1,247 +1,350 @@
 <?php
+/**
+ * WPIE Background Export Controller Class
+ *
+ * Handles background cron execution, token authentication, and lock management for background export tasks.
+ *
+ * @package    WPIE
+ * @subpackage WPIE/Export/Extensions/BG
+ */
 
 namespace wpie\export\bg;
+
+use WpieApp\Core\Helpers\Param;
+use wpie\export\WPIE_Export;
 
 defined( 'ABSPATH' ) || exit;
 
 if ( file_exists( WPIE_EXPORT_CLASSES_DIR . '/class-wpie-export.php' ) ) {
-
-        require_once(WPIE_EXPORT_CLASSES_DIR . '/class-wpie-export.php');
+	require_once WPIE_EXPORT_CLASSES_DIR . '/class-wpie-export.php';
 }
 
-class WPIE_BG extends \wpie\export\WPIE_Export {
+/**
+ * Class WPIE_BG
+ *
+ * Background and external cron controller for exports.
+ */
+class WPIE_BG extends WPIE_Export {
 
-        public function __construct() {
-                
-        }
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {}
 
-        public function init() {
+	/**
+	 * Initialize hooks for background exports.
+	 *
+	 * @return void
+	 */
+	public function init() {
 
-                add_action( 'init', array( $this, 'init_process' ), 100 );
+		add_action( 'init', array( $this, 'init_process' ), 100 );
 
-                add_filter( 'wpie_add_export_extension_process_btn', array( $this, 'add_bg_export_btn' ), 10, 1 );
-        }
+		add_filter( 'wpie_add_export_extension_process_btn', array( $this, 'add_bg_export_btn' ), 10, 1 );
+	}
 
-        public function add_bg_export_btn( $files = array() ) {
+	/**
+	 * Register background export action button template.
+	 *
+	 * @param array $files Template file paths.
+	 * @return array
+	 */
+	public function add_bg_export_btn( $files = array() ) {
 
-                $fileName = WPIE_EXPORT_CLASSES_DIR . '/extensions/bg/wpie_bg_btn.php';
+		$fileName = WPIE_EXPORT_CLASSES_DIR . '/extensions/bg/wpie_bg_btn.php';
 
-                if ( !in_array( $fileName, $files ) ) {
+		if ( ! in_array( $fileName, $files, true ) ) {
+			$files[] = $fileName;
+		}
 
-                        $files[] = $fileName;
-                }
+		return $files;
+	}
 
-                return $files;
-        }
+	/**
+	 * Run background export process iteration.
+	 *
+	 * @return void|bool
+	 */
+	public function init_process() {
 
-        public function init_process() {
+		if ( ! $this->isValidRequest() ) {
 
-                if ( !$this->isValidRequest() ) {
+			$wpie_bg_and_cron_processing = maybe_unserialize( get_option( 'wpie_bg_and_cron_processing', '' ) );
 
-                        $wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing", "" ) );
+			$cronMethod = isset( $wpie_bg_and_cron_processing['method'] ) ? (string) $wpie_bg_and_cron_processing['method'] : '';
 
-                        $cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
+			$cron_token = Param::getSanitized( 'wpie_cron_token', 'text', '' );
 
-                        if ( $cronMethod !== "external" || !isset( $_GET[ 'wpie_cron_token' ] ) ) {
-                                return true;
-                        }
+			if ( 'external' !== $cronMethod || empty( $cron_token ) ) {
+				return true;
+			}
 
-                        $respons = [
-                                "status"  => "error",
-                                "plugin"  => "WP Import Export",
-                                "message" => "Invalid Request",
-                        ];
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'plugin'  => 'WP Import Export',
+					'message' => __( 'Invalid Request', 'wp-import-export-lite' ),
+				)
+			);
+		}
 
-                        echo json_encode( $respons );
+		$this->unlockTemplate();
 
-                        die();
-                }
+		$this->setBgExport();
+	}
 
-                $this->unlockTemplate();
+	/**
+	 * Dispatch one export batch step in the background.
+	 *
+	 * @return void
+	 */
+	public function setBgExport() {
 
-                $this->setBgExport();
-        }
+		global $wpdb;
 
-        public function setBgExport() {
+		$bgProcess = get_option( 'wpie_bg_process' );
 
-                global $wpdb;
+		$wpieProcess = array();
 
-                $bgProcess = \get_option( "wpie_bg_process" );
+		if ( is_string( $bgProcess ) && trim( $bgProcess ) !== '' ) {
+			$wpieProcess = maybe_unserialize( $bgProcess );
+		}
 
-                $wpieProcess = [];
-                
-                if ( is_string( $bgProcess ) && trim( $bgProcess ) !== '' ) {
-                        $wpieProcess = \maybe_unserialize( $bgProcess );
-                }
+		if ( ! is_array( $wpieProcess ) || empty( $wpieProcess ) ) {
+			$wpieProcess = array();
+		}
 
-                if ( !is_array( $wpieProcess ) || empty( $wpieProcess ) ) {
-                        $wpieProcess = [];
-                }
-                $wpieProcess[ 'processing' ] = isset( $wpieProcess[ 'processing' ] ) ? $wpieProcess[ 'processing' ] : [];
+		$wpieProcess['processing']           = isset( $wpieProcess['processing'] ) ? $wpieProcess['processing'] : array();
+		$wpieProcess['processing']['export'] = ( ! empty( $wpieProcess['processing'] ) && isset( $wpieProcess['processing']['export'] ) && is_array( $wpieProcess['processing']['export'] ) ) ? $wpieProcess['processing']['export'] : array();
 
-                $wpieProcess[ 'processing' ][ 'export' ] = !empty( $wpieProcess[ 'processing' ] ) && isset( $wpieProcess[ 'processing' ][ 'export' ] ) ? $wpieProcess[ 'processing' ][ 'export' ] : [];
+		$template = $this->getTemplate( $wpieProcess['processing']['export'] );
 
-                $template = $this->getTemplate( $wpieProcess[ 'processing' ][ 'export' ] );
+		if ( ! isset( $template->id ) ) {
+			return;
+		}
 
-                if ( !isset( $template->id ) ) {
-                        return;
-                }
-                $templateId = $template->id;
+		$templateId = (int) $template->id;
 
-                $process_log = isset( $template->process_log ) && !empty( $template->process_log ) ? maybe_unserialize( $template->process_log ) : [];
+		$wpieProcess['processing']['export'][] = $templateId;
 
-                $wpieProcess[ 'processing' ][ 'export' ][] = $templateId;
+		update_option( 'wpie_bg_process', maybe_serialize( $wpieProcess ) );
 
-                \update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 1 WHERE `id` = %d", $templateId ) );
 
-                $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 1 WHERE `id` = %d ", $templateId ) );
+		$export_type = isset( $template->opration_type ) ? (string) $template->opration_type : 'post';
 
-                $export_type = isset( $template->opration_type ) ? $template->opration_type : "post";
+		$opration = isset( $template->opration ) ? (string) $template->opration : 'export';
 
-                $opration = isset( $template->opration ) ? $template->opration : "export";
+		$this->init_export( $export_type, $opration, $template );
 
-                $process_log = $this->init_export( $export_type, $opration, $template );
+		$wpieProcess['processing']['export'] = array_values( array_diff( $wpieProcess['processing']['export'], array( $templateId ) ) );
 
-                $wpieProcess[ 'processing' ][ 'export' ] = array_diff( $wpieProcess[ 'processing' ][ 'export' ], [ $templateId ] );
+		update_option( 'wpie_bg_process', maybe_serialize( $wpieProcess ) );
 
-                \update_option( "wpie_bg_process", \maybe_serialize( $wpieProcess ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `id` = %d", $templateId ) );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
-                $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `id` = %d ", $templateId ) );
+		$this->setCronMsg( $templateId );
+	}
 
-                $this->setCronMsg( $templateId );
-        }
+	/**
+	 * Retrieve next pending background export template record.
+	 *
+	 * @param array $excludes Template IDs currently being processed.
+	 * @return object|false
+	 */
+	public function getTemplate( $excludes = array() ) {
 
-        public function getTemplate( $excludes = [] ) {
+		global $wpdb;
 
-                global $wpdb;
+		$clean_excludes = ( ! empty( $excludes ) && is_array( $excludes ) ) ? array_values( array_filter( array_map( 'absint', array_unique( $excludes ) ) ) ) : array();
 
-                $idQuery = "";
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		if ( ! empty( $clean_excludes ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $clean_excludes ), '%d' ) );
+			$template     = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}wpie_template WHERE `opration` IN ('export', 'schedule_export') AND `status` LIKE %s AND `process_lock` = 0 AND `id` NOT IN ({$placeholders}) ORDER BY `id` ASC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+					array_merge( array( '%background%' ), $clean_excludes )
+				)
+			);
+		} else {
+			$template = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}wpie_template WHERE `opration` IN ('export', 'schedule_export') AND `status` LIKE %s AND `process_lock` = 0 ORDER BY `id` ASC LIMIT 1",
+					'%background%'
+				)
+			);
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
-                if ( !empty( $excludes ) ) {
-                        $idQuery = " AND `id` NOT IN (" . implode( ",", array_map( "absint", array_unique( $excludes ) ) ) . ") ";
-                }
+		if ( isset( $template->id ) && absint( $template->id ) > 0 ) {
+			return $template;
+		}
 
-                $template = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "wpie_template where `opration` in ('export','schedule_export') and `status` LIKE '%background%' and `process_lock` = 0 " . $idQuery . " ORDER BY `id` ASC limit 1" );
+		unset( $template );
 
-                if ( isset( $template->id ) && absint( $template->id ) > 0 ) {
+		return false;
+	}
 
-                        return $template;
-                }
-                unset( $template );
+	/**
+	 * Release stale process locks for interrupted background jobs.
+	 *
+	 * @return void
+	 */
+	private function unlockTemplate() {
 
-                return false;
-        }
+		global $wpdb;
 
-        private function unlockTemplate() {
+		$wpieProcess = maybe_unserialize( get_option( 'wpie_bg_process', array() ) );
 
-                global $wpdb;
+		if ( ! is_array( $wpieProcess ) || empty( $wpieProcess ) ) {
+			$wpieProcess = array();
+		}
 
-                $wpieProcess = \maybe_unserialize( \get_option( "wpie_bg_process", [] ) );
+		$wpieProcess['processing'] = isset( $wpieProcess['processing'] ) ? $wpieProcess['processing'] : array();
 
-                if ( !is_array( $wpieProcess ) || empty( $wpieProcess ) ) {
-                        $wpieProcess = [];
-                }
+		$processingIds = ( ! empty( $wpieProcess['processing'] ) && isset( $wpieProcess['processing']['export'] ) && is_array( $wpieProcess['processing']['export'] ) ) ? $wpieProcess['processing']['export'] : array();
 
-                $wpieProcess[ 'processing' ] = isset( $wpieProcess[ 'processing' ] ) ? $wpieProcess[ 'processing' ] : [];
+		if ( empty( $processingIds ) ) {
+			$this->updateTemplateLock();
+			return;
+		}
 
-                $processingIds = !empty( $wpieProcess[ 'processing' ] ) && isset( $wpieProcess[ 'processing' ][ 'export' ] ) ? $wpieProcess[ 'processing' ][ 'export' ] : [];
+		$idList = array_values( array_filter( array_map( 'absint', $processingIds ) ) );
 
-                if ( empty( $processingIds ) ) {
-                        $this->updateTemplateLock();
-                        return;
-                }
+		if ( empty( $idList ) ) {
+			$this->updateTemplateLock();
+			return;
+		}
 
-                $idList = array_map( "absint", $processingIds );
+		$placeholders = implode( ',', array_fill( 0, count( $idList ), '%d' ) );
 
-                $templates = $wpdb->get_results( "SELECT `id`,`process_log`,`process_lock`,`last_update_date` FROM " . $wpdb->prefix . "wpie_template where `id` IN (" . implode( ",", $idList ) . ") ORDER BY `id` ASC" );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		$templates = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT `id`, `process_log`, `process_lock`, `last_update_date` FROM {$wpdb->prefix}wpie_template WHERE `id` IN ({$placeholders}) ORDER BY `id` ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				$idList
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
-                $updateIds = [];
+		$updateIds = array();
 
-                foreach ( $templates as $template ) {
+		foreach ( $templates as $template ) {
 
-                        $id = isset( $template->id ) ? $template->id : 0;
+			$id = isset( $template->id ) ? (int) $template->id : 0;
 
-                        if ( intval( $template->process_lock ) === 0 ) {
-                                $updateIds[] = $id;
-                                continue;
-                        }
+			if ( 0 === (int) $template->process_lock ) {
+				$updateIds[] = $id;
+				continue;
+			}
 
-                        $currentTime = strtotime( current_time( "mysql" ) );
+			$currentTime = strtotime( current_time( 'mysql' ) );
 
-                        $allowTime = 60 * 5;
+			$allowTime = 60 * 5;
 
-                        $last_update_date = isset( $template->last_update_date ) ? $template->last_update_date : "";
+			$last_update_date = isset( $template->last_update_date ) ? (string) $template->last_update_date : '';
+			$last_update_time = ( '' !== $last_update_date ) ? strtotime( $last_update_date ) : 0;
 
-                        if ( $currentTime >= (strtotime( $last_update_date ) + $allowTime) ) {
-                                $updateIds[] = $id;
-                                continue;
-                        }
-                }
+			if ( $currentTime >= ( $last_update_time + $allowTime ) ) {
+				$updateIds[] = $id;
+				continue;
+			}
+		}
 
-                $this->updateTemplateLock( $updateIds );
+		$this->updateTemplateLock( $updateIds );
 
-                $wpieProcess[ 'processing' ][ 'export' ] = array_diff( $processingIds, $updateIds );
+		$wpieProcess['processing']['export'] = array_values( array_diff( $processingIds, $updateIds ) );
 
-                \update_option( "wpie_bg_process", maybe_serialize( $wpieProcess ) );
-        }
+		update_option( 'wpie_bg_process', maybe_serialize( $wpieProcess ) );
+	}
 
-        private function updateTemplateLock( $ids = [] ) {
+	/**
+	 * Reset lock column in database for given template IDs.
+	 *
+	 * @param array $ids Array of template IDs.
+	 * @return void
+	 */
+	private function updateTemplateLock( $ids = array() ) {
 
-                $ids = !empty( $ids ) ? array_map( "absint", $ids ) : [];
+		$clean_ids = ( ! empty( $ids ) && is_array( $ids ) ) ? array_values( array_filter( array_map( 'absint', $ids ) ) ) : array();
 
-                $ids = !empty( $ids ) ? implode( ",", array_unique( $ids ) ) : "";
+		global $wpdb;
 
-                $idQuery = "";
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		if ( ! empty( $clean_ids ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $clean_ids ), '%d' ) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `process_lock` = 1 AND `opration` IN ('export', 'schedule_export') AND `id` IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+					$clean_ids
+				)
+			);
+		} else {
+			$wpdb->query( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `process_lock` = 1 AND `opration` IN ('export', 'schedule_export')" );
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
+	}
 
-                if ( !empty( $ids ) ) {
-                        $idQuery = " AND `id` IN (" . $ids . ")";
-                }
+	/**
+	 * Validate request authorization for external cron triggers.
+	 *
+	 * @return bool
+	 */
+	private function isValidRequest() {
 
-                global $wpdb;
+		$wpie_bg_and_cron_processing = maybe_unserialize( get_option( 'wpie_bg_and_cron_processing', '' ) );
 
-                $wpdb->query( "UPDATE {$wpdb->prefix}wpie_template SET `process_lock` = 0 WHERE `process_lock` = 1 and `opration` in ('export','schedule_export') " . $idQuery );
-        }
+		$cronMethod = isset( $wpie_bg_and_cron_processing['method'] ) ? (string) $wpie_bg_and_cron_processing['method'] : '';
 
-        private function isValidRequest() {
+		if ( 'external' !== $cronMethod ) {
+			return true;
+		}
 
-                $wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing", "" ) );
+		$token = Param::getSanitized( 'wpie_cron_token', 'text', '' );
 
-                $cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
+		$siteToken = isset( $wpie_bg_and_cron_processing['token'] ) ? (string) $wpie_bg_and_cron_processing['token'] : '';
 
-                if ( $cronMethod !== "external" ) {
-                        return true;
-                }
+		if ( '' === $siteToken || '' === $token || ! hash_equals( $siteToken, $token ) ) {
+			return false;
+		}
 
-                $token = isset( $_GET[ 'wpie_cron_token' ] ) ? \sanitize_textarea_field( $_GET[ 'wpie_cron_token' ] ) : "";
+		return true;
+	}
 
-                $siteToken = isset( $wpie_bg_and_cron_processing[ 'token' ] ) ? $wpie_bg_and_cron_processing[ 'token' ] : "";
+	/**
+	 * Send JSON response for external cron calls.
+	 *
+	 * @param int $templateId Template ID.
+	 * @return void
+	 */
+	private function setCronMsg( $templateId ) {
 
-                if ( ( string ) $siteToken !== ( string ) $token ) {
-                        return false;
-                }
+		$wpie_bg_and_cron_processing = maybe_unserialize( get_option( 'wpie_bg_and_cron_processing', '' ) );
 
-                return true;
-        }
+		$cronMethod = isset( $wpie_bg_and_cron_processing['method'] ) ? (string) $wpie_bg_and_cron_processing['method'] : '';
 
-        private function setCronMsg( $templateId ) {
+		if ( 'external' !== $cronMethod ) {
+			return;
+		}
 
-                $wpie_bg_and_cron_processing = \maybe_unserialize( \get_option( "wpie_bg_and_cron_processing", "" ) );
+		wp_send_json(
+			array(
+				'status'  => 'success',
+				'plugin'  => 'WP Import Export',
+				'message' => 'WP Import Export : Export #' . absint( $templateId ) . ' Processing',
+			)
+		);
+	}
 
-                $cronMethod = isset( $wpie_bg_and_cron_processing[ 'method' ] ) ? $wpie_bg_and_cron_processing[ 'method' ] : "";
-
-                if ( $cronMethod !== "external" ) {
-                        return true;
-                }
-
-                $respons = [
-                        "status"  => "success",
-                        "plugin"  => "WP Import Export",
-                        "message" => "WP Import Export : Export #" . $templateId . " Processing"
-                ];
-
-                echo json_encode( $respons );
-
-                die();
-        }
-
+	/**
+	 * Destructor.
+	 */
+	public function __destruct() {
+		foreach ( $this as $key => $value ) {
+			unset( $this->$key );
+		}
+	}
 }

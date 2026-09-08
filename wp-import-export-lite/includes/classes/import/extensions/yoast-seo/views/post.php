@@ -279,8 +279,8 @@ if ( !function_exists( "wpie_import_get_yoast_seo_post_tab" ) ) {
 
                                                                                         ?>
                                                                                         <div class="wpie_field_mapping_other_option_wrapper">
-                                                                                                <input type="radio" class="wpie_radio wpie_field_mapping_other_option_radio wpie_item__yoast_wpseo_schema_page_type wpie_item__yoast_wpseo_schema_page_type_<?php echo $value; ?>" name="wpie_item__yoast_wpseo_schema_page_type" id="wpie_item__yoast_wpseo_schema_page_type_<?php echo $value; ?>" value="<?php echo $value; ?>"  />
-                                                                                                <label for="wpie_item__yoast_wpseo_schema_page_type_<?php echo $value; ?>" class="wpie_radio_label"><?php echo esc_html( $label ); ?></label>
+                                                                                                <input type="radio" class="wpie_radio wpie_field_mapping_other_option_radio wpie_item__yoast_wpseo_schema_page_type wpie_item__yoast_wpseo_schema_page_type_<?php echo esc_attr( $value ); ?>" name="wpie_item__yoast_wpseo_schema_page_type" id="wpie_item__yoast_wpseo_schema_page_type_<?php echo esc_attr( $value ); ?>" value="<?php echo esc_attr( $value ); ?>"  />
+                                                                                                <label for="wpie_item__yoast_wpseo_schema_page_type_<?php echo esc_attr( $value ); ?>" class="wpie_radio_label"><?php echo esc_html( $label ); ?></label>
                                                                                         </div>
                                                                                         <?php
                                                                                 }
@@ -314,8 +314,8 @@ if ( !function_exists( "wpie_import_get_yoast_seo_post_tab" ) ) {
 
                                                                                                 ?>
                                                                                                 <div class="wpie_field_mapping_other_option_wrapper">
-                                                                                                        <input type="radio" class="wpie_radio wpie_field_mapping_other_option_radio wpie_item__yoast_wpseo_schema_article_type wpie_item__yoast_wpseo_schema_article_type_<?php echo $value; ?>" name="wpie_item__yoast_wpseo_schema_article_type" id="wpie_item__yoast_wpseo_schema_article_type_<?php echo $value; ?>" value="<?php echo $value; ?>"  />
-                                                                                                        <label for="wpie_item__yoast_wpseo_schema_article_type_<?php echo $value; ?>" class="wpie_radio_label"><?php echo esc_html( $label ); ?></label>
+                                                                                                        <input type="radio" class="wpie_radio wpie_field_mapping_other_option_radio wpie_item__yoast_wpseo_schema_article_type wpie_item__yoast_wpseo_schema_article_type_<?php echo esc_attr( $value ); ?>" name="wpie_item__yoast_wpseo_schema_article_type" id="wpie_item__yoast_wpseo_schema_article_type_<?php echo esc_attr( $value ); ?>" value="<?php echo esc_attr( $value ); ?>"  />
+                                                                                                        <label for="wpie_item__yoast_wpseo_schema_article_type_<?php echo esc_attr( $value ); ?>" class="wpie_radio_label"><?php echo esc_html( $label ); ?></label>
                                                                                                 </div>
                                                                                                 <?php
                                                                                         }

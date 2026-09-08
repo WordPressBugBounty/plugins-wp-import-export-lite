@@ -7,6 +7,7 @@ use wpie\import\upload\validate\WPIE_Upload_Validate;
 use wpie\import\chunk\WPIE_Chunk;
 use wpie\import\upload\WPIE_Upload;
 use wpie\import\Compatibility\Manager as AddOns;
+use WpieApp\Core\Helpers\Param;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -228,13 +229,13 @@ class WPIE_Import {
 
                 $new_values[ 'last_update_date' ] = $current_time;
 
-                $is_update = false;
+		$is_update = false;
 
-                if ( absint( $import_id ) > 0 ) {
-                        $is_update = $wpdb->update( $wpdb->prefix . "wpie_template", $new_values, [ "id" => absint( $import_id ) ] );
-                }
+		if ( absint( $import_id ) > 0 ) {
+			$is_update = $wpdb->update( $wpdb->prefix . "wpie_template", $new_values, [ "id" => absint( $import_id ) ] );
+		}
 
-                if ( $is_update === false || absint( $is_update ) === 0 ) {
+		if ( absint( $import_id ) === 0 ) {
 
                         if ( empty( $unique_id ) ) {
                                 $unique_id = uniqid();
@@ -298,7 +299,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $wpie_import_id = isset( $_GET[ "wpie_import_id" ] ) ? intval( wpie_sanitize_field( $_GET[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::getSanitized( 'wpie_import_id', 'int', 0 );
 
                 if ( $wpie_import_id != 0 ) {
 
@@ -312,25 +313,25 @@ class WPIE_Import {
 
                                 $data_parser = new WPIE_Upload_Validate();
 
-                                $wpie_csv_delimiter = isset( $_GET[ "wpie_csv_delimiter" ] ) ? wpie_sanitize_field( $_GET[ "wpie_csv_delimiter" ] ) : ",";
+                                $wpie_csv_delimiter = Param::getSanitized( 'wpie_csv_delimiter', 'text', ',' );
 
-                                $is_first_row_title = isset( $_GET[ "wpie_file_first_row_is_title" ] ) ? wpie_sanitize_field( $_GET[ "wpie_file_first_row_is_title" ] ) : 1;
+                                $is_first_row_title = Param::getSanitized( 'wpie_file_first_row_is_title', 'text', 1 );
 
                                 $template_options = isset( $template_data->options ) ? maybe_unserialize( $template_data->options ) : [];
 
                                 $importFile = isset( $template_options[ 'importFile' ] ) ? $template_options[ 'importFile' ] : [];
 
-                                $activeFile = isset( $_GET[ 'activeFile' ] ) ? wpie_sanitize_field( $_GET[ 'activeFile' ] ) : "";
+                                $activeFile = Param::getSanitized( 'activeFile', 'text', '' );
 
                                 $fileData = isset( $importFile[ $activeFile ] ) ? $importFile[ $activeFile ] : [];
 
                                 $sheetData = $this->getSheetData( $fileData );
 
-                                $activeSheet = isset( $_GET[ 'activeSheet' ] ) ? wpie_sanitize_field( $_GET[ 'activeSheet' ] ) : "";
+                                $activeSheet = Param::getSanitized( 'activeSheet', 'text', '' );
 
                                 $activeSheet = empty( $activeSheet ) ? (isset( $sheetData[ 'activeSheet' ] ) ? $sheetData[ 'activeSheet' ] : '') : $activeSheet;
 
-                                $activeFormat = isset( $_GET[ 'activeFormat' ] ) ? wpie_sanitize_field( $_GET[ 'activeFormat' ] ) : false;
+                                $activeFormat = Param::getSanitized( 'activeFormat', 'text', false );
 
                                 $data = $data_parser->wpie_parse_upload_data( $template_data, $wpie_csv_delimiter, $is_first_row_title, false, false, $activeSheet, $activeFormat );
 
@@ -351,7 +352,7 @@ class WPIE_Import {
                                         if ( is_array( $data ) && isset( $data[ 'delimiter' ] ) ) {
                                                 $return_value[ 'delimiter' ] = $data[ 'delimiter' ];
                                         }
-                                        $activeSheet = isset( $_GET[ 'activeSheet' ] ) ? wpie_sanitize_field( $_GET[ 'activeSheet' ] ) : "";
+                                        $activeSheet = Param::getSanitized( 'activeSheet', 'text', '' );
 
                                         $return_value[ 'sheetList' ]   = isset( $sheetData[ 'sheetList' ] ) ? $sheetData[ 'sheetList' ] : [];
                                         $return_value[ 'activeSheet' ] = empty( $activeSheet ) ? (isset( $sheetData[ 'activeSheet' ] ) ? $sheetData[ 'activeSheet' ] : '') : $activeSheet;
@@ -413,7 +414,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $wpie_import_id = isset( $_POST[ "wpie_import_id" ] ) ? intval( wpie_sanitize_field( $_POST[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::postSanitized( 'wpie_import_id', 'int', 0 );
 
                 $template_data = $this->get_template_by_id( $wpie_import_id );
 
@@ -422,7 +423,7 @@ class WPIE_Import {
                         $template_options = maybe_unserialize( $template_data->options );
 
                         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Escaping for HTML will break functionality.
-                        $new_template_data = array_merge( $template_options, wp_unslash( $_POST ) );
+                        $new_template_data = array_merge( $template_options, Param::post() );
 
                         if ( file_exists( WPIE_IMPORT_CLASSES_DIR . '/class-wpie-record.php' ) ) {
                                 require_once(WPIE_IMPORT_CLASSES_DIR . '/class-wpie-record.php');
@@ -464,7 +465,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $type = isset( $_GET[ "type" ] ) ? wpie_sanitize_field( $_GET[ "type" ] ) : "";
+                $type = Param::getSanitized( 'type', 'key', '' );
 
                 if ( !empty( $type ) ) {
 
@@ -519,7 +520,7 @@ class WPIE_Import {
 
         public function wpie_finalyze_template_data( $opration = "import" ) {
 
-                $wpie_import_id = isset( $_POST[ "wpie_import_id" ] ) ? absint( wpie_sanitize_field( $_POST[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::postSanitized( 'wpie_import_id', 'absint', 0 );
 
                 if ( $wpie_import_id > 0 ) {
 
@@ -537,15 +538,15 @@ class WPIE_Import {
                         }
 
                         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Escaping for HTML will break functionality.
-                        $new_template_data = array_merge( $template_options, wp_unslash( $_POST ) );
+                        $new_template_data = array_merge( $template_options, Param::post() );
 
                         $new_values[ 'options' ] = maybe_serialize( $new_template_data );
 
                         $new_values[ 'opration' ] = $opration;
 
-                        $new_values[ 'opration_type' ] = isset( $_POST[ 'wpie_import_type' ] ) ? wpie_sanitize_field( $_POST[ 'wpie_import_type' ] ) : "post";
+                        $new_values[ 'opration_type' ] = Param::postSanitized( 'wpie_import_type', 'key', 'post' );
 
-                        $bg = isset( $_POST[ 'bg' ] ) ? absint( wpie_sanitize_field( $_POST[ 'bg' ] ) ) : 0;
+                        $bg = Param::postSanitized( 'bg', 'absint', 0 );
 
                         if ( $bg == 1 ) {
                                 $new_values[ 'status' ] = "background";
@@ -593,7 +594,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $wpie_import_id = isset( $_GET[ "wpie_import_id" ] ) ? intval( wpie_sanitize_field( $_GET[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::getSanitized( 'wpie_import_id', 'int', 0 );
 
                 if ( $wpie_import_id != 0 ) {
 
@@ -719,7 +720,7 @@ class WPIE_Import {
 
                 global $wpdb;
 
-                $content_type = isset( $_GET[ 'wpie_import_type' ] ) ? wpie_sanitize_field( $_GET[ 'wpie_import_type' ] ) : "post";
+                $content_type = Param::getSanitized( 'wpie_import_type', 'key', 'post' );
 
                 $results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`,`options` FROM " . $wpdb->prefix . "wpie_template where `opration_type` = %s AND `opration`='import_template' ORDER BY `" . $wpdb->prefix . "wpie_template`.`id` DESC", $content_type ) );
 
@@ -763,7 +764,7 @@ class WPIE_Import {
 
                 global $wpdb;
 
-                $type = isset( $_POST[ 'type' ] ) ? wpie_sanitize_field( $_POST[ 'type' ] ) : "post";
+                $type = Param::postSanitized( 'type', 'key', 'post' );
 
                 $results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`,`options`,`create_date` FROM " . $wpdb->prefix . "wpie_template where `opration_type` = %s AND `opration`='import' ORDER BY `" . $wpdb->prefix . "wpie_template`.`id` DESC", $type ) );
 
@@ -819,7 +820,7 @@ class WPIE_Import {
 
                 global $wpdb;
 
-                $template_id = isset( $_POST[ 'template_id' ] ) ? absint( wpie_sanitize_field( $_POST[ 'template_id' ] ) ) : 0;
+                $template_id = Param::postSanitized( 'template_id', 'absint', 0 );
 
                 if ( $template_id > 0 ) {
 
@@ -830,7 +831,7 @@ class WPIE_Import {
                                 $options = maybe_unserialize( $options );
 
                                 // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Escaping for HTML will break functionality.
-                                $new_options = wp_unslash( $_POST );
+                                $new_options = Param::post();
 
                                 $new_options[ 'wpie_template_name' ] = isset( $options[ 'wpie_template_name' ] ) ? $options[ 'wpie_template_name' ] : "";
 
@@ -850,7 +851,7 @@ class WPIE_Import {
                         }
                 }
 
-                $template_name = isset( $_POST[ 'wpie_template_name' ] ) ? wpie_sanitize_field( $_POST[ 'wpie_template_name' ] ) : "";
+                $template_name = Param::postSanitized( 'wpie_template_name', 'text', '' );
 
                 $is_exist = false;
 
@@ -880,7 +881,7 @@ class WPIE_Import {
                 if ( $is_exist === false ) {
 
                         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Escaping for HTML will break functionality.
-                        $template_id = $this->wpie_generate_template( wp_unslash( $_POST ), "import_template", "completed" );
+                        $template_id = $this->wpie_generate_template( Param::post(), "import_template", "completed" );
 
                         $return_value[ 'status' ] = 'success';
 
@@ -904,7 +905,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $template_id = isset( $_GET[ "wpie_template_id" ] ) ? absint( wpie_sanitize_field( $_GET[ "wpie_template_id" ] ) ) : 0;
+                $template_id = Param::getSanitized( 'wpie_template_id', 'absint', 0 );
 
                 if ( $template_id > 0 ) {
 
@@ -930,7 +931,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $wpie_import_id = isset( $_GET[ "wpie_import_id" ] ) ? intval( wpie_sanitize_field( $_GET[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::getSanitized( 'wpie_import_id', 'int', 0 );
 
                 if ( $wpie_import_id != 0 ) {
 
@@ -973,11 +974,11 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $wpie_import_id = isset( $_GET[ "wpie_import_id" ] ) ? absint( wpie_sanitize_field( $_GET[ "wpie_import_id" ] ) ) : 0;
+                $wpie_import_id = Param::getSanitized( 'wpie_import_id', 'absint', 0 );
 
                 if ( $wpie_import_id != 0 ) {
 
-                        $wpie_status = isset( $_GET[ "status" ] ) ? wpie_sanitize_field( $_GET[ "status" ] ) : "";
+                        $wpie_status = Param::getSanitized( 'status', 'key', '' );
 
                         $status = "";
 
@@ -1018,7 +1019,7 @@ class WPIE_Import {
 
                 $return_value = array( 'status' => 'error' );
 
-                $wpie_import_id = isset( $_GET[ "import_id" ] ) ? absint( wpie_sanitize_field( $_GET[ "import_id" ] ) ) : 0;
+                $wpie_import_id = Param::getSanitized( 'import_id', 'absint', 0 );
 
                 if ( $wpie_import_id != 0 ) {
 
@@ -1064,13 +1065,13 @@ class WPIE_Import {
 
                 $return_value = array( "status" => "error" );
 
-                $import_id = isset( $_GET[ 'import_id' ] ) ? absint( $_GET[ 'import_id' ] ) : 0;
+                $import_id = Param::getSanitized( 'import_id', 'absint', 0 );
 
                 if ( $import_id > 0 ) {
 
-                        $ref_id = isset( $_GET[ 'ref_id' ] ) ? wpie_sanitize_field( $_GET[ 'ref_id' ] ) : "";
+                        $ref_id = Param::getSanitized( 'ref_id', 'key', '' );
 
-                        $nonce = isset( $_GET[ 'nonce' ] ) ? wpie_sanitize_field( $_GET[ 'nonce' ] ) : "";
+                        $nonce = Param::getSanitized( 'nonce', 'text', '' );
 
                         $validate_nonce = wp_verify_nonce( $nonce, $import_id . $ref_id );
 
@@ -1101,7 +1102,9 @@ class WPIE_Import {
 
                                                 $ref_base_dir = $ref_fileData[ 'baseDir' ] ? $ref_fileData[ 'baseDir' ] : "";
 
-                                                $this->remove_dir( WPIE_UPLOAD_IMPORT_DIR . "/" . $ref_base_dir . "/" );
+                                                if ( ! empty( $ref_base_dir ) && is_string( $ref_base_dir ) && strpos( $ref_base_dir, '..' ) === false && strpos( $ref_base_dir, "\0" ) === false ) {
+                                                        $this->remove_dir( WPIE_UPLOAD_IMPORT_DIR . "/" . $ref_base_dir . "/", WPIE_UPLOAD_IMPORT_DIR );
+                                                }
 
                                                 unset( $ref_option, $ref_activeFile, $ref_importFile, $ref_fileData );
                                         } else {
@@ -1177,14 +1180,14 @@ class WPIE_Import {
 
                                                 $originalName = $fileData[ 'originalName' ] ? $fileData[ 'originalName' ] : "";
 
-                                                if ( is_readable( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/log" ) ) {
-                                                        $this->remove_dir( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/log/" );
-                                                        wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/log" );
-                                                }
-                                                if ( is_readable( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunk" ) ) {
-                                                        $this->remove_dir( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" );
-                                                        wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks" );
-                                                }
+						if ( is_readable( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/log" ) ) {
+							$this->remove_dir( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/log/" );
+							wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/log" );
+						}
+						if ( is_readable( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks" ) ) {
+							$this->remove_dir( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks/" );
+							wp_mkdir_p( WPIE_UPLOAD_IMPORT_DIR . "/" . $baseDir . "/parse/chunks" );
+						}
 
                                                 $return_value[ "import_type" ] = $import_type;
 
@@ -1235,58 +1238,144 @@ class WPIE_Import {
                 die();
         }
 
-        private function custom_copy( $src = "", $dst = "" ) {
+	/**
+	 * Recursively copy files and directories with safety checks.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $src Source directory.
+	 * @param string $dst Destination directory.
+	 * @return void
+	 */
+	private function custom_copy( $src = "", $dst = "" ) {
 
-                if ( is_dir( $src ) ) {
-                        // open the source directory 
-                        $dir = opendir( $src );
+		if ( empty( $src ) || empty( $dst ) || ! is_string( $src ) || ! is_string( $dst ) ) {
+			return;
+		}
 
-                        // Make the destination directory if not exist 
-                        if ( !is_dir( $dst ) ) {
-                                wp_mkdir_p( $dst );
+		if ( strpos( $src, "\0" ) !== false || strpos( $dst, "\0" ) !== false ) {
+			return;
+		}
+
+		if ( is_dir( $src ) ) {
+			$dir = opendir( $src );
+			if ( ! $dir ) {
+				return;
+			}
+
+			if ( ! is_dir( $dst ) ) {
+				wp_mkdir_p( $dst );
+			}
+
+			while ( ( $file = readdir( $dir ) ) !== false ) {
+				if ( ( $file !== '.' ) && ( $file !== '..' ) ) {
+					$src_file = $src . '/' . $file;
+					$dst_file = $dst . '/' . $file;
+					if ( is_dir( $src_file ) ) {
+						$this->custom_copy( $src_file, $dst_file );
+					} else {
+						copy( $src_file, $dst_file );
+					}
+				}
+			}
+
+			closedir( $dir );
+		}
+	}
+
+        /**
+         * Safely removes a directory and its contents, strictly confined to the allowed base directory.
+         * Resolves canonical paths using realpath() to prevent arbitrary directory deletion via directory traversal.
+         *
+         * @param string $targetDir Directory to delete.
+         * @param string $baseDir Allowed base directory boundary (defaults to WPIE_UPLOAD_IMPORT_DIR).
+         * @return bool True if directory was removed, false otherwise.
+         */
+        private function remove_dir( $targetDir = "", $baseDir = "" ) {
+
+                if ( empty( $targetDir ) || ! is_string( $targetDir ) ) {
+                        return false;
+                }
+
+                // Disallow directory traversal sequences and null bytes
+                if ( strpos( $targetDir, '..' ) !== false || strpos( $targetDir, "\0" ) !== false ) {
+                        return false;
+                }
+
+                // If base directory is not explicitly specified, default to WPIE_UPLOAD_IMPORT_DIR or WPIE_UPLOAD_DIR
+                if ( empty( $baseDir ) ) {
+                        $baseDir = defined( 'WPIE_UPLOAD_IMPORT_DIR' ) ? WPIE_UPLOAD_IMPORT_DIR : ( defined( 'WPIE_UPLOAD_DIR' ) ? WPIE_UPLOAD_DIR : "" );
+                }
+
+                if ( empty( $baseDir ) || ! is_string( $baseDir ) || strpos( $baseDir, "\0" ) !== false ) {
+                        return false;
+                }
+
+                if ( ! is_dir( $baseDir ) ) {
+                        return false;
+                }
+
+                $real_base = realpath( $baseDir );
+                if ( $real_base === false ) {
+                        return false;
+                }
+
+                // If target is a symlink, remove it directly without recursing into target
+                if ( is_link( $targetDir ) ) {
+                        return @wp_delete_file( $targetDir );
+                }
+
+                if ( ! is_dir( $targetDir ) ) {
+                        return false;
+                }
+
+                $real_target = realpath( $targetDir );
+                if ( $real_target === false ) {
+                        return false;
+                }
+
+                $base_norm   = trailingslashit( wp_normalize_path( $real_base ) );
+                $target_norm = trailingslashit( wp_normalize_path( $real_target ) );
+
+                // Target directory must be strictly inside the base directory, never the base directory itself
+                if ( $target_norm === $base_norm || strpos( $target_norm, $base_norm ) !== 0 ) {
+                        return false;
+                }
+
+                // Also ensure target is strictly inside WPIE_UPLOAD_DIR when defined
+                if ( defined( 'WPIE_UPLOAD_DIR' ) ) {
+                        $real_upload = realpath( WPIE_UPLOAD_DIR );
+                        if ( $real_upload !== false ) {
+                                $upload_norm = trailingslashit( wp_normalize_path( $real_upload ) );
+                                if ( $target_norm === $upload_norm || strpos( $target_norm, $upload_norm ) !== 0 ) {
+                                        return false;
+                                }
                         }
+                }
 
-                        // Loop through the files in source directory 
-                        while ( $file = readdir( $dir ) ) {
+                $cdir = scandir( $real_target );
 
-                                if ( ( $file != '.' ) && ( $file != '..' ) ) {
-                                        if ( is_dir( $src . '/' . $file ) ) {
-
-                                                // Recursively calling custom copy function 
-                                                // for sub directory  
-                                                $this->custom_copy( $src . '/' . $file, $dst . '/' . $file );
+                if ( is_array( $cdir ) && ! empty( $cdir ) ) {
+                        foreach ( $cdir as $value ) {
+                                if ( ! in_array( $value, array( ".", ".." ), true ) ) {
+                                        $childPath = $real_target . DIRECTORY_SEPARATOR . $value;
+                                        if ( is_link( $childPath ) ) {
+                                                @wp_delete_file( $childPath );
+                                        } elseif ( is_dir( $childPath ) ) {
+                                                $this->remove_dir( $childPath, $baseDir );
                                         } else {
-                                                copy( $src . '/' . $file, $dst . '/' . $file );
+                                                @wp_delete_file( $childPath );
                                         }
                                 }
                         }
-
-                        closedir( $dir );
                 }
-        }
 
-        private function remove_dir( $targetDir = "" ) {
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- Custom recursive directory removal with path validation.
+                $deleted = @rmdir( $real_target );
 
-                if ( is_dir( $targetDir ) ) {
+                unset( $cdir );
 
-                        $cdir = scandir( $targetDir );
-
-                        if ( is_array( $cdir ) && !empty( $cdir ) ) {
-                                foreach ( $cdir as $key => $value ) {
-                                        if ( !in_array( $value, array( ".", ".." ) ) ) {
-                                                if ( is_dir( $targetDir . '/' . $value ) ) {
-                                                        $this->remove_dir( $targetDir . '/' . $value );
-                                                } else {
-                                                        unlink( $targetDir . '/' . $value );
-                                                }
-                                        }
-                                }
-                        }
-
-                        rmdir( $targetDir );
-
-                        unset( $cdir );
-                }
+                return $deleted;
         }
 
         public function __destruct() {
