@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Import Export Lite\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 06:43+0000\n"
+"POT-Creation-Date: 2026-09-10 06:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -46,11 +46,11 @@ msgstr ""
 msgid "%1$s by %2$s."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1102
+#: includes/classes/class-wpie-general.php:1110
 msgid "[Show less]"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1101
+#: includes/classes/class-wpie-general.php:1109
 msgid "[Show more]"
 msgstr ""
 
@@ -66,37 +66,37 @@ msgid ""
 "subscriber."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:862
+#: includes/classes/class-wpie-general.php:868
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:84
-#: includes/views/wpie-manage-import.php:84
+#: includes/views/wpie-manage-export.php:86
+#: includes/views/wpie-manage-import.php:86
 msgid "Actions"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:191
-#: includes/views/wpie-new-export.php:485
+#: includes/views/wpie-new-export.php:193
+#: includes/views/wpie-new-export.php:487
 msgid "Add"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:197
+#: includes/views/wpie-new-export.php:199
 msgid "Add All"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:194
+#: includes/views/wpie-new-export.php:196
 msgid "Add Bulk"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:465
+#: includes/views/wpie-new-export.php:467
 msgid "Add Fields"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:277
+#: includes/views/wpie-new-import.php:279
 msgid "Add Filter"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:132
+#: includes/views/wpie-new-export.php:134
 msgid "Add filtering options"
 msgstr ""
 
@@ -106,11 +106,11 @@ msgstr ""
 msgid "Add New"
 msgstr ""
 
-#: includes/views/wpie-settings.php:186
+#: includes/views/wpie-settings.php:188
 msgid "Add Shortcode"
 msgstr ""
 
-#: includes/views/wpie-settings.php:206
+#: includes/views/wpie-settings.php:208
 msgid "Advance Options"
 msgstr ""
 
@@ -119,48 +119,48 @@ msgstr ""
 msgid "Advanced Custom Fields"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:209
-#: includes/views/wpie-new-import.php:555
+#: includes/views/wpie-new-export.php:211
+#: includes/views/wpie-new-import.php:557
 #: includes/classes/import/extensions/yoast-seo/views/post.php:149
 #: includes/classes/import/extensions/yoast-seo/views/taxonomy.php:137
 msgid "Advanced Options"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1020
+#: includes/classes/class-wpie-general.php:1028
 msgid "Ajax request aborted."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:115
+#: includes/views/wpie-new-export.php:117
 msgid "All Attributes"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1030
+#: includes/classes/class-wpie-general.php:1038
 msgid "AND"
 msgstr ""
 
-#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:31
+#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:33
 msgid "and they will appear in this list "
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:68
-#: includes/views/wpie-manage-import.php:68
+#: includes/views/wpie-manage-export.php:70
+#: includes/views/wpie-manage-import.php:70
 msgid "Apply"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:127
+#: includes/views/wpie-new-export.php:129
 msgid "Apply Filters & Options"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:353
+#: includes/views/wpie-new-import.php:355
 msgid "Apply Options"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:321
+#: includes/views/wpie-new-import.php:323
 msgid "Apply to xpath"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:230
-#: includes/views/wpie-manage-import.php:241
+#: includes/views/wpie-manage-export.php:232
+#: includes/views/wpie-manage-import.php:243
 msgid "Are you sure want to delete?"
 msgstr ""
 
@@ -188,32 +188,32 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:613
-#: includes/views/wpie-new-import.php:650
+#: includes/views/wpie-new-import.php:615
+#: includes/views/wpie-new-import.php:652
 msgid "Back"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:181
-#: includes/views/wpie-new-import.php:256
+#: includes/views/wpie-new-import.php:183
+#: includes/views/wpie-new-import.php:258
 msgid "Back to Step 1"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:268
-#: includes/views/wpie-new-import.php:395
+#: includes/views/wpie-new-import.php:270
+#: includes/views/wpie-new-import.php:397
 msgid "Back to Step 2"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:427
-#: includes/views/wpie-new-import.php:509
+#: includes/views/wpie-new-import.php:429
+#: includes/views/wpie-new-import.php:511
 msgid "Back to Step 3"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:521
-#: includes/views/wpie-new-import.php:601
+#: includes/views/wpie-new-import.php:523
+#: includes/views/wpie-new-import.php:603
 msgid "Back to Step 4"
 msgstr ""
 
-#: includes/views/wpie-settings.php:225
+#: includes/views/wpie-settings.php:227
 msgid "Background & Cron Processing"
 msgstr ""
 
@@ -222,16 +222,16 @@ msgid "Background Export"
 msgstr ""
 
 #: includes/classes/class-wpie-extensions.php:166
-#: includes/views/wpie-new-import.php:834
+#: includes/views/wpie-new-import.php:836
 msgid "Background Import"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1077
+#: includes/classes/class-wpie-general.php:1085
 msgid "Background Process Set Successfully"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:706
-#: includes/views/wpie-new-import.php:837
+#: includes/classes/class-wpie-common-action.php:709
+#: includes/views/wpie-new-import.php:839
 #: includes/classes/export/class-wpie-export.php:719
 msgid "Background Process Successfully Set"
 msgstr ""
@@ -240,7 +240,7 @@ msgstr ""
 msgid "Backup Directory is not writable"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1021
+#: includes/classes/class-wpie-general.php:1029
 msgid "Bad Request"
 msgstr ""
 
@@ -253,16 +253,16 @@ msgstr ""
 msgid "Breadcrumbs Title"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:62
-#: includes/views/wpie-manage-import.php:62
+#: includes/views/wpie-manage-export.php:64
+#: includes/views/wpie-manage-import.php:64
 msgid "Bulk Actions"
 msgstr ""
 
-#: includes/classes/import/file-format/manager.php:144
+#: includes/classes/import/file-format/manager.php:145
 msgid "Can't Create file"
 msgstr ""
 
-#: includes/classes/import/file-format/manager.php:150
+#: includes/classes/import/file-format/manager.php:151
 msgid "can't open GZ file"
 msgstr ""
 
@@ -270,18 +270,18 @@ msgstr ""
 msgid "can't parse uploaded file"
 msgstr ""
 
-#: includes/classes/import/extensions/user/class-wpie-user.php:351
+#: includes/classes/import/extensions/user/class-wpie-user.php:407
 msgid "Can't update current Login user"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:234
-#: includes/views/wpie-manage-import.php:245
-#: includes/views/wpie-new-export.php:452
-#: includes/views/wpie-new-export.php:482
+#: includes/views/wpie-manage-export.php:236
+#: includes/views/wpie-manage-import.php:247
+#: includes/views/wpie-new-export.php:454
+#: includes/views/wpie-new-export.php:484
 msgid "Cancel"
 msgstr ""
 
-#: includes/classes/import/extensions/user/class-wpie-user.php:327
+#: includes/classes/import/extensions/user/class-wpie-user.php:382
 msgid "Cannot create a user with an empty email"
 msgstr ""
 
@@ -316,40 +316,40 @@ msgstr ""
 msgid "Checksum mismatch"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1044
+#: includes/classes/class-wpie-general.php:1052
 msgid "Choose Excel Sheet"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:221
+#: includes/views/wpie-new-export.php:223
 msgid "Choose Export file type"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:182
+#: includes/views/wpie-new-export.php:184
 msgid "Choose Fields"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1043
-#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:15
+#: includes/classes/class-wpie-general.php:1051
+#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:17
 msgid "Choose File"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:107
+#: includes/views/wpie-new-import.php:109
 msgid "Choose how you want to import your data"
 msgstr ""
 
-#: includes/views/wpie-settings.php:146 includes/views/wpie-settings.php:147
+#: includes/views/wpie-settings.php:148 includes/views/wpie-settings.php:149
 msgid "Choose Role"
 msgstr ""
 
-#: includes/views/wpie-settings.php:85
+#: includes/views/wpie-settings.php:87
 msgid "Choose Templates"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:73
+#: includes/views/wpie-new-export.php:75
 msgid "Choose what to export"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1104
+#: includes/classes/class-wpie-general.php:1112
 #: includes/classes/import/fields/wpie-comments.php:326
 #: includes/classes/import/fields/wpie-taxonomy.php:384
 #: includes/classes/import/extensions/user/wpie-user-fields.php:272
@@ -366,16 +366,16 @@ msgstr ""
 msgid "Class PharData Not Found"
 msgstr ""
 
-#: includes/views/wpie-settings.php:230
+#: includes/views/wpie-settings.php:232
 msgid "Click Here"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:495
-#: includes/views/wpie-new-import.php:499
+#: includes/views/wpie-new-import.php:497
+#: includes/views/wpie-new-import.php:501
 msgid "click here"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:348
+#: includes/views/wpie-new-import.php:350
 msgid "Click Here For Details"
 msgstr ""
 
@@ -385,8 +385,8 @@ msgstr ""
 msgid "Click to specify"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1033
-#: includes/views/wpie-new-export.php:614
+#: includes/classes/class-wpie-general.php:1041
+#: includes/views/wpie-new-export.php:616
 #: includes/classes/import/fields/wpie-comments.php:234
 #: includes/classes/import/fields/wpie-taxonomy.php:254
 #: includes/classes/import/extensions/user/wpie-user-fields.php:178
@@ -475,28 +475,28 @@ msgstr ""
 msgid "Comments"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:248
+#: includes/classes/import/class-wpie-import-engine.php:251
 msgid "Complete Pending Last Records"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:112
-#: includes/views/wpie-manage-import.php:110
+#: includes/views/wpie-manage-export.php:114
+#: includes/views/wpie-manage-import.php:112
 msgid "Completed"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1011
-#: includes/views/wpie-manage-export.php:227
-#: includes/views/wpie-manage-import.php:238
-#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:35
+#: includes/classes/class-wpie-general.php:1019
+#: includes/views/wpie-manage-export.php:229
+#: includes/views/wpie-manage-import.php:240
+#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:37
 msgid "Confirm"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:625
-#: includes/views/wpie-new-import.php:662
+#: includes/views/wpie-new-import.php:627
+#: includes/views/wpie-new-import.php:664
 msgid "Confirm & Run Import"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:302
+#: includes/views/wpie-new-import.php:304
 #: includes/classes/export/class-wpie-export.php:438
 #: includes/classes/export/class-wpie-export.php:444
 #: includes/classes/export/class-wpie-export.php:450
@@ -512,73 +512,73 @@ msgstr ""
 msgid "Content + Date"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:524
-#: includes/views/wpie-new-import.php:604
+#: includes/views/wpie-new-import.php:526
+#: includes/views/wpie-new-import.php:606
 msgid "Continue"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:101
-#: includes/views/wpie-new-import.php:172
+#: includes/views/wpie-new-import.php:103
+#: includes/views/wpie-new-import.php:174
 msgid "Continue to Step 2"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:184
-#: includes/views/wpie-new-import.php:259
+#: includes/views/wpie-new-import.php:186
+#: includes/views/wpie-new-import.php:261
 msgid "Continue to Step 3"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:271
-#: includes/views/wpie-new-import.php:398
+#: includes/views/wpie-new-import.php:273
+#: includes/views/wpie-new-import.php:400
 msgid "Continue to Step 4"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:430
-#: includes/views/wpie-new-import.php:512
+#: includes/views/wpie-new-import.php:432
+#: includes/views/wpie-new-import.php:514
 msgid "Continue to Step 5"
 msgstr ""
 
-#: support/wordpress_4.6.php:97
+#: support/wordpress_4.6.php:100
 msgid "Could not access filesystem."
 msgstr ""
 
-#: support/wordpress_4.6.php:262
+#: support/wordpress_4.6.php:265
 msgid "Could not copy file."
 msgstr ""
 
-#: support/wordpress_4.6.php:207
+#: support/wordpress_4.6.php:210
 msgid "Could not copy files. You may have run out of disk space."
 msgstr ""
 
-#: support/wordpress_4.6.php:229
+#: support/wordpress_4.6.php:232
 msgid "Could not create directory."
 msgstr ""
 
-#: support/wordpress_4.6.php:257
+#: support/wordpress_4.6.php:260
 msgid "Could not extract file from archive."
 msgstr ""
 
-#: includes/classes/export/class-wpie-export.php:1169
+#: includes/classes/export/class-wpie-export.php:1251
 msgid "Could not open archive"
 msgstr ""
 
-#: support/wordpress_4.6.php:173 support/wordpress_4.6.php:238
+#: support/wordpress_4.6.php:176 support/wordpress_4.6.php:241
 msgid "Could not retrieve file from archive."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:729
+#: includes/views/wpie-new-import.php:731
 msgid "Created"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:162
+#: includes/views/wpie-manage-import.php:164
 msgid "created"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:222
+#: includes/views/wpie-new-export.php:224
 #: includes/classes/import/extensions/local-upload/wpie-local-upload-view.php:35
 msgid "CSV"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:338
+#: includes/views/wpie-new-import.php:340
 msgid "CSV Delimiter"
 msgstr ""
 
@@ -601,12 +601,12 @@ msgstr ""
 msgid "Data Not Found"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:82
-#: includes/views/wpie-manage-import.php:82
+#: includes/views/wpie-manage-export.php:84
+#: includes/views/wpie-manage-import.php:84
 msgid "Date"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:423
+#: includes/views/wpie-new-export.php:425
 msgid "Date Format"
 msgstr ""
 
@@ -617,43 +617,43 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:238
+#: includes/views/wpie-new-export.php:240
 msgid "Default : , (Comma)"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:258
+#: includes/views/wpie-new-export.php:260
 msgid "Default : 50"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:122
+#: includes/views/wpie-new-export.php:124
 msgid "Default : All Attributes."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:249
+#: includes/views/wpie-new-export.php:251
 msgid "Default : Auto Generated"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:229
+#: includes/views/wpie-new-export.php:231
 msgid "Default : CSV"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:269
+#: includes/views/wpie-new-export.php:271
 msgid "Default : empty"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:431
+#: includes/views/wpie-new-export.php:433
 msgid "Default : Site Date Format"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:63
-#: includes/views/wpie-manage-export.php:160
-#: includes/views/wpie-manage-import.php:63
-#: includes/views/wpie-manage-import.php:175
-#: includes/views/wpie-settings.php:111
+#: includes/views/wpie-manage-export.php:65
+#: includes/views/wpie-manage-export.php:162
+#: includes/views/wpie-manage-import.php:65
+#: includes/views/wpie-manage-import.php:177
+#: includes/views/wpie-settings.php:113
 msgid "Delete"
 msgstr ""
 
-#: includes/views/wpie-settings.php:213
+#: includes/views/wpie-settings.php:215
 msgid "Delete All Data on plugin uninstall"
 msgstr ""
 
@@ -673,15 +673,20 @@ msgstr ""
 msgid "Destination file already exists"
 msgstr ""
 
-#: support/wordpress_4.6.php:181
+#: support/wordpress_4.6.php:184
 msgid "Directory traversal detected in archive entry."
 msgstr ""
 
 #: includes/classes/export/class-wpie-export-engine.php:281
+#: includes/classes/export/class-wpie-export.php:1334
 msgid "Directory traversal detected in export directory."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:884
+#: includes/classes/export/class-wpie-export.php:1370
+msgid "Directory traversal detected outside export directory."
+msgstr ""
+
+#: includes/classes/class-wpie-general.php:890
 msgid "Dismiss"
 msgstr ""
 
@@ -690,7 +695,7 @@ msgstr ""
 msgid "Display Name"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:288
+#: includes/views/wpie-new-export.php:290
 msgid "Do not add Empty nodes in xml file"
 msgstr ""
 
@@ -699,12 +704,12 @@ msgid "Do not add empty value fields in database"
 msgstr ""
 
 #: includes/classes/class-wpie-general.php:163
-#: includes/views/wpie-extension-info.php:90
-#: includes/views/wpie-extensions.php:168
-#: includes/views/wpie-manage-export.php:198
-#: includes/views/wpie-manage-import.php:227
-#: includes/views/wpie-new-export.php:394
-#: includes/views/wpie-new-import.php:766 includes/views/wpie-settings.php:280
+#: includes/views/wpie-extension-info.php:92
+#: includes/views/wpie-extensions.php:170
+#: includes/views/wpie-manage-export.php:200
+#: includes/views/wpie-manage-import.php:229
+#: includes/views/wpie-new-export.php:396
+#: includes/views/wpie-new-import.php:768 includes/views/wpie-settings.php:282
 msgid "Documentation"
 msgstr ""
 
@@ -731,9 +736,9 @@ msgstr ""
 msgid "Don't touch existing images, append new images"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:161
-#: includes/views/wpie-manage-import.php:169
-#: includes/views/wpie-new-export.php:620
+#: includes/views/wpie-manage-export.php:163
+#: includes/views/wpie-manage-import.php:171
+#: includes/views/wpie-new-export.php:622
 #: includes/classes/import/extensions/url-upload/wpie-url-upload-view.php:17
 #: includes/classes/import/extensions/user/wpie-user.php:16
 msgid "Download"
@@ -747,11 +752,11 @@ msgstr ""
 msgid "Download images hosted elsewhere"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:170
+#: includes/views/wpie-manage-import.php:172
 msgid "Download Log File"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1084
+#: includes/classes/class-wpie-general.php:1092
 msgid "Downloading File"
 msgstr ""
 
@@ -763,12 +768,12 @@ msgstr ""
 msgid "Dropbox"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:158
+#: includes/views/wpie-new-export.php:160
 msgid "Dynamic date allowed"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:138
-#: includes/views/wpie-new-import.php:282
+#: includes/views/wpie-new-export.php:140
+#: includes/views/wpie-new-import.php:284
 msgid "Element"
 msgstr ""
 
@@ -781,19 +786,19 @@ msgstr ""
 msgid "Email Notifications"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:663
+#: includes/classes/class-wpie-common-action.php:666
 msgid "Empty Data"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:66
+#: includes/views/wpie-new-import.php:68
 msgid "Empty Nonce"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:69
+#: includes/views/wpie-new-import.php:71
 msgid "Empty Reference ID"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:733
+#: includes/classes/class-wpie-common-action.php:736
 #: includes/classes/export/class-wpie-export.php:750
 msgid "Empty Status"
 msgstr ""
@@ -813,13 +818,13 @@ msgstr ""
 msgid "Enter one per line, or separate them with a"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:266
+#: includes/views/wpie-new-export.php:268
 msgid ""
 "Enter only path that not include file name. it's useful when you sync any "
 "export data with import. Path folders must be exist"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:266
+#: includes/views/wpie-new-export.php:268
 msgid "Enter relative path to"
 msgstr ""
 
@@ -841,7 +846,7 @@ msgstr ""
 msgid "equal to or older than"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:296
+#: includes/views/wpie-new-import.php:298
 #: includes/classes/export/class-wpie-export.php:432
 #: includes/classes/export/class-wpie-export.php:448
 #: includes/classes/export/class-wpie-export.php:456
@@ -849,42 +854,43 @@ msgstr ""
 msgid "equals"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:299
+#: includes/views/wpie-new-import.php:301
 msgid "equals or greater than"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:301
+#: includes/views/wpie-new-import.php:303
 msgid "equals or less than"
 msgstr ""
 
-#: includes/views/wpie-extension-info.php:101
-#: includes/views/wpie-extensions.php:179
-#: includes/views/wpie-manage-export.php:205
-#: includes/views/wpie-manage-import.php:209
-#: includes/views/wpie-new-export.php:495
-#: includes/views/wpie-new-import.php:777 includes/views/wpie-settings.php:262
+#. %s: User role name.
+#: includes/views/wpie-extension-info.php:103
+#: includes/views/wpie-extensions.php:181
+#: includes/views/wpie-manage-export.php:207
+#: includes/views/wpie-manage-import.php:211
+#: includes/views/wpie-new-export.php:497
+#: includes/views/wpie-new-import.php:779 includes/views/wpie-settings.php:264
 #: includes/classes/import/class-wpie-comment.php:24
-#: includes/classes/import/class-wpie-comment.php:125
-#: includes/classes/import/class-wpie-comment.php:145
+#: includes/classes/import/class-wpie-comment.php:127
+#: includes/classes/import/class-wpie-comment.php:147
 #: includes/classes/import/class-wpie-post.php:223
 #: includes/classes/import/class-wpie-post.php:230
-#: includes/classes/import/class-wpie-post.php:698
+#: includes/classes/import/class-wpie-post.php:718
 #: includes/classes/import/class-wpie-taxonomy.php:68
 #: includes/classes/import/class-wpie-taxonomy.php:85
 #: includes/classes/import/class-wpie-taxonomy.php:92
-#: includes/classes/import/extensions/user/class-wpie-user.php:255
-#: includes/classes/import/extensions/user/class-wpie-user.php:327
-#: includes/classes/import/extensions/user/class-wpie-user.php:339
-#: includes/classes/import/extensions/user/class-wpie-user.php:377
-#: includes/classes/import/extensions/user/class-wpie-user.php:384
+#: includes/classes/import/extensions/user/class-wpie-user.php:310
+#: includes/classes/import/extensions/user/class-wpie-user.php:382
+#: includes/classes/import/extensions/user/class-wpie-user.php:395
+#: includes/classes/import/extensions/user/class-wpie-user.php:433
+#: includes/classes/import/extensions/user/class-wpie-user.php:440
 msgid "ERROR"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1010
+#: includes/classes/class-wpie-general.php:1018
 msgid "Error"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:670
+#: includes/classes/class-wpie-common-action.php:673
 msgid "Error when moving uploaded file"
 msgstr ""
 
@@ -896,24 +902,24 @@ msgstr ""
 msgid "Every 30 Minutes"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:161
+#: includes/views/wpie-new-export.php:163
 msgid "Example :"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:638
+#: includes/views/wpie-new-import.php:640
 msgid "Existing data will be skipped with the data specified in this import."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:639
+#: includes/views/wpie-new-import.php:641
 msgid "Existing data will be updated with the data specified in this import."
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:287
+#: includes/classes/import/class-wpie-import-engine.php:290
 msgid "Existing item found"
 msgstr ""
 
 #: includes/classes/class-wpie-general.php:190
-#: includes/views/wpie-new-export.php:58 includes/views/wpie-settings.php:114
+#: includes/views/wpie-new-export.php:60 includes/views/wpie-settings.php:116
 msgid "Export"
 msgstr ""
 
@@ -926,43 +932,46 @@ msgid "Export automatically and periodically from WordPress Site"
 msgstr ""
 
 #: includes/classes/export/class-wpie-export-engine.php:290
+#: includes/classes/export/class-wpie-export.php:1348
 msgid "Export base directory could not be resolved."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1038
+#: includes/classes/class-wpie-general.php:1046
 msgid "Export Completed"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-engine.php:315
+#: includes/classes/export/class-wpie-export-engine.php:316
 msgid "Export directory could not be resolved."
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-engine.php:322
+#: includes/classes/export/class-wpie-export-engine.php:323
 msgid "Export directory is outside the allowed export base directory."
 msgstr ""
 
-#: includes/views/wpie-extensions.php:49
+#: includes/views/wpie-extensions.php:51
 msgid "Export Extensions"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1035
-#: includes/views/wpie-new-export.php:406
+#: includes/classes/class-wpie-general.php:1043
+#: includes/views/wpie-new-export.php:408
 msgid "Export Field Editor"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:246
+#: includes/views/wpie-new-export.php:248
 msgid "Export File Name"
 msgstr ""
 
 #: includes/classes/export/class-wpie-export-engine.php:234
+#: includes/classes/export/class-wpie-export.php:1286
 msgid "Export file name cannot be empty."
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-engine.php:330
+#: includes/classes/export/class-wpie-export-engine.php:331
+#: includes/classes/export/class-wpie-export.php:1379
 msgid "Export file path is outside the allowed base directory."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:218
+#: includes/views/wpie-new-export.php:220
 msgid "Export File Type"
 msgstr ""
 
@@ -974,11 +983,11 @@ msgstr ""
 msgid "Export in Background from WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:540
+#: includes/views/wpie-new-export.php:542
 msgid "Export In Process"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:55
+#: includes/views/wpie-manage-export.php:57
 msgid "Export Log"
 msgstr ""
 
@@ -996,7 +1005,11 @@ msgid ""
 "Export Products, Orders, Product Categories and coupons from WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:439
+#: includes/classes/export/class-wpie-export.php:1363
+msgid "Export target directory could not be resolved."
+msgstr ""
+
+#: includes/views/wpie-new-export.php:441
 msgid "Export the value returned by a PHP function"
 msgstr ""
 
@@ -1004,7 +1017,7 @@ msgstr ""
 msgid "Export Users & User's metadata from WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:55
+#: includes/views/wpie-new-export.php:57
 msgid "Export With Settings For Import"
 msgstr ""
 
@@ -1012,11 +1025,11 @@ msgstr ""
 msgid "Export Yoast SEO Settings from WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:551
+#: includes/views/wpie-new-export.php:553
 msgid "Exported"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:544
+#: includes/views/wpie-new-export.php:546
 msgid ""
 "Exporting may take some time. Please do not close your browser or refresh "
 "the page until the process is complete."
@@ -1026,8 +1039,8 @@ msgstr ""
 msgid "Extension Not Found"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:665
-#: includes/views/wpie-extensions.php:33
+#: includes/classes/class-wpie-general.php:670
+#: includes/views/wpie-extensions.php:35
 msgid "Extensions"
 msgstr ""
 
@@ -1044,7 +1057,7 @@ msgstr ""
 msgid "Fail To Generate Log"
 msgstr ""
 
-#: includes/classes/import/class-wpie-comment.php:125
+#: includes/classes/import/class-wpie-comment.php:127
 msgid "Fail to insert comment"
 msgstr ""
 
@@ -1056,21 +1069,21 @@ msgstr ""
 msgid "Failed to copy file"
 msgstr ""
 
-#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:131
+#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:132
 msgid "Failed to move uploaded file."
 msgstr ""
 
-#: includes/classes/import/class-wpie-csv-chunk.php:102
+#: includes/classes/import/class-wpie-csv-chunk.php:103
 msgid "Failed to open file for reading"
 msgstr ""
 
-#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:118
-#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:153
+#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:119
+#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:154
 msgid "Failed to open input stream."
 msgstr ""
 
-#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:128
-#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:165
+#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:129
+#: includes/classes/import/extensions/local-upload/class-wpie-local-upload.php:166
 msgid "Failed to open output stream."
 msgstr ""
 
@@ -1084,89 +1097,91 @@ msgstr ""
 msgid "Failed to upload files"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:490
+#: includes/views/wpie-new-import.php:492
 msgid "Field Mapping"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:412
+#: includes/views/wpie-new-export.php:414
 msgid "Field Name"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:235
+#: includes/views/wpie-new-export.php:237
 msgid "Field Separator"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:416
+#: includes/views/wpie-new-export.php:418
 msgid "Field value"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:360
+#: includes/views/wpie-new-import.php:362
 msgid "File Data Preview"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:329
+#: includes/classes/class-wpie-general.php:331
 msgid "File does not exist."
 msgstr ""
 
-#: includes/classes/import/downloader/file-header.php:78
+#. %s: HTTP response status code.
+#: includes/classes/import/downloader/file-header.php:79
 #, php-format
 msgid "File Download Error : %s invalid http response status code"
 msgstr ""
 
 #: includes/classes/import/class-wpie-attachments.php:372
-#: includes/classes/import/class-wpie-images.php:865
+#: includes/classes/import/class-wpie-images.php:869
 msgid "File Download Error : Can't copy File"
 msgstr ""
 
-#: includes/classes/import/downloader/manager.php:99
+#: includes/classes/import/downloader/manager.php:100
 msgid "File Download Error : Empty File"
 msgstr ""
 
-#: includes/classes/import/downloader/manager.php:97
+#: includes/classes/import/downloader/manager.php:98
 msgid "File Download Error : File is not readable"
 msgstr ""
 
 #: includes/classes/import/downloader/download.php:71
 #: includes/classes/import/downloader/file-header.php:21
 #: includes/classes/import/downloader/manager.php:24
-#: includes/classes/import/downloader/manager.php:66
+#: includes/classes/import/downloader/manager.php:67
 msgid "File Download Error : File URL is empty"
 msgstr ""
 
 #: includes/classes/import/downloader/download.php:77
 #: includes/classes/import/downloader/file-header.php:26
-#: includes/classes/import/downloader/manager.php:37
-#: includes/classes/import/downloader/manager.php:71
+#: includes/classes/import/downloader/manager.php:38
+#: includes/classes/import/downloader/manager.php:72
 #: includes/classes/import/extensions/url-upload/class-wpie-url-upload.php:31
 msgid "File Download Error : File URL is not valid"
 msgstr ""
 
-#: includes/classes/import/downloader/file-header.php:190
+#: includes/classes/import/downloader/file-header.php:191
 msgid "File Download Error : Invalid File Format"
 msgstr ""
 
-#: includes/classes/import/downloader/manager.php:101
+#: includes/classes/import/downloader/manager.php:103
 msgid "File Download Error : Something Wrong, File rename not work."
 msgstr ""
 
-#: includes/classes/import/downloader/manager.php:28
+#. %s: File URL.
+#: includes/classes/import/downloader/manager.php:29
 #, php-format
 msgid "File Download Error : URL `%s` is not valid."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:347
+#: includes/views/wpie-new-import.php:349
 msgid "File First Row is Row Title."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1072
+#: includes/classes/class-wpie-general.php:1080
 msgid "File is downloading from FTP/SFTP"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1071
+#: includes/classes/class-wpie-general.php:1079
 msgid "File is downloading from URL"
 msgstr ""
 
-#: includes/classes/import/class-wpie-record.php:257
+#: includes/classes/import/class-wpie-record.php:259
 msgid "File is Empty"
 msgstr ""
 
@@ -1175,8 +1190,8 @@ msgid "File is Empty. Please Choose another file"
 msgstr ""
 
 #: includes/classes/import/class-wpie-csv-chunk.php:62
-#: includes/classes/import/class-wpie-csv-chunk.php:263
-#: includes/classes/import/class-wpie-csv-chunk.php:326
+#: includes/classes/import/class-wpie-csv-chunk.php:266
+#: includes/classes/import/class-wpie-csv-chunk.php:332
 msgid "File is not Readable"
 msgstr ""
 
@@ -1185,7 +1200,7 @@ msgstr ""
 msgid "File is not valid Image"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-engine.php:392
+#: includes/classes/export/class-wpie-export-engine.php:393
 msgid "File is not Writable"
 msgstr ""
 
@@ -1194,9 +1209,9 @@ msgstr ""
 msgid "File is Valid"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:79
-#: includes/views/wpie-manage-import.php:79
-#: includes/views/wpie-new-import.php:709
+#: includes/views/wpie-manage-export.php:81
+#: includes/views/wpie-manage-import.php:81
+#: includes/views/wpie-new-import.php:711
 msgid "File Name"
 msgstr ""
 
@@ -1204,55 +1219,56 @@ msgstr ""
 msgid "File Name is empty"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:193
-#: includes/classes/import/class-wpie-record.php:254
+#: includes/classes/import/class-wpie-import-engine.php:196
+#: includes/classes/import/class-wpie-record.php:256
 #: includes/classes/import/extensions/existing-file/class-existing-file.php:44
 msgid "File not exist"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export.php:1205
-#: includes/classes/export/class-wpie-export.php:1243
-#: includes/classes/export/class-wpie-export.php:1318
+#: includes/classes/export/class-wpie-export.php:1402
+#: includes/classes/export/class-wpie-export.php:1454
+#: includes/classes/export/class-wpie-export.php:1545
 #: includes/classes/import/class-wpie-upload-validate.php:114
 #: includes/classes/import/class-wpie-upload-validate.php:208
 msgid "File not found"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:334
+#: includes/views/wpie-new-import.php:336
 msgid "File Options"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:266
+#: includes/views/wpie-new-export.php:268
 msgid "File path for extra copy in WordPress upload directory"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-engine.php:404
+#: includes/classes/export/class-wpie-export-engine.php:405
 msgid "File path validation failed"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:344
+#: includes/views/wpie-new-import.php:346
 msgid "File Row Title"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:715
+#: includes/views/wpie-new-import.php:717
 msgid "File Size"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:539
+#: includes/classes/class-wpie-common-action.php:542
 #: includes/classes/import/class-wpie-images.php:419
 #: includes/classes/import/class-wpie-upload-validate.php:132
 msgid "File type is not allowed"
 msgstr ""
 
 #: includes/classes/export/class-wpie-export-engine.php:251
+#: includes/classes/export/class-wpie-export.php:1303
 msgid "File type not allowed."
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:679
+#: includes/classes/class-wpie-common-action.php:682
 msgid "File upload failed"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1045
+#: includes/classes/class-wpie-general.php:1053
 msgid "File Uploaded Successfully"
 msgstr ""
 
@@ -1282,36 +1298,36 @@ msgstr ""
 msgid "Focus Keywords"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:164
+#: includes/views/wpie-new-export.php:166
 msgid "For more click"
 msgstr ""
 
-#: includes/views/wpie-settings.php:230
+#: includes/views/wpie-settings.php:232
 msgid "For More Details"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:80
+#: includes/views/wpie-new-export.php:82
 msgid "Free Export Types"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:197
+#: includes/views/wpie-new-import.php:199
 msgid "Free Import Types"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:583
+#: includes/views/wpie-new-import.php:585
 msgid "Friendly Name"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:356
+#: includes/views/wpie-new-export.php:358
 msgid "From Exports"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:458
+#: includes/views/wpie-new-import.php:460
 msgid "From Imports"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:343
-#: includes/views/wpie-new-import.php:445
+#: includes/views/wpie-new-export.php:345
+#: includes/views/wpie-new-import.php:447
 msgid "From Saved Settings"
 msgstr ""
 
@@ -1325,27 +1341,27 @@ msgstr ""
 msgid "Genre: %s."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1053
+#: includes/classes/class-wpie-general.php:1061
 msgid "Get Configuration"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1054
+#: includes/classes/class-wpie-general.php:1062
 msgid "Get Import Fields"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1055
+#: includes/classes/class-wpie-general.php:1063
 msgid "Get Preview Records"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1051
+#: includes/classes/class-wpie-general.php:1059
 msgid "Get Setting List"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1052
+#: includes/classes/class-wpie-general.php:1060
 msgid "Get Settings List"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1050
+#: includes/classes/class-wpie-general.php:1058
 msgid "Get Template List"
 msgstr ""
 
@@ -1353,29 +1369,29 @@ msgstr ""
 msgid "Google Drive"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:298
+#: includes/views/wpie-new-import.php:300
 #: includes/classes/export/class-wpie-export.php:458
 #: includes/classes/export/class-wpie-export.php:468
 msgid "greater than"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:530
+#: includes/views/wpie-new-import.php:532
 msgid "Handle Existing Items"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:236
+#: includes/views/wpie-new-import.php:238
 msgid "Handle New and Existing Items"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:164
+#: includes/views/wpie-new-export.php:166
 msgid "here"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:563
+#: includes/views/wpie-new-import.php:565
 msgid "High Speed Small File Processing"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:642
+#: includes/views/wpie-new-import.php:644
 msgid ""
 "High-Speed, Small File Processing enabled. Your import will fail if it takes "
 "longer than your server's max_execution_time."
@@ -1463,7 +1479,7 @@ msgid ""
 "here. The recommended image size for Twitter is 1024 x 512px."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:885
+#: includes/classes/class-wpie-general.php:891
 msgid ""
 "If your .htaccess file were writable, we could do this automatically, but it "
 "isn’t. So you must either make it writable or manually update your .htaccess "
@@ -1478,7 +1494,7 @@ msgid ""
 "name, or ID."
 msgstr ""
 
-#: support/wordpress_4.6.php:251
+#: support/wordpress_4.6.php:254
 msgid "Illegal file path in archive."
 msgstr ""
 
@@ -1524,7 +1540,7 @@ msgid "Images.jpg"
 msgstr ""
 
 #: includes/classes/class-wpie-general.php:189
-#: includes/views/wpie-settings.php:126
+#: includes/views/wpie-settings.php:128
 msgid "Import"
 msgstr ""
 
@@ -1536,19 +1552,19 @@ msgstr ""
 msgid "Import automatically & periodically to WordPress Site"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1063
+#: includes/classes/class-wpie-general.php:1071
 msgid "Import Complete!"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:692
+#: includes/views/wpie-new-import.php:694
 msgid "Import Data"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:190
+#: includes/views/wpie-new-import.php:192
 msgid "Import each record as"
 msgstr ""
 
-#: includes/views/wpie-extensions.php:106
+#: includes/views/wpie-extensions.php:108
 msgid "Import Extensions"
 msgstr ""
 
@@ -1576,7 +1592,7 @@ msgstr ""
 msgid "Import In Background"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1078
+#: includes/classes/class-wpie-general.php:1086
 msgid "Import in Background"
 msgstr ""
 
@@ -1584,7 +1600,7 @@ msgstr ""
 msgid "Import in Background to WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:55
+#: includes/views/wpie-manage-import.php:57
 msgid "Import Log"
 msgstr ""
 
@@ -1593,19 +1609,19 @@ msgstr ""
 msgid "Import multilingual content to WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:239
+#: includes/views/wpie-new-import.php:241
 msgid "Import new items & Update Existing Items"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:243
+#: includes/views/wpie-new-import.php:245
 msgid "Import new items only & Skip Existing Items"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1064
+#: includes/classes/class-wpie-general.php:1072
 msgid "Import Paused"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1062
+#: includes/classes/class-wpie-general.php:1070
 msgid "Import Processing"
 msgstr ""
 
@@ -1618,15 +1634,15 @@ msgid ""
 "Import Products, Orders, Product Categories and coupons to WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:559
+#: includes/views/wpie-new-import.php:561
 msgid "Import Speed Optimization"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1065
+#: includes/classes/class-wpie-general.php:1073
 msgid "Import Stopped"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:631
+#: includes/views/wpie-new-import.php:633
 msgid "Import Summary"
 msgstr ""
 
@@ -1642,11 +1658,11 @@ msgstr ""
 msgid "Import Yoast SEO Settings to WordPress Site"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:742
+#: includes/views/wpie-new-import.php:744
 msgid "Imported"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1066
+#: includes/classes/class-wpie-general.php:1074
 msgid ""
 "Importing may take some time. Please do not close your browser or refresh "
 "the page until the process is complete."
@@ -1657,15 +1673,15 @@ msgstr ""
 msgid "In"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:570
+#: includes/views/wpie-new-import.php:572
 msgid "In each iteration, process"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:275
+#: includes/views/wpie-new-export.php:277
 msgid "Include BOM"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:278
+#: includes/views/wpie-new-export.php:280
 msgid "Include BOM in export file"
 msgstr ""
 
@@ -1673,7 +1689,7 @@ msgstr ""
 msgid "Includes only these post types"
 msgstr ""
 
-#: support/wordpress_4.6.php:163
+#: support/wordpress_4.6.php:166
 msgid "Incompatible Archive."
 msgstr ""
 
@@ -1682,17 +1698,25 @@ msgstr ""
 msgid "Index"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1017
+#: includes/classes/class-wpie-general.php:1025
 msgid "Internal Server Error [500]."
 msgstr ""
 
 #: includes/classes/export/class-wpie-export-engine.php:259
+#: includes/classes/export/class-wpie-export.php:1312
 msgid "Invalid export file extension."
 msgstr ""
 
 #: includes/classes/export/class-wpie-export-engine.php:239
 #: includes/classes/export/class-wpie-export-engine.php:246
+#: includes/classes/export/class-wpie-export.php:1291
+#: includes/classes/export/class-wpie-export.php:1298
+#: includes/classes/export/class-wpie-export.php:1339
 msgid "Invalid export file name."
+msgstr ""
+
+#: includes/classes/export/class-wpie-export.php:1109
+msgid "Invalid export file type."
 msgstr ""
 
 #: includes/classes/import/extensions/existing-file/class-existing-file.php:60
@@ -1707,7 +1731,7 @@ msgstr ""
 msgid "Invalid file path or path traversal detected"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:324
+#: includes/classes/class-wpie-general.php:326
 msgid "Invalid file path."
 msgstr ""
 
@@ -1715,7 +1739,7 @@ msgstr ""
 msgid "Invalid File to parse. Please Choose other FIle"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:63
+#: includes/views/wpie-new-import.php:65
 #: includes/classes/import/class-wpie-import.php:1230
 msgid "Invalid Nonce. Go to Manage Import for new valid Reimport links"
 msgstr ""
@@ -1724,7 +1748,7 @@ msgstr ""
 msgid "Invalid Request"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:304
+#: includes/views/wpie-new-import.php:306
 #: includes/classes/export/class-wpie-export.php:440
 #: includes/classes/export/class-wpie-export.php:452
 #: includes/classes/export/class-wpie-export.php:462
@@ -1732,7 +1756,7 @@ msgstr ""
 msgid "is empty"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:305
+#: includes/views/wpie-new-import.php:307
 #: includes/classes/export/class-wpie-export.php:441
 #: includes/classes/export/class-wpie-export.php:453
 #: includes/classes/export/class-wpie-export.php:463
@@ -1748,11 +1772,11 @@ msgid ""
 "import speed"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:567
+#: includes/views/wpie-new-import.php:569
 msgid "Iterative, Piece-by-Piece Processing"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:227
+#: includes/views/wpie-new-export.php:229
 #: includes/classes/import/extensions/local-upload/wpie-local-upload-view.php:39
 msgid "JSON"
 msgstr ""
@@ -1771,8 +1795,8 @@ msgstr ""
 msgid "Last Name"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:146
-#: includes/views/wpie-manage-import.php:149
+#: includes/views/wpie-manage-export.php:148
+#: includes/views/wpie-manage-import.php:151
 msgid "Last run"
 msgstr ""
 
@@ -1788,30 +1812,30 @@ msgstr ""
 msgid "Leave these User Meta alone, update all other User Meta"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:300
+#: includes/views/wpie-new-import.php:302
 #: includes/classes/export/class-wpie-export.php:460
 #: includes/classes/export/class-wpie-export.php:470
 msgid "less than"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:817
+#: includes/classes/class-wpie-common-action.php:820
 msgid "License management is available in the Pro version."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:437
+#: includes/views/wpie-new-import.php:439
 msgid "Load & Save Settings"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:338
-#: includes/views/wpie-new-import.php:442
+#: includes/views/wpie-new-export.php:340
+#: includes/views/wpie-new-import.php:444
 msgid "Load Settings"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:752
+#: includes/views/wpie-new-import.php:754
 msgid "Log"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-log.php:94
+#: includes/classes/import/class-wpie-import-log.php:95
 msgid "Log Directory is not writable"
 msgstr ""
 
@@ -1823,23 +1847,23 @@ msgstr ""
 msgid "Login / Username"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:661
-#: includes/views/wpie-manage-export.php:46
-#: includes/views/wpie-new-export.php:617 includes/views/wpie-settings.php:166
+#: includes/classes/class-wpie-general.php:666
+#: includes/views/wpie-manage-export.php:48
+#: includes/views/wpie-new-export.php:619 includes/views/wpie-settings.php:168
 msgid "Manage Export"
 msgstr ""
 
-#: includes/views/wpie-settings.php:182
+#: includes/views/wpie-settings.php:184
 msgid "Manage Extensions"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:663
-#: includes/views/wpie-manage-import.php:46
-#: includes/views/wpie-new-import.php:844 includes/views/wpie-settings.php:174
+#: includes/classes/class-wpie-general.php:668
+#: includes/views/wpie-manage-import.php:48
+#: includes/views/wpie-new-import.php:846 includes/views/wpie-settings.php:176
 msgid "Manage Import"
 msgstr ""
 
-#: includes/views/wpie-settings.php:76
+#: includes/views/wpie-settings.php:78
 msgid "Manage Templates"
 msgstr ""
 
@@ -1913,32 +1937,32 @@ msgstr ""
 msgid "Name & Description"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:427
+#: includes/views/wpie-new-export.php:429
 msgid "Natural Language PHP date()"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:133
-#: includes/views/wpie-manage-import.php:136
+#: includes/views/wpie-manage-export.php:135
+#: includes/views/wpie-manage-import.php:138
 msgid "Never"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:660
-#: includes/views/wpie-new-export.php:42 includes/views/wpie-settings.php:162
+#: includes/classes/class-wpie-general.php:665
+#: includes/views/wpie-new-export.php:44 includes/views/wpie-settings.php:164
 msgid "New Export"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:662
-#: includes/views/wpie-new-import.php:81 includes/views/wpie-new-import.php:841
-#: includes/views/wpie-settings.php:170
+#: includes/classes/class-wpie-general.php:667
+#: includes/views/wpie-new-import.php:83 includes/views/wpie-new-import.php:843
+#: includes/views/wpie-settings.php:172
 msgid "New Import"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:640
+#: includes/views/wpie-new-import.php:642
 msgid ""
 "New Items will be created from records that don't match the above criteria."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:641
+#: includes/views/wpie-new-import.php:643
 msgid ""
 "New Items will be skipped from records that don't match the above criteria."
 msgstr ""
@@ -1966,19 +1990,19 @@ msgstr ""
 msgid "No Archive"
 msgstr ""
 
-#: includes/views/wpie-extension-info.php:76
+#: includes/views/wpie-extension-info.php:78
 msgid "No configuration settings found for this extension."
 msgstr ""
 
-#: includes/views/wpie-extensions.php:96 includes/views/wpie-extensions.php:153
+#: includes/views/wpie-extensions.php:98 includes/views/wpie-extensions.php:155
 msgid "No Extension installed. Please install extension for use all features."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1034
+#: includes/classes/class-wpie-general.php:1042
 msgid "No fields found please choose other option"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:522
+#: includes/classes/class-wpie-common-action.php:524
 msgid "No file uploaded"
 msgstr ""
 
@@ -1991,15 +2015,15 @@ msgstr ""
 msgid "No Index"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:186
+#: includes/views/wpie-manage-import.php:188
 msgid "No Records Found"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1061
+#: includes/classes/class-wpie-general.php:1069
 msgid "No Records Found. Please Try another File or Data Format or Excel Sheet"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1060
+#: includes/classes/class-wpie-general.php:1068
 msgid "No Records Found. Please Try another filters"
 msgstr ""
 
@@ -2007,11 +2031,11 @@ msgstr ""
 msgid "No Snippet"
 msgstr ""
 
-#: support/wordpress_4.6.php:141
+#: support/wordpress_4.6.php:144
 msgid "No suitable ZIP extraction library available."
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:175
+#: includes/views/wpie-manage-export.php:177
 msgid "No Templates Found"
 msgstr ""
 
@@ -2029,15 +2053,15 @@ msgstr ""
 msgid "Normal Data"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1015
+#: includes/classes/class-wpie-general.php:1023
 msgid "Not connected. Verify Network."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:303
+#: includes/views/wpie-new-import.php:305
 msgid "not contains"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:297
+#: includes/views/wpie-new-import.php:299
 msgid "not equals"
 msgstr ""
 
@@ -2050,7 +2074,7 @@ msgstr ""
 msgid "Note : Email is required field for new items. Optional for update items"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:434
+#: includes/views/wpie-new-import.php:436
 msgid ""
 "Note : Filling some data is required. You can fill in the data through the "
 "load settings or manually"
@@ -2066,37 +2090,37 @@ msgstr ""
 msgid "Note : Name is required field for new items. Optional for update items"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:542
+#: includes/views/wpie-new-import.php:544
 msgid ""
 "Note : Please choose only field that you have filled in previous step and "
 "you want to update otherwise you can lose your some of data. Not apply on "
 "creating new items"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:226
+#: includes/views/wpie-new-export.php:228
 msgid "ODS"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:553
-#: includes/views/wpie-new-import.php:377
-#: includes/views/wpie-new-import.php:412
-#: includes/views/wpie-new-import.php:744
+#: includes/views/wpie-new-export.php:555
+#: includes/views/wpie-new-import.php:379
+#: includes/views/wpie-new-import.php:414
+#: includes/views/wpie-new-import.php:746
 msgid "of"
 msgstr ""
 
-#: includes/views/wpie-extensions.php:78 includes/views/wpie-extensions.php:135
+#: includes/views/wpie-extensions.php:80 includes/views/wpie-extensions.php:137
 msgid "OFF"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1009
-#: includes/views/wpie-extension-info.php:109
-#: includes/views/wpie-extensions.php:187
-#: includes/views/wpie-manage-export.php:213
-#: includes/views/wpie-manage-export.php:237
-#: includes/views/wpie-manage-import.php:217
-#: includes/views/wpie-manage-import.php:248
-#: includes/views/wpie-new-export.php:503
-#: includes/views/wpie-new-import.php:785 includes/views/wpie-settings.php:270
+#: includes/classes/class-wpie-general.php:1017
+#: includes/views/wpie-extension-info.php:111
+#: includes/views/wpie-extensions.php:189
+#: includes/views/wpie-manage-export.php:215
+#: includes/views/wpie-manage-export.php:239
+#: includes/views/wpie-manage-import.php:219
+#: includes/views/wpie-manage-import.php:250
+#: includes/views/wpie-new-export.php:505
+#: includes/views/wpie-new-import.php:787 includes/views/wpie-settings.php:272
 msgid "Ok"
 msgstr ""
 
@@ -2104,7 +2128,7 @@ msgstr ""
 msgid "older than"
 msgstr ""
 
-#: includes/views/wpie-extensions.php:77 includes/views/wpie-extensions.php:134
+#: includes/views/wpie-extensions.php:79 includes/views/wpie-extensions.php:136
 msgid "ON"
 msgstr ""
 
@@ -2130,7 +2154,7 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1031
+#: includes/classes/class-wpie-general.php:1039
 #: includes/classes/import/extensions/local-upload/wpie-local-upload-view.php:10
 msgid "OR"
 msgstr ""
@@ -2169,7 +2193,7 @@ msgstr ""
 msgid "Parent term"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1049
+#: includes/classes/class-wpie-general.php:1057
 msgid "Parsing upload file"
 msgstr ""
 
@@ -2178,26 +2202,26 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: support/wordpress_4.6.php:187
+#: support/wordpress_4.6.php:190
 msgid "Path outside destination directory detected."
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:162
-#: includes/views/wpie-manage-import.php:171
-#: includes/views/wpie-new-export.php:594
-#: includes/views/wpie-new-import.php:680
+#: includes/views/wpie-manage-export.php:164
+#: includes/views/wpie-manage-import.php:173
+#: includes/views/wpie-new-export.php:596
+#: includes/views/wpie-new-import.php:682
 msgid "Pause"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:635
+#: includes/views/wpie-new-export.php:637
 msgid ""
 "Pause Exporting may take some time. Please do not close your browser or "
 "refresh the page until the process is complete."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1090
-#: includes/views/wpie-manage-export.php:114
-#: includes/views/wpie-manage-import.php:114
+#: includes/classes/class-wpie-general.php:1098
+#: includes/views/wpie-manage-export.php:116
+#: includes/views/wpie-manage-import.php:116
 msgid "Paused"
 msgstr ""
 
@@ -2205,64 +2229,64 @@ msgstr ""
 msgid "Permission denied!"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:513
-#: includes/views/wpie-new-import.php:795
+#: includes/views/wpie-new-export.php:515
+#: includes/views/wpie-new-import.php:797
 msgid "Permission Required"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:643
+#: includes/views/wpie-new-import.php:645
 msgid "Piece By Piece Processing enabled."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1106
+#: includes/classes/class-wpie-general.php:1114
 msgid "Please Activate Plugin Purchase Code from WP Imp Exp => Settings"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1041
+#: includes/classes/class-wpie-general.php:1049
 msgid "Please Activate Product Attributes Export Extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1088
+#: includes/classes/class-wpie-general.php:1096
 msgid "Please Activate Product Attributes Import Extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1039
+#: includes/classes/class-wpie-general.php:1047
 msgid "Please Activate User Export Extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1086
+#: includes/classes/class-wpie-general.php:1094
 msgid "Please Activate User Import Extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1040
+#: includes/classes/class-wpie-general.php:1048
 msgid "Please Activate WooCommerce Export Extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1087
+#: includes/classes/class-wpie-general.php:1095
 msgid "Please Activate WooCommerce Import Extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1100
+#: includes/classes/class-wpie-general.php:1108
 msgid "Please Activate WooCommerce Plugin"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1026
+#: includes/classes/class-wpie-general.php:1034
 msgid "Please choose export taxonomy type"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1025
+#: includes/classes/class-wpie-general.php:1033
 msgid "Please choose export type"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1073
+#: includes/classes/class-wpie-general.php:1081
 msgid "Please choose user role"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1069
+#: includes/classes/class-wpie-general.php:1077
 msgid "Please Choose Valid File"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:499
+#: includes/views/wpie-new-import.php:501
 msgid "Please contact admin for allow shortcode in field. for more"
 msgstr ""
 
@@ -2270,82 +2294,82 @@ msgstr ""
 msgid "Please enable PHP ZIP extension"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1029
+#: includes/classes/class-wpie-general.php:1037
 msgid "Please enter CSV delimiter"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1036
+#: includes/classes/class-wpie-general.php:1044
 msgid "Please Enter Field Name"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1028
+#: includes/classes/class-wpie-general.php:1036
 msgid "Please enter Setting Name"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1027
+#: includes/classes/class-wpie-general.php:1035
 msgid "Please enter template Name"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1081
+#: includes/classes/class-wpie-general.php:1089
 msgid "Please Enter Valid Host Name"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1083
+#: includes/classes/class-wpie-general.php:1091
 msgid "Please Enter Valid Host Password"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1085
+#: includes/classes/class-wpie-general.php:1093
 msgid "Please Enter Valid Host Path"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1082
+#: includes/classes/class-wpie-general.php:1090
 msgid "Please Enter Valid Host Username"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1080
+#: includes/classes/class-wpie-general.php:1088
 msgid "Please Enter Valid URL"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1096
+#: includes/classes/class-wpie-general.php:1104
 msgid "Please Fill Required Fields"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1075
+#: includes/classes/class-wpie-general.php:1083
 msgid "Please select any action"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1098
+#: includes/classes/class-wpie-general.php:1106
 msgid "Please Select any Layout"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1097
+#: includes/classes/class-wpie-general.php:1105
 msgid "Please Select any template"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1074
+#: includes/classes/class-wpie-general.php:1082
 msgid "Please Select Templates"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:632
+#: includes/views/wpie-new-export.php:634
 msgid "Please Wait"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:644
-#: includes/views/wpie-new-import.php:822
+#: includes/views/wpie-new-export.php:646
+#: includes/views/wpie-new-import.php:824
 msgid "Please Wait until process is complete"
 msgstr ""
 
-#: includes/views/wpie-settings.php:137
+#: includes/views/wpie-settings.php:139
 msgid "Plugin Access Permission"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1079
+#: includes/classes/class-wpie-general.php:1087
 msgid ""
 "plugin will automatically import data in Background. you can close your "
 "browser."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:289
+#: includes/views/wpie-new-export.php:291
 msgid "Plugin will not add empty value nodes"
 msgstr ""
 
@@ -2381,48 +2405,48 @@ msgstr ""
 msgid "Post Tags"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:94
+#: includes/views/wpie-new-export.php:96
 msgid "Premium Export Types"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:211
+#: includes/views/wpie-new-import.php:213
 msgid "Premium Import Types"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1089
+#: includes/classes/class-wpie-general.php:1097
 msgid "Prepare File"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:52 includes/views/wpie-new-export.php:525
-#: includes/views/wpie-new-import.php:807
+#: includes/views/wpie-new-export.php:54 includes/views/wpie-new-export.php:527
+#: includes/views/wpie-new-import.php:809
 msgid "Preview"
 msgstr ""
 
-#: includes/views/wpie-extensions.php:84 includes/views/wpie-extensions.php:141
+#: includes/views/wpie-extensions.php:86 includes/views/wpie-extensions.php:143
 msgid "Pro Addon"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1107
+#: includes/classes/class-wpie-general.php:1115
 msgid "Pro Feature Only"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:712
+#: includes/classes/class-wpie-common-action.php:715
 msgid "Process Paused Successfully"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:709
+#: includes/classes/class-wpie-common-action.php:712
 #: includes/classes/export/class-wpie-export.php:724
 msgid "Process Stopped Successfully"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1091
-#: includes/views/wpie-manage-export.php:109
-#: includes/views/wpie-manage-import.php:112
-#: includes/views/wpie-manage-import.php:118
+#: includes/classes/class-wpie-general.php:1099
+#: includes/views/wpie-manage-export.php:111
+#: includes/views/wpie-manage-import.php:114
+#: includes/views/wpie-manage-import.php:120
 msgid "Processing"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1099
+#: includes/classes/class-wpie-general.php:1107
 msgid "Processing Reimport"
 msgstr ""
 
@@ -2432,7 +2456,7 @@ msgstr ""
 
 #: includes/classes/class-wpie-extensions.php:124
 #: includes/classes/class-wpie-extensions.php:221
-#: includes/views/wpie-new-export.php:97 includes/views/wpie-new-import.php:214
+#: includes/views/wpie-new-export.php:99 includes/views/wpie-new-import.php:216
 #: includes/classes/export/class-wpie-export.php:269
 #: includes/classes/import/class-wpie-import.php:34
 msgid "Product Attributes"
@@ -2443,7 +2467,7 @@ msgstr ""
 msgid "Product Categories"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:96 includes/views/wpie-new-import.php:213
+#: includes/views/wpie-new-export.php:98 includes/views/wpie-new-import.php:215
 #: includes/classes/export/class-wpie-export.php:268
 #: includes/classes/import/class-wpie-import.php:33
 #: includes/classes/import/fields/wpie-comments.php:18
@@ -2455,59 +2479,59 @@ msgstr ""
 msgid "Product Tags"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-base.php:587
+#: includes/classes/export/class-wpie-export-base.php:588
 msgid "Product Type"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export-base.php:589
+#: includes/classes/export/class-wpie-export-base.php:590
 msgid "Product Visibility"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1093
+#: includes/classes/class-wpie-general.php:1101
 msgid "Purchase Code is empty"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1094
+#: includes/classes/class-wpie-general.php:1102
 msgid "Purchase Code is Invalid"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:80
-#: includes/views/wpie-manage-import.php:80
+#: includes/views/wpie-manage-export.php:82
+#: includes/views/wpie-manage-import.php:82
 msgid "Query"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:232
+#: includes/classes/import/class-wpie-import-engine.php:235
 msgid "Record"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:153
-#: includes/views/wpie-new-import.php:746
+#: includes/views/wpie-manage-import.php:155
+#: includes/views/wpie-new-import.php:748
 msgid "Records"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:574
+#: includes/views/wpie-new-import.php:576
 msgid "records"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:150
+#: includes/views/wpie-manage-export.php:152
 msgid "Records Exported"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:157
+#: includes/views/wpie-manage-import.php:159
 msgid "Records Imported"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:255
+#: includes/views/wpie-new-export.php:257
 msgid "Records Per iteration"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:643
+#: includes/views/wpie-new-import.php:645
 msgid ""
 "records will be processed each iteration. If it takes longer than your "
 "server's max_execution_time to process"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:643
+#: includes/views/wpie-new-import.php:645
 msgid "records, your import will fail."
 msgstr ""
 
@@ -2516,7 +2540,7 @@ msgstr ""
 msgid "Registered Date"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:174
+#: includes/views/wpie-manage-import.php:176
 msgid "Reimport"
 msgstr ""
 
@@ -2536,22 +2560,22 @@ msgstr ""
 msgid "Released: %d."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:200
+#: includes/views/wpie-new-export.php:202
 msgid "Remove All"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1018
+#: includes/classes/class-wpie-general.php:1026
 msgid "Requested JSON parse failed."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1016
+#: includes/classes/class-wpie-general.php:1024
 msgid "Requested page not found. [404]"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:164
-#: includes/views/wpie-manage-import.php:173
-#: includes/views/wpie-new-export.php:600
-#: includes/views/wpie-new-import.php:683
+#: includes/views/wpie-manage-export.php:166
+#: includes/views/wpie-manage-import.php:175
+#: includes/views/wpie-new-export.php:602
+#: includes/views/wpie-new-import.php:685
 msgid "Resume"
 msgstr ""
 
@@ -2564,34 +2588,34 @@ msgstr ""
 msgid "Role Successfully Saved"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:636
+#: includes/views/wpie-new-import.php:638
 msgid "rows in your file"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:139
-#: includes/views/wpie-new-import.php:283
+#: includes/views/wpie-new-export.php:141
+#: includes/views/wpie-new-import.php:285
 msgid "Rule"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1032
-#: includes/views/wpie-extension-info.php:63
-#: includes/views/wpie-extensions.php:39 includes/views/wpie-new-export.php:377
-#: includes/views/wpie-new-export.php:455
-#: includes/views/wpie-new-import.php:476 includes/views/wpie-settings.php:197
-#: includes/views/wpie-settings.php:217 includes/views/wpie-settings.php:250
+#: includes/classes/class-wpie-general.php:1040
+#: includes/views/wpie-extension-info.php:65
+#: includes/views/wpie-extensions.php:41 includes/views/wpie-new-export.php:379
+#: includes/views/wpie-new-export.php:457
+#: includes/views/wpie-new-import.php:478 includes/views/wpie-settings.php:199
+#: includes/views/wpie-settings.php:219 includes/views/wpie-settings.php:252
 msgid "Save"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:367
+#: includes/views/wpie-new-export.php:369
 msgid "Save Setting"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1059
-#: includes/views/wpie-new-import.php:468
+#: includes/classes/class-wpie-general.php:1067
+#: includes/views/wpie-new-import.php:470
 msgid "Save Settings"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1058
+#: includes/classes/class-wpie-general.php:1066
 msgid "Save Template"
 msgstr ""
 
@@ -2607,7 +2631,7 @@ msgstr ""
 msgid "Schema"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:535
+#: includes/views/wpie-new-import.php:537
 msgid "Search Existing Item"
 msgstr ""
 
@@ -2627,22 +2651,22 @@ msgid ""
 "images"
 msgstr ""
 
-#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:18
-#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:19
+#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:20
+#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:21
 msgid "Select a previously uploaded file"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1024
-#: includes/views/wpie-new-export.php:146
-#: includes/views/wpie-new-import.php:290
+#: includes/classes/class-wpie-general.php:1032
+#: includes/views/wpie-new-export.php:148
+#: includes/views/wpie-new-import.php:292
 msgid "Select Element"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:79
+#: includes/views/wpie-new-export.php:81
 msgid "Select Export Type"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:471
+#: includes/views/wpie-new-export.php:473
 msgid "Select Fields"
 msgstr ""
 
@@ -2650,29 +2674,29 @@ msgstr ""
 msgid "Select Files"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1023
-#: includes/views/wpie-new-export.php:151
-#: includes/views/wpie-new-import.php:295
+#: includes/classes/class-wpie-general.php:1031
+#: includes/views/wpie-new-export.php:153
+#: includes/views/wpie-new-import.php:297
 msgid "Select Rule"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1013
-#: includes/views/wpie-new-export.php:346
-#: includes/views/wpie-new-export.php:359
-#: includes/views/wpie-new-import.php:448
-#: includes/views/wpie-new-import.php:461
+#: includes/classes/class-wpie-general.php:1021
+#: includes/views/wpie-new-export.php:348
+#: includes/views/wpie-new-export.php:361
+#: includes/views/wpie-new-import.php:450
+#: includes/views/wpie-new-import.php:463
 msgid "Select Setting"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:106
+#: includes/views/wpie-new-export.php:108
 msgid "Select Taxonomy"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1012
+#: includes/classes/class-wpie-general.php:1020
 msgid "Select Template"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:585
+#: includes/views/wpie-new-export.php:587
 msgid "Send"
 msgstr ""
 
@@ -2680,7 +2704,7 @@ msgstr ""
 msgid "Send Email Notifications For Imported Users"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:559
+#: includes/views/wpie-new-export.php:561
 msgid "Send Exported Data To"
 msgstr ""
 
@@ -2703,7 +2727,7 @@ msgstr ""
 msgid "Set Alt Text(s)"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1076
+#: includes/classes/class-wpie-general.php:1084
 msgid "Set Background Process"
 msgstr ""
 
@@ -2715,11 +2739,11 @@ msgstr ""
 msgid "Set Description(s)"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1070
+#: includes/classes/class-wpie-general.php:1078
 msgid "Set Existing File"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1095
+#: includes/classes/class-wpie-general.php:1103
 msgid "Set Schedule"
 msgstr ""
 
@@ -2727,7 +2751,7 @@ msgstr ""
 msgid "Set slug automatically"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1056
+#: includes/classes/class-wpie-general.php:1064
 msgid "Set Template"
 msgstr ""
 
@@ -2739,12 +2763,12 @@ msgstr ""
 msgid "Set Title(s)"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1014
+#: includes/classes/class-wpie-general.php:1022
 msgid "Setting Loaded Successfully"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:371
-#: includes/views/wpie-new-import.php:471
+#: includes/views/wpie-new-export.php:373
+#: includes/views/wpie-new-import.php:473
 msgid "Setting Name"
 msgstr ""
 
@@ -2766,14 +2790,14 @@ msgstr ""
 msgid "Setting updated successfully"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:664
-#: includes/views/wpie-extension-info.php:50
-#: includes/views/wpie-settings.php:67 includes/views/wpie-settings.php:178
+#: includes/classes/class-wpie-general.php:669
+#: includes/views/wpie-extension-info.php:52
+#: includes/views/wpie-settings.php:69 includes/views/wpie-settings.php:180
 msgid "Settings"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:501
-#: includes/classes/class-wpie-common-action.php:780
+#: includes/classes/class-wpie-common-action.php:502
+#: includes/classes/class-wpie-common-action.php:783
 msgid "Settings Successfully Saved"
 msgstr ""
 
@@ -2782,7 +2806,7 @@ msgstr ""
 msgid "Settings Successfully Updated"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1057
+#: includes/classes/class-wpie-general.php:1065
 msgid "Settings Updating"
 msgstr ""
 
@@ -2790,28 +2814,28 @@ msgstr ""
 msgid "Shipping Details"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:495
+#: includes/views/wpie-new-import.php:497
 msgid "Shortcode allowed in field. for more"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:294
+#: includes/classes/import/class-wpie-import-engine.php:297
 msgid "Skip Existing Items"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:305
+#: includes/classes/import/class-wpie-import-engine.php:308
 msgid "Skip New Items"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:294
-#: includes/classes/import/class-wpie-import-engine.php:305
+#: includes/classes/import/class-wpie-import-engine.php:297
+#: includes/classes/import/class-wpie-import-engine.php:308
 msgid "SKIPPED"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:733
+#: includes/views/wpie-new-import.php:735
 msgid "Skipped"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:163
+#: includes/views/wpie-manage-import.php:165
 msgid "skipped"
 msgstr ""
 
@@ -2822,16 +2846,16 @@ msgstr ""
 
 #: includes/classes/import/class-wpie-post.php:230
 #: includes/classes/import/class-wpie-taxonomy.php:92
-#: includes/classes/import/extensions/user/class-wpie-user.php:384
+#: includes/classes/import/extensions/user/class-wpie-user.php:440
 msgid "something wrong, ID = 0 was generated."
 msgstr ""
 
 #: includes/classes/import/class-wpie-attachments.php:358
-#: includes/classes/import/class-wpie-images.php:851
+#: includes/classes/import/class-wpie-images.php:855
 msgid "Sorry, you are not allowed to upload this file type."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:578
+#: includes/views/wpie-new-import.php:580
 msgid "Split file up into 1000 record chunks."
 msgstr ""
 
@@ -2842,40 +2866,40 @@ msgstr ""
 msgid "Standard"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:83
-#: includes/views/wpie-manage-import.php:83
+#: includes/views/wpie-manage-export.php:85
+#: includes/views/wpie-manage-import.php:85
 msgid "Status"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:163
-#: includes/views/wpie-manage-import.php:172
-#: includes/views/wpie-new-export.php:597
-#: includes/views/wpie-new-import.php:686
+#: includes/views/wpie-manage-export.php:165
+#: includes/views/wpie-manage-import.php:174
+#: includes/views/wpie-new-export.php:599
+#: includes/views/wpie-new-import.php:688
 msgid "Stop"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1092
-#: includes/views/wpie-manage-export.php:116
-#: includes/views/wpie-manage-import.php:116
+#: includes/classes/class-wpie-general.php:1100
+#: includes/views/wpie-manage-export.php:118
+#: includes/views/wpie-manage-import.php:118
 msgid "Stopped"
 msgstr ""
 
-#: includes/classes/import/class-wpie-import-engine.php:379
+#: includes/classes/import/class-wpie-import-engine.php:382
 msgid "Successfully Imported"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:81
-#: includes/views/wpie-manage-import.php:81
+#: includes/views/wpie-manage-export.php:83
+#: includes/views/wpie-manage-import.php:83
 msgid "Summary"
 msgstr ""
 
 #: includes/classes/class-wpie-general.php:164
-#: includes/views/wpie-extension-info.php:88
-#: includes/views/wpie-extensions.php:166
-#: includes/views/wpie-manage-export.php:196
-#: includes/views/wpie-manage-import.php:225
-#: includes/views/wpie-new-export.php:392
-#: includes/views/wpie-new-import.php:764 includes/views/wpie-settings.php:278
+#: includes/views/wpie-extension-info.php:90
+#: includes/views/wpie-extensions.php:168
+#: includes/views/wpie-manage-export.php:198
+#: includes/views/wpie-manage-import.php:227
+#: includes/views/wpie-new-export.php:394
+#: includes/views/wpie-new-import.php:766 includes/views/wpie-settings.php:280
 msgid "Support"
 msgstr ""
 
@@ -2892,7 +2916,7 @@ msgstr ""
 msgid "Taxonomy does not exist."
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:742
+#: includes/classes/class-wpie-common-action.php:745
 #: includes/classes/export/class-wpie-export.php:758
 msgid "Template id not found"
 msgstr ""
@@ -2908,10 +2932,10 @@ msgstr ""
 msgid "Template Not Found"
 msgstr ""
 
-#: includes/classes/export/class-wpie-export.php:996
-#: includes/classes/export/class-wpie-export.php:1004
-#: includes/classes/export/class-wpie-export.php:1131
-#: includes/classes/export/class-wpie-export.php:1136
+#: includes/classes/export/class-wpie-export.php:998
+#: includes/classes/export/class-wpie-export.php:1006
+#: includes/classes/export/class-wpie-export.php:1186
+#: includes/classes/export/class-wpie-export.php:1191
 #: includes/classes/import/class-wpie-import.php:1233
 msgid "Template not found"
 msgstr ""
@@ -2924,7 +2948,7 @@ msgstr ""
 msgid "Templates Successfully Deleted"
 msgstr ""
 
-#: includes/classes/class-wpie-common-action.php:650
+#: includes/classes/class-wpie-common-action.php:653
 msgid "Templates Successfully Imported"
 msgstr ""
 
@@ -2945,7 +2969,7 @@ msgid ""
 "to update existing data, and much more."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:275
+#: includes/views/wpie-new-export.php:277
 msgid ""
 "The BOM will help some programs like Microsoft Excel read your export file "
 "if it includes non-English characters."
@@ -3018,7 +3042,7 @@ msgstr ""
 msgid "The value should be one of the following: ('noindex', 'index')."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1037
+#: includes/classes/class-wpie-general.php:1045
 msgid "There aren't any Records to export."
 msgstr ""
 
@@ -3031,12 +3055,12 @@ msgstr ""
 msgid "This is a hashed password from another WordPress site"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:548
-#: includes/views/wpie-new-import.php:723
+#: includes/views/wpie-new-export.php:550
+#: includes/views/wpie-new-import.php:725
 msgid "Time Elapsed"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1019
+#: includes/classes/class-wpie-general.php:1027
 msgid "Time out error."
 msgstr ""
 
@@ -3047,16 +3071,16 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1103
+#: includes/classes/class-wpie-general.php:1111
 msgid "Title is required field for new data"
 msgstr ""
 
-#: includes/views/wpie-manage-export.php:154
-#: includes/views/wpie-manage-import.php:153
+#: includes/views/wpie-manage-export.php:156
+#: includes/views/wpie-manage-import.php:155
 msgid "Total"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:47
+#: includes/views/wpie-new-export.php:49
 msgid "Total Records Found"
 msgstr ""
 
@@ -3081,24 +3105,24 @@ msgstr ""
 msgid "Twitter Options"
 msgstr ""
 
-#: includes/classes/import/class-wpie-record.php:266
+#: includes/classes/import/class-wpie-record.php:268
 msgid "Unable to open XML file"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:342
+#: includes/classes/class-wpie-general.php:344
 msgid "Unauthorized file download."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1022
+#: includes/classes/class-wpie-general.php:1030
 msgid "Uncaught Error"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:426
+#: includes/views/wpie-new-export.php:428
 msgid "UNIX timestamp - PHP time()"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:351
-#: includes/views/wpie-new-import.php:453
+#: includes/views/wpie-new-export.php:353
+#: includes/views/wpie-new-import.php:455
 msgid "Update"
 msgstr ""
 
@@ -3136,11 +3160,11 @@ msgstr ""
 msgid "Update all User Meta and Remove meta if not found in file"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:247
+#: includes/views/wpie-new-import.php:249
 msgid "Update Existing Items & Skip new items"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:544
+#: includes/views/wpie-new-import.php:546
 msgid "Update Existing items Fields"
 msgstr ""
 
@@ -3156,27 +3180,27 @@ msgstr ""
 msgid "Update only these User Meta, leave the rest alone"
 msgstr ""
 
-#: includes/views/wpie-settings.php:190
+#: includes/views/wpie-settings.php:192
 msgid "Update Superior Users"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:731
+#: includes/views/wpie-new-import.php:733
 msgid "Updated"
 msgstr ""
 
-#: includes/views/wpie-manage-import.php:161
+#: includes/views/wpie-manage-import.php:163
 msgid "updated"
 msgstr ""
 
-#: includes/views/wpie-extensions.php:35
-#: includes/views/wpie-manage-export.php:48
-#: includes/views/wpie-manage-import.php:48
-#: includes/views/wpie-new-export.php:44 includes/views/wpie-new-import.php:83
-#: includes/views/wpie-settings.php:69
+#: includes/views/wpie-extensions.php:37
+#: includes/views/wpie-manage-export.php:50
+#: includes/views/wpie-manage-import.php:50
+#: includes/views/wpie-new-export.php:46 includes/views/wpie-new-import.php:85
+#: includes/views/wpie-settings.php:71
 msgid "Upgrade Pro"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1048
+#: includes/classes/class-wpie-general.php:1056
 msgid "Upload Complete"
 msgstr ""
 
@@ -3188,17 +3212,17 @@ msgstr ""
 msgid "Upload directory not found"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:334
+#: includes/classes/class-wpie-general.php:336
 msgid "Upload directory not found."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1105
+#: includes/classes/class-wpie-general.php:1113
 msgid ""
 "Upload Directory YOUR_SITE/wp-content/uploads/wp-import-export-lite is not "
 "Writable. Please change permission to make writable"
 msgstr ""
 
-#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:31
+#: includes/classes/import/extensions/existing-file/wpie-existing-file-view.php:33
 msgid "Upload files to"
 msgstr ""
 
@@ -3227,7 +3251,7 @@ msgstr ""
 msgid "Uploaded file is not readable"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1046
+#: includes/classes/class-wpie-general.php:1054
 msgid "Uploaded file must be CSV, ZIP, XLS, XLSX, XML, TXT, JSON"
 msgstr ""
 
@@ -3244,7 +3268,7 @@ msgstr ""
 msgid "Uploaded file must be XML, CSV, ZIP, XLS, XLSX, ODS, TXT, JSON, TAR"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1047
+#: includes/classes/class-wpie-general.php:1055
 #: includes/classes/import/extensions/local-upload/wpie-local-upload-view.php:19
 msgid "Uploading"
 msgstr ""
@@ -3263,12 +3287,12 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:187
+#: includes/views/wpie-new-export.php:189
 msgid ""
 "Use click on text for edit field. Use Drag and Drop for change any position"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:472
+#: includes/views/wpie-new-export.php:474
 msgid "Use Ctrl + Click to Select Multiple Fields"
 msgstr ""
 
@@ -3293,15 +3317,15 @@ msgstr ""
 msgid "Use images currently uploaded in"
 msgstr ""
 
-#: includes/views/wpie-settings.php:240
+#: includes/views/wpie-settings.php:242
 msgid "Use this single link for ALL schedule and background processing."
 msgstr ""
 
-#: includes/views/wpie-settings.php:237
+#: includes/views/wpie-settings.php:239
 msgid "Use Web Host / External Cron & Processing"
 msgstr ""
 
-#: includes/views/wpie-settings.php:233
+#: includes/views/wpie-settings.php:235
 msgid "Use WordPress Default Cron & processing"
 msgstr ""
 
@@ -3309,31 +3333,31 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:735
+#: includes/classes/class-wpie-general.php:740
 msgid "User Add Shortcode in import field"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:729
+#: includes/classes/class-wpie-general.php:734
 msgid "User can export new data"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:731
+#: includes/classes/class-wpie-general.php:736
 msgid "User can import new data"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:730
+#: includes/classes/class-wpie-general.php:735
 msgid "User can manage export data"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:734
+#: includes/classes/class-wpie-general.php:739
 msgid "User can manage Extensions of import and export"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:732
+#: includes/classes/class-wpie-general.php:737
 msgid "User can manage import data"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:733
+#: includes/classes/class-wpie-general.php:738
 msgid "User can manage Settings of import and export"
 msgstr ""
 
@@ -3361,8 +3385,8 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:140
-#: includes/views/wpie-new-import.php:284
+#: includes/views/wpie-new-export.php:142
+#: includes/views/wpie-new-import.php:286
 #: includes/classes/import/fields/wpie-comments.php:197
 #: includes/classes/import/fields/wpie-comments.php:286
 #: includes/classes/import/fields/wpie-taxonomy.php:217
@@ -3386,11 +3410,11 @@ msgstr ""
 #: includes/classes/import/class-wpie-images.php:532
 #: includes/classes/import/class-wpie-images.php:568
 #: includes/classes/import/class-wpie-images.php:581
-#: includes/classes/import/class-wpie-import-engine.php:321
-#: includes/classes/import/class-wpie-import-engine.php:603
-#: includes/classes/import/class-wpie-import-engine.php:625
-#: includes/classes/import/extensions/user/class-wpie-user.php:351
-#: includes/classes/import/extensions/user/class-wpie-user.php:362
+#: includes/classes/import/class-wpie-import-engine.php:324
+#: includes/classes/import/class-wpie-import-engine.php:606
+#: includes/classes/import/class-wpie-import-engine.php:628
+#: includes/classes/import/extensions/user/class-wpie-user.php:407
+#: includes/classes/import/extensions/user/class-wpie-user.php:418
 #: includes/classes/import/extensions/yoast-seo/class-images.php:77
 #: includes/classes/import/extensions/yoast-seo/class-images.php:80
 #: includes/classes/import/extensions/yoast-seo/class-images.php:117
@@ -3405,7 +3429,7 @@ msgstr ""
 msgid "Website URL"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:635
+#: includes/views/wpie-new-import.php:637
 msgid "which is"
 msgstr ""
 
@@ -3413,14 +3437,15 @@ msgstr ""
 msgid "WooCommerce"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:99 includes/views/wpie-new-import.php:216
+#: includes/views/wpie-new-export.php:101
+#: includes/views/wpie-new-import.php:218
 #: includes/classes/export/class-wpie-export.php:271
 #: includes/classes/import/class-wpie-import.php:36
 msgid "WooCommerce Coupons"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:100
-#: includes/views/wpie-new-import.php:217
+#: includes/views/wpie-new-export.php:102
+#: includes/views/wpie-new-import.php:219
 #: includes/classes/export/class-wpie-export.php:272
 #: includes/classes/import/class-wpie-import.php:37
 msgid "WooCommerce Customers"
@@ -3430,49 +3455,50 @@ msgstr ""
 msgid "WooCommerce Import"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:98 includes/views/wpie-new-import.php:215
+#: includes/views/wpie-new-export.php:100
+#: includes/views/wpie-new-import.php:217
 #: includes/classes/export/class-wpie-export.php:270
 #: includes/classes/import/class-wpie-import.php:35
 msgid "WooCommerce Orders"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:95 includes/views/wpie-new-import.php:212
+#: includes/views/wpie-new-export.php:97 includes/views/wpie-new-import.php:214
 #: includes/classes/export/class-wpie-export.php:267
 #: includes/classes/import/class-wpie-import.php:32
 msgid "WooCommerce Products"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1067
+#: includes/classes/class-wpie-general.php:1075
 msgid ""
 "WordPress Import Export partially imported your file into your WordPress "
 "installation!"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1068
+#: includes/classes/class-wpie-general.php:1076
 msgid ""
 "WordPress Import Export successfully imported your file into your WordPress "
 "installation!"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:635
+#: includes/views/wpie-new-import.php:637
 msgid "WordPress Import Export will import the file"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:637
+#: includes/views/wpie-new-import.php:639
 msgid ""
 "WordPress Import Export will merge data into existing Items, matching the "
 "following criteria: has the same"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:636
+#: includes/views/wpie-new-import.php:638
 msgid "WordPress Import Export will process"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:659
+#: includes/classes/class-wpie-general.php:664
 msgid "WP Imp Exp"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:659
+#: includes/classes/class-wpie-general.php:664
 msgid "WP Import Export Dashboard"
 msgstr ""
 
@@ -3486,14 +3512,14 @@ msgid ""
 "Export Pro is active."
 msgstr ""
 
-#: includes/views/wpie-new-export.php:255
+#: includes/views/wpie-new-export.php:257
 msgid ""
 "WP Import Export must be able to process this many records in less than your "
 "server's timeout settings. If your export fails before completion, to "
 "troubleshoot you should lower this number."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:885
+#: includes/classes/class-wpie-general.php:891
 msgid "WP Import Export: "
 msgstr ""
 
@@ -3502,15 +3528,15 @@ msgstr ""
 msgid "WPML"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:223
+#: includes/views/wpie-new-export.php:225
 msgid "XLS"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:224
+#: includes/views/wpie-new-export.php:226
 msgid "XLSX"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:225
+#: includes/views/wpie-new-export.php:227
 #: includes/classes/import/extensions/local-upload/wpie-local-upload-view.php:43
 msgid "XML"
 msgstr ""
@@ -3519,15 +3545,15 @@ msgstr ""
 msgid "XML File Not Found"
 msgstr ""
 
-#: includes/views/wpie-new-import.php:326
+#: includes/views/wpie-new-import.php:328
 msgid "XPath"
 msgstr ""
 
-#: includes/views/wpie-new-export.php:430
+#: includes/views/wpie-new-export.php:432
 msgid "Y-m-d"
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1008
+#: includes/classes/class-wpie-general.php:1016
 #: includes/classes/import/extensions/yoast-seo/views/post.php:235
 #: includes/classes/import/extensions/yoast-seo/views/taxonomy.php:169
 msgid "Yes"
@@ -3546,24 +3572,24 @@ msgstr ""
 msgid "Yoast SEO Data"
 msgstr ""
 
-#: includes/classes/import/extensions/user/class-wpie-user.php:255
-#: includes/classes/import/extensions/user/class-wpie-user.php:339
+#: includes/classes/import/extensions/user/class-wpie-user.php:310
+#: includes/classes/import/extensions/user/class-wpie-user.php:395
 #, php-format
 msgid "You do not have permission to assign the superior role \"%s\"."
 msgstr ""
 
-#: includes/classes/import/extensions/user/class-wpie-user.php:362
+#: includes/classes/import/extensions/user/class-wpie-user.php:418
 msgid "You do not have permission to update superior users."
 msgstr ""
 
-#: includes/classes/class-wpie-general.php:1042
+#: includes/classes/class-wpie-general.php:1050
 msgid "You haven't selected any columns for export."
 msgstr ""
 
-#: includes/views/wpie-new-import.php:644
+#: includes/views/wpie-new-import.php:646
 msgid "Your file will be split into 1000 records chunks before processing."
 msgstr ""
 
-#: includes/classes/export/class-wpie-export.php:1151
+#: includes/classes/export/class-wpie-export.php:1206
 msgid "ZipArchive class not available on this server."
 msgstr ""

@@ -5,7 +5,7 @@ Donate link: https://1.envato.market/1krom
 Requires at least: 4.4
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 3.9.33
+Stable tag: 3.9.34
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -146,7 +146,25 @@ Documentation and tutorials are available at [VJInfotech Documentation](https://
 
 == Changelog ==
 
+= 3.9.34 =
+* Fix: Security - Enforce canonical directory containment and filename validation during post-export file generation and archive creation to prevent path traversal (CVE-2026-76550, reported by Erwan Le Rousseau / WPScan / Automattic).
+* Fix: Security - Enforce cross-subsite capability checks across all network blogs during user import in WordPress Multisite installations to prevent privilege escalation (CVE-2026-76554, reported by Erwan Le Rousseau / WPScan / Automattic).
+* Fix: Security - Enforce strict default-deny allowlist policy for custom callable PHP functions in SafeFunction helper (Reported by Erwan Le Rousseau / WPScan / Automattic).
+* Fix: Security - Sanitize meta keys and add HTML output escaping in import administration interface to prevent cross-site scripting (XSS) (Reported by Erwan Le Rousseau / WPScan / Automattic).
+* Fix: Minor UI and stability fixes.
+
 = 3.9.33 =
+* Fix: Security - Remote code execution through export field PHP function callbacks (Reported by WPScan).
+* Fix: Security - Remote code execution and arbitrary file creation via export template output path traversal (Reported by Minseong Kim / mak3bread).
+* Fix: Security - Arbitrary file upload through remote image import extension manipulation (Reported by Minseong Kim / mak3bread).
+* Fix: Security - Arbitrary directory deletion through template path traversal (Reported by Minseong Kim / mak3bread).
+* Fix: Security - Privilege escalation through user import by enforcing WordPress capability and superior role checks (Reported by Minseong Kim / mak3bread).
+* Fix: Security - SQL injection in export filter rules (Reported by Minseong Kim / mak3bread).
+* Fix: Security - SQL injection in import options (Reported by Minseong Kim / mak3bread).
+* Fix: Security - Stored cross-site scripting (XSS) through custom field names in export settings (Reported by Minseong Kim / mak3bread).
+* Fix: Security - Sensitive file disclosure and path traversal through existing-file import (Reported by Hasyros).
+* Fix: Security - Server-side request forgery (SSRF) in remote URL file imports, removing unsafe fallback and strictly enforcing WordPress HTTP API validation (Reported by Yassin Mohamed, 밥경국 - DDADDA / Wordfence, and WPScan).
+* Fix: Deprecated utf8_encode() usage for PHP 8.2+ compatibility.
 * Fix: Maintenance update and compatibility verification with latest WordPress and PHP versions.
 * Fix: Minor UI and stability fixes.
 
@@ -192,5 +210,8 @@ Documentation and tutorials are available at [VJInfotech Documentation](https://
 
 == Upgrade Notice ==
 
+= 3.9.34 =
+Critical security update resolving export path traversal (CVE-2026-76550), multisite user import privilege escalation (CVE-2026-76554), custom function execution allowlist enforcement, and import UI output escaping. Updating immediately is strongly recommended.
+
 = 3.9.33 =
-Recommended update for full compatibility with modern WordPress and PHP environments, including latest security patches.
+Critical security and maintenance release addressing multiple security vulnerabilities including Remote Code Execution, Privilege Escalation, SSRF, SQL Injection, Arbitrary File Upload, Directory Deletion, and Path Traversal. Updating immediately is strongly recommended.

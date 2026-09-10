@@ -47,6 +47,110 @@ class SafeFunction {
 
 		$functionLower = strtolower( $function );
 
+		// Strict non-bypassable blacklist of dangerous functions, command execution, filesystem, and core operations.
+		$blacklist = array(
+			// System / Command execution
+			'exec',
+			'passthru',
+			'system',
+			'shell_exec',
+			'popen',
+			'proc_open',
+			'pcntl_exec',
+			'dl',
+
+			// Code evaluation & dynamic callback dispatch
+			'eval',
+			'assert',
+			'create_function',
+			'call_user_func',
+			'call_user_func_array',
+			'forward_static_call',
+			'forward_static_call_array',
+			'array_map',
+			'array_filter',
+			'array_reduce',
+			'array_walk',
+			'array_walk_recursive',
+			'usort',
+			'uasort',
+			'uksort',
+
+			// Filesystem write / delete / modify
+			'file_put_contents',
+			'unlink',
+			'rmdir',
+			'mkdir',
+			'rename',
+			'copy',
+			'chmod',
+			'chown',
+			'chgrp',
+			'touch',
+			'symlink',
+			'link',
+			'fopen',
+			'fwrite',
+			'fputs',
+			'truncate',
+			'ftruncate',
+
+			// Filesystem read / inclusion
+			'file_get_contents',
+			'readfile',
+			'file',
+			'highlight_file',
+			'show_source',
+			'include',
+			'include_once',
+			'require',
+			'require_once',
+			'virtual',
+
+			// Process / Environment / Configuration
+			'putenv',
+			'ini_set',
+			'ini_alter',
+			'ini_restore',
+			'set_time_limit',
+			'apache_setenv',
+
+			// Serialization / Injection
+			'unserialize',
+
+			// Mail / Network
+			'mail',
+			'mb_send_mail',
+			'fsockopen',
+			'pfsockopen',
+
+			// WordPress critical user / post / authentication operations
+			'wp_delete_user',
+			'wp_delete_post',
+			'wp_delete_attachment',
+			'wp_delete_comment',
+			'wp_set_current_user',
+			'wp_set_auth_cookie',
+			'wp_clear_auth_cookie',
+			'wp_create_user',
+			'wp_insert_user',
+			'wp_update_user',
+			'update_option',
+			'delete_option',
+			'add_option',
+			'update_site_option',
+			'delete_site_option',
+			'add_site_option',
+			'wp_install',
+			'wp_uninstall',
+			'wp_upgrade',
+		);
+
+		// Any blacklisted function is immediately blocked and cannot be overridden by filters.
+		if ( in_array( $functionLower, $blacklist, true ) ) {
+			return false;
+		}
+
 		$safePHPBuiltins = [
 			// String functions
 			'strtolower',
@@ -191,12 +295,11 @@ class SafeFunction {
 		}
 
 		// Block ALL PHP built-in and WordPress core functions not in the safe list above.
-		// Only user-defined functions (from themes/plugins) can pass through below.
 		if ( self::isCoreFunction( $function ) ) {
 			return false;
 		}
 
-		// If an allowlist filter is defined, validate against it; otherwise allow user-defined functions.
+		// User-defined functions must be explicitly declared in the allowlist filter.
 		$filter = 'wpie_' . $type . '_custom_function_allow_list';
 
 		/**
@@ -204,21 +307,20 @@ class SafeFunction {
 		 *
 		 * @since 3.9.33
 		 *
-		 * @param string[]|null $allowList Array of allowed custom function names, or null to allow user functions.
+		 * @param string[] $allowList Array of allowed custom function names.
 		 */
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook is prefixed with wpie_.
-		$allowList = function_exists( 'apply_filters' ) ? \apply_filters( $filter, null ) : null;
+		$allowList = function_exists( 'apply_filters' ) ? \apply_filters( $filter, array() ) : array();
 
-		if ( is_array( $allowList ) ) {
+		if ( is_array( $allowList ) && ! empty( $allowList ) ) {
 			foreach ( $allowList as $allowedFunction ) {
-				if ( is_string( $allowedFunction ) && strcasecmp( $function, trim( $allowedFunction ) ) === 0 ) {
+				if ( is_string( $allowedFunction ) && $functionLower === strtolower( trim( $allowedFunction ) ) ) {
 					return true;
 				}
 			}
-			return false;
 		}
 
-		return true;
+		return false;
 	}
 
 	/**

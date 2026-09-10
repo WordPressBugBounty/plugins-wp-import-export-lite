@@ -505,7 +505,9 @@ abstract class WPIE_Export_Engine extends \wpie\export\base\WPIE_Export_Base {
 
 					$final_data['status'] = 'completed';
 
-					$extra_copy_path = ( isset( $this->template_options['extra_copy_path'] ) && ! empty( $this->template_options['extra_copy_path'] ) ) ? ltrim( trailingslashit( sanitize_text_field( $this->template_options['extra_copy_path'] ) ), '/\\' ) : '';
+					$raw_extra_copy_path = isset( $this->template_options['extra_copy_path'] ) ? wp_unslash( (string) $this->template_options['extra_copy_path'] ) : '';
+
+					$extra_copy_path = ( '' !== $raw_extra_copy_path && strpos( $raw_extra_copy_path, '..' ) === false && strpos( $raw_extra_copy_path, "\0" ) === false && strpos( $raw_extra_copy_path, ':' ) === false ) ? ltrim( trailingslashit( sanitize_text_field( $raw_extra_copy_path ) ), '/\\' ) : '';
 
 					$is_package = isset( $this->template_options['is_package'] ) ? intval( $this->template_options['is_package'] ) : 0;
 

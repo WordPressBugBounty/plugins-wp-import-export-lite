@@ -1054,9 +1054,21 @@ class WPIE_Export {
 
 				$options = isset( $template->options ) ? maybe_unserialize( $template->options ) : array();
 
-				$filename = isset( $options['fileName'] ) ? (string) $options['fileName'] : '';
+				$raw_filename = isset( $options['fileName'] ) ? (string) $options['fileName'] : '';
+				$fileDir      = isset( $options['fileDir'] ) ? (string) $options['fileDir'] : '';
 
-				$fileDir = isset( $options['fileDir'] ) ? (string) $options['fileDir'] : '';
+				$validated_filename = $this->validate_export_filename( $raw_filename );
+				if ( is_wp_error( $validated_filename ) ) {
+					return $validated_filename;
+				}
+
+				$filename = $validated_filename;
+
+				// Verify source export directory and file remain strictly inside WPIE_UPLOAD_EXPORT_DIR.
+				$src_filepath = $this->validate_export_filepath( $fileDir, $filename );
+				if ( is_wp_error( $src_filepath ) ) {
+					return $src_filepath;
+				}
 
 				$is_package = isset( $options['is_package'] ) ? (int) $options['is_package'] : 0;
 
@@ -1066,13 +1078,13 @@ class WPIE_Export {
 					$is_package = isset( $options['is_migrate_package'] ) ? (int) $options['is_migrate_package'] : 0;
 				}
 
-				$type = isset( $options['wpie_export_file_type'] ) && ! empty( $options['wpie_export_file_type'] ) ? (string) $options['wpie_export_file_type'] : 'csv';
+				$type = isset( $options['wpie_export_file_type'] ) && ! empty( $options['wpie_export_file_type'] ) ? strtolower( (string) $options['wpie_export_file_type'] ) : 'csv';
 
 				$new_type = '';
 
 				if ( 0 === $is_package ) {
 
-					// Corrected logic: only convert if format is non-empty and NOT csv.
+					// Only convert if format is non-empty and NOT csv.
 					if ( '' !== $type && 'csv' !== $type ) {
 
 						$data = null;
@@ -1092,13 +1104,19 @@ class WPIE_Export {
 							case 'ods':
 								$data = $this->csv2excel( $filename, $fileDir, $type );
 								break;
+
+							default:
+								$data = new \WP_Error( 'wpie_export_invalid_type', __( 'Invalid export file type.', 'wp-import-export-lite' ) );
+								break;
 						}
 
 						if ( is_wp_error( $data ) ) {
 							return $data;
 						}
 
-						$new_type = $type;
+						if ( true === $data ) {
+							$new_type = $type;
+						}
 					}
 				} else {
 
@@ -1115,17 +1133,52 @@ class WPIE_Export {
 
 				if ( '' !== $new_type ) {
 
-					$options['fileName'] = str_replace( '.csv', '.' . $new_type, $filename );
+					$base_name          = pathinfo( $filename, PATHINFO_FILENAME );
+					$new_filename       = $base_name . '.' . $new_type;
+					$validated_new_name = $this->validate_export_filename( $new_filename, array( $new_type ) );
+
+					if ( is_wp_error( $validated_new_name ) ) {
+						return $validated_new_name;
+					}
+
+					$options['fileName'] = $validated_new_name;
 
 					global $wpdb;
 
 					$wpdb->update( "{$wpdb->prefix}wpie_template", array( 'options' => maybe_serialize( $options ) ), array( 'id' => $export_id ) );
 				}
 
-				$extra_copy_path = isset( $options['extra_copy_path'] ) && ! empty( $options['extra_copy_path'] ) ? ltrim( trailingslashit( sanitize_text_field( $options['extra_copy_path'] ) ), '/\\' ) : '';
+				$raw_extra_copy_path = isset( $options['extra_copy_path'] ) ? (string) $options['extra_copy_path'] : '';
+				$raw_extra_copy_path = wp_unslash( $raw_extra_copy_path );
 
-				if ( '' !== $extra_copy_path && is_dir( WPIE_SITE_UPLOAD_DIR . '/' . $extra_copy_path ) ) {
-					@copy( WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . $options['fileName'], WPIE_SITE_UPLOAD_DIR . '/' . $extra_copy_path . $options['fileName'] );
+				if ( '' !== $raw_extra_copy_path && strpos( $raw_extra_copy_path, '..' ) === false && strpos( $raw_extra_copy_path, "\0" ) === false && strpos( $raw_extra_copy_path, ':' ) === false ) {
+
+					$extra_copy_path = ltrim( trailingslashit( sanitize_text_field( $raw_extra_copy_path ) ), '/\\' );
+
+					if ( '' !== $extra_copy_path && is_dir( WPIE_SITE_UPLOAD_DIR . '/' . $extra_copy_path ) ) {
+
+						$current_export_file = isset( $options['fileName'] ) ? (string) $options['fileName'] : $filename;
+						$validated_copy_name = $this->validate_export_filename( $current_export_file );
+
+						if ( ! is_wp_error( $validated_copy_name ) ) {
+
+							$src_filepath = $this->validate_export_filepath( $fileDir, $validated_copy_name );
+
+							$base_upload_dir = realpath( WPIE_SITE_UPLOAD_DIR );
+							$dest_dir        = realpath( WPIE_SITE_UPLOAD_DIR . '/' . $extra_copy_path );
+
+							if ( ! is_wp_error( $src_filepath ) && file_exists( $src_filepath ) && $base_upload_dir && $dest_dir ) {
+
+								$base_upload_dir_norm = trailingslashit( wp_normalize_path( $base_upload_dir ) );
+								$dest_dir_norm        = trailingslashit( wp_normalize_path( $dest_dir ) );
+
+								// Enforce that destination sits strictly inside WPIE_SITE_UPLOAD_DIR
+								if ( strpos( $dest_dir_norm, $base_upload_dir_norm ) === 0 ) {
+									@copy( $src_filepath, $dest_dir_norm . $validated_copy_name );
+								}
+							}
+						}
+					}
 				}
 
 				unset( $options, $filename, $fileDir, $is_package, $type, $new_type );
@@ -1159,25 +1212,49 @@ class WPIE_Export {
 
 		WPIE_Import_Config::generate( $options );
 
+		$filename = isset( $options['fileName'] ) ? (string) $options['fileName'] : '';
+		$fileDir  = isset( $options['fileDir'] ) ? (string) $options['fileDir'] : '';
+
+		// Validate raw filename first
+		$validated_filename = $this->validate_export_filename( $filename );
+		if ( is_wp_error( $validated_filename ) ) {
+			return $validated_filename;
+		}
+
+		// Force archive name to strictly have a .zip extension
+		$zip_filename           = pathinfo( $validated_filename, PATHINFO_FILENAME ) . '.zip';
+		$validated_zip_filename = $this->validate_export_filename( $zip_filename, array( 'zip' ) );
+		if ( is_wp_error( $validated_zip_filename ) ) {
+			return $validated_zip_filename;
+		}
+
+		// Validate and resolve destination zip path inside WPIE_UPLOAD_EXPORT_DIR
+		$zipfile = $this->validate_export_filepath( $fileDir, $validated_zip_filename );
+		if ( is_wp_error( $zipfile ) ) {
+			return $zipfile;
+		}
+
+		// Validate source file path inside WPIE_UPLOAD_EXPORT_DIR
+		$source_file = $this->validate_export_filepath( $fileDir, $validated_filename );
+		if ( is_wp_error( $source_file ) ) {
+			return $source_file;
+		}
+
+		$config_file = $this->validate_export_filepath( $fileDir, 'config.json' );
+		if ( is_wp_error( $config_file ) ) {
+			return $config_file;
+		}
+
 		$zip = new \ZipArchive();
 
-		$filename = isset( $options['fileName'] ) ? (string) $options['fileName'] : '';
-
-		$fileDir = isset( $options['fileDir'] ) ? (string) $options['fileDir'] : '';
-
-		$zipfile = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . str_replace( '.csv', '.zip', $filename );
-
-		if ( true !== $zip->open( $zipfile, \ZipArchive::CREATE ) ) {
+		if ( true !== $zip->open( $zipfile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE ) ) {
 			return new \WP_Error( 'woo_import_export_error', __( 'Could not open archive', 'wp-import-export-lite' ) );
 		}
 
 		unset( $zipfile );
 
-		$source_file = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . $filename;
-		$config_file = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/config.json';
-
 		if ( file_exists( $source_file ) ) {
-			$zip->addFile( $source_file, $filename );
+			$zip->addFile( $source_file, $validated_filename );
 		}
 
 		if ( file_exists( $config_file ) ) {
@@ -1192,6 +1269,121 @@ class WPIE_Export {
 	}
 
 	/**
+	 * Validate and sanitize export filename.
+	 *
+	 * Blocks traversal sequences, null bytes, executable or server-parsed extensions,
+	 * and restricts export files to safe extensions.
+	 *
+	 * @since 3.9.34
+	 *
+	 * @param string $filename Raw filename.
+	 * @param array  $extra_allowed Optional additional allowed extensions.
+	 * @return string|\WP_Error Validated filename, or WP_Error on failure.
+	 */
+	protected function validate_export_filename( $filename = '', $extra_allowed = array() ) {
+
+		if ( ! is_string( $filename ) || trim( $filename ) === '' ) {
+			return new \WP_Error( 'wpie_export_invalid_filename', __( 'Export file name cannot be empty.', 'wp-import-export-lite' ) );
+		}
+
+		// Disallow null bytes.
+		if ( strpos( $filename, "\0" ) !== false ) {
+			return new \WP_Error( 'wpie_export_invalid_filename', __( 'Invalid export file name.', 'wp-import-export-lite' ) );
+		}
+
+		// Sanitize and isolate base filename to prevent path traversal in filename parameter.
+		$clean_filename = wp_basename( sanitize_file_name( $filename ) );
+
+		if ( empty( $clean_filename ) ) {
+			return new \WP_Error( 'wpie_export_invalid_filename', __( 'Invalid export file name.', 'wp-import-export-lite' ) );
+		}
+
+		// Strictly block executable, script, or server-parsed extensions anywhere in the filename.
+		if ( preg_match( '/\.(php[0-9]?|phtml|phar|inc|cgi|pl|py|sh|bash|exe|bat|cmd|htaccess|htpasswd)/i', $clean_filename ) ) {
+			return new \WP_Error( 'wpie_export_disallowed_file', __( 'File type not allowed.', 'wp-import-export-lite' ) );
+		}
+
+		// Allow only safe, valid export file extensions.
+		$ext                = strtolower( (string) pathinfo( $clean_filename, PATHINFO_EXTENSION ) );
+		$default_allowed    = array( 'csv', 'tsv', 'xml', 'json', 'xls', 'xlsx', 'ods', 'txt', 'zip' );
+		$allowed_extensions = apply_filters( 'wpie_export_allowed_file_extensions', array_unique( array_merge( $default_allowed, (array) $extra_allowed ) ) );
+
+		if ( empty( $ext ) || ! in_array( $ext, $allowed_extensions, true ) ) {
+			return new \WP_Error( 'wpie_export_invalid_extension', __( 'Invalid export file extension.', 'wp-import-export-lite' ) );
+		}
+
+		return $clean_filename;
+	}
+
+	/**
+	 * Resolve and validate export directory and file path using realpath().
+	 *
+	 * Ensures that constructed directory and file paths remain strictly inside
+	 * the intended base directory (WPIE_UPLOAD_EXPORT_DIR) to prevent directory traversal.
+	 *
+	 * @since 3.9.34
+	 *
+	 * @param string $filedir  Relative export directory.
+	 * @param string $filename Validated export filename.
+	 * @return string|\WP_Error Validated full file path, or WP_Error on failure.
+	 */
+	protected function validate_export_filepath( $filedir = '', $filename = '' ) {
+
+		// Reject directory traversal sequences or null bytes in directory parameter.
+		if ( ! is_string( $filedir ) || strpos( $filedir, '..' ) !== false || strpos( $filedir, "\0" ) !== false ) {
+			return new \WP_Error( 'wpie_export_traversal_detected', __( 'Directory traversal detected in export directory.', 'wp-import-export-lite' ) );
+		}
+
+		// Reject directory traversal sequences or null bytes in filename parameter.
+		if ( ! is_string( $filename ) || strpos( $filename, '..' ) !== false || strpos( $filename, "\0" ) !== false ) {
+			return new \WP_Error( 'wpie_export_invalid_filename', __( 'Invalid export file name.', 'wp-import-export-lite' ) );
+		}
+
+		if ( ! is_dir( WPIE_UPLOAD_EXPORT_DIR ) ) {
+			wp_mkdir_p( WPIE_UPLOAD_EXPORT_DIR );
+		}
+
+		$base_export_dir = realpath( WPIE_UPLOAD_EXPORT_DIR );
+		if ( false === $base_export_dir ) {
+			return new \WP_Error( 'wpie_export_dir_error', __( 'Export base directory could not be resolved.', 'wp-import-export-lite' ) );
+		}
+
+		$base_export_dir = trailingslashit( wp_normalize_path( $base_export_dir ) );
+
+		// Construct and normalize target directory.
+		$clean_dir  = ltrim( str_replace( array( '\\', '/' ), DIRECTORY_SEPARATOR, $filedir ), DIRECTORY_SEPARATOR );
+		$target_dir = ! empty( $clean_dir ) ? WPIE_UPLOAD_EXPORT_DIR . DIRECTORY_SEPARATOR . $clean_dir : WPIE_UPLOAD_EXPORT_DIR;
+
+		if ( ! is_dir( $target_dir ) ) {
+			wp_mkdir_p( $target_dir );
+		}
+
+		$resolved_dir = realpath( $target_dir );
+		if ( false === $resolved_dir ) {
+			return new \WP_Error( 'wpie_export_dir_error', __( 'Export target directory could not be resolved.', 'wp-import-export-lite' ) );
+		}
+
+		$resolved_dir_norm = trailingslashit( wp_normalize_path( $resolved_dir ) );
+
+		// Enforce containment: Target directory must reside within base export directory.
+		if ( strpos( $resolved_dir_norm, $base_export_dir ) !== 0 ) {
+			return new \WP_Error( 'wpie_export_traversal_detected', __( 'Directory traversal detected outside export directory.', 'wp-import-export-lite' ) );
+		}
+
+		$clean_filename = wp_basename( sanitize_file_name( $filename ) );
+		$full_path      = $resolved_dir_norm . $clean_filename;
+
+		if ( file_exists( $full_path ) ) {
+			$real_filepath = realpath( $full_path );
+			if ( false === $real_filepath || strpos( trailingslashit( wp_normalize_path( dirname( $real_filepath ) ) ), $base_export_dir ) !== 0 ) {
+				return new \WP_Error( 'wpie_export_traversal_detected', __( 'Export file path is outside the allowed base directory.', 'wp-import-export-lite' ) );
+			}
+		}
+
+		return $full_path;
+	}
+
+	/**
 	 * Converts exported CSV file to Excel format (xls, xlsx, ods).
 	 *
 	 * @param string $filename CSV file name.
@@ -1201,17 +1393,20 @@ class WPIE_Export {
 	 */
 	private function csv2excel( $filename = '', $fileDir = '', $type = 'xlsx' ) {
 
-		$file = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . $filename;
+		$src_file = $this->validate_export_filepath( $fileDir, $filename );
+		if ( is_wp_error( $src_file ) ) {
+			return $src_file;
+		}
 
-		if ( ! file_exists( $file ) ) {
+		if ( ! file_exists( $src_file ) ) {
 			return new \WP_Error( 'wpie_import_error', __( 'File not found', 'wp-import-export-lite' ), 404 );
 		}
 
 		wpie_load_vendor_autoloader();
 
-		$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load( $file );
+		$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load( $src_file );
 
-		unset( $file );
+		unset( $src_file );
 
 		if ( 'xls' === $type ) {
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls( $spreadsheet );
@@ -1221,7 +1416,18 @@ class WPIE_Export {
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx( $spreadsheet );
 		}
 
-		$writer->save( WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . str_replace( '.csv', '.' . $type, $filename ) );
+		$target_filename       = pathinfo( $filename, PATHINFO_FILENAME ) . '.' . $type;
+		$validated_target_name = $this->validate_export_filename( $target_filename, array( $type ) );
+		if ( is_wp_error( $validated_target_name ) ) {
+			return $validated_target_name;
+		}
+
+		$target_filepath = $this->validate_export_filepath( $fileDir, $validated_target_name );
+		if ( is_wp_error( $target_filepath ) ) {
+			return $target_filepath;
+		}
+
+		$writer->save( $target_filepath );
 
 		$spreadsheet->disconnectWorksheets();
 
@@ -1239,16 +1445,19 @@ class WPIE_Export {
 	 */
 	private function csv2json( $filename = '', $fileDir = '' ) {
 
-		$file = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . $filename;
+		$src_file = $this->validate_export_filepath( $fileDir, $filename );
+		if ( is_wp_error( $src_file ) ) {
+			return $src_file;
+		}
 
-		if ( ! file_exists( $file ) ) {
+		if ( ! file_exists( $src_file ) ) {
 			return new \WP_Error( 'wpie_import_error', __( 'File not found', 'wp-import-export-lite' ), 404 );
 		}
 
 		$csv = array();
 
 		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Direct CSV stream operations.
-		$handle = fopen( $file, 'rb' );
+		$handle = fopen( $src_file, 'rb' );
 
 		if ( false !== $handle ) {
 
@@ -1299,9 +1508,20 @@ class WPIE_Export {
 		}
 		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-		file_put_contents( WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . str_replace( '.csv', '.json', $filename ), wp_json_encode( $csv ) );
+		$target_filename       = pathinfo( $filename, PATHINFO_FILENAME ) . '.json';
+		$validated_target_name = $this->validate_export_filename( $target_filename, array( 'json' ) );
+		if ( is_wp_error( $validated_target_name ) ) {
+			return $validated_target_name;
+		}
 
-		unset( $file, $csv );
+		$target_filepath = $this->validate_export_filepath( $fileDir, $validated_target_name );
+		if ( is_wp_error( $target_filepath ) ) {
+			return $target_filepath;
+		}
+
+		file_put_contents( $target_filepath, wp_json_encode( $csv ) );
+
+		unset( $src_file, $csv );
 
 		return true;
 	}
@@ -1316,9 +1536,12 @@ class WPIE_Export {
 	 */
 	private function csv2xml( $filename = '', $fileDir = '', $skip_empty_nodes = false ) {
 
-		$file = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . $filename;
+		$src_file = $this->validate_export_filepath( $fileDir, $filename );
+		if ( is_wp_error( $src_file ) ) {
+			return $src_file;
+		}
 
-		if ( ! file_exists( $file ) ) {
+		if ( ! file_exists( $src_file ) ) {
 			return new \WP_Error( 'wpie_import_error', __( 'File not found', 'wp-import-export-lite' ), 404 );
 		}
 
@@ -1337,9 +1560,9 @@ class WPIE_Export {
 		$headers = array();
 
 		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Direct CSV stream operations.
-		$wfp = fopen( $file, 'rb' );
+		$wfp = fopen( $src_file, 'rb' );
 
-		unset( $file );
+		unset( $src_file );
 
 		if ( false !== $wfp ) {
 
@@ -1394,7 +1617,18 @@ class WPIE_Export {
 		}
 		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-		$converter->saveFile( WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/' . str_replace( '.csv', '.xml', $filename ) );
+		$target_filename       = pathinfo( $filename, PATHINFO_FILENAME ) . '.xml';
+		$validated_target_name = $this->validate_export_filename( $target_filename, array( 'xml' ) );
+		if ( is_wp_error( $validated_target_name ) ) {
+			return $validated_target_name;
+		}
+
+		$target_filepath = $this->validate_export_filepath( $fileDir, $validated_target_name );
+		if ( is_wp_error( $target_filepath ) ) {
+			return $target_filepath;
+		}
+
+		$converter->saveFile( $target_filepath );
 
 		unset( $converter, $headers );
 

@@ -311,8 +311,20 @@ class WPIE_Import_Config {
 		$fileDir = isset( self::$options['fileDir'] ) ? sanitize_file_name( (string) self::$options['fileDir'] ) : '';
 
 		if ( '' !== $fileDir ) {
-			$filePath = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir . '/config.json';
-			file_put_contents( $filePath, wp_json_encode( $config ) );
+			$target_dir = WPIE_UPLOAD_EXPORT_DIR . '/' . $fileDir;
+			if ( ! is_dir( $target_dir ) ) {
+				wp_mkdir_p( $target_dir );
+			}
+			$base_dir        = realpath( WPIE_UPLOAD_EXPORT_DIR );
+			$real_target_dir = realpath( $target_dir );
+			if ( $base_dir && $real_target_dir ) {
+				$base_dir_norm   = trailingslashit( wp_normalize_path( $base_dir ) );
+				$target_dir_norm = trailingslashit( wp_normalize_path( $real_target_dir ) );
+				if ( strpos( $target_dir_norm, $base_dir_norm ) === 0 ) {
+					$filePath = $target_dir_norm . 'config.json';
+					file_put_contents( $filePath, wp_json_encode( $config ) );
+				}
+			}
 		}
 
 		unset( $config, $fileDir );

@@ -386,7 +386,7 @@ class WPIE_Post extends WPIE_Export_Engine {
 				$meta_data[] = apply_filters(
 					'wpie_pre_item_meta',
 					array(
-						'name'    => $key,
+						'name'    => esc_html( $key ),
 						'type'    => 'wpie_cf',
 						'metaKey' => $key,
 					),

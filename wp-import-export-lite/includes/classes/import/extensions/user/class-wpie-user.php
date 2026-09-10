@@ -72,9 +72,59 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                         return true;
                 }
 
-                if ( \is_multisite() && \is_super_admin( $target_user->ID ) ) {
-                        if ( ! \is_super_admin( $importer->ID ) ) {
-                                return true;
+                if ( \is_multisite() ) {
+                        // In multisite, if target user is super admin, only super admin can manage them.
+                        if ( \is_super_admin( $target_user->ID ) ) {
+                                if ( ! \is_super_admin( $importer->ID ) ) {
+                                        return true;
+                                }
+                        }
+
+                        // If importer is network super admin, they hold all capabilities network-wide.
+                        if ( \is_super_admin( $importer->ID ) ) {
+                                return false;
+                        }
+
+                        // For non-super-admin importers, resolve target's capabilities across ALL network blogs.
+                        $target_blogs = function_exists( 'get_blogs_of_user' ) ? \get_blogs_of_user( $target_user->ID ) : array();
+
+                        if ( ! empty( $target_blogs ) && is_array( $target_blogs ) ) {
+                                foreach ( $target_blogs as $blog_id => $blog_info ) {
+                                        $b_id = is_object( $blog_info ) && isset( $blog_info->userblog_id ) ? (int) $blog_info->userblog_id : (int) $blog_id;
+                                        if ( $b_id <= 0 ) {
+                                                continue;
+                                        }
+
+                                        if ( function_exists( 'switch_to_blog' ) && function_exists( 'restore_current_blog' ) ) {
+                                                \switch_to_blog( $b_id );
+                                                try {
+                                                        $target_on_blog   = new \WP_User( $target_user->ID, '', $b_id );
+                                                        $importer_on_blog = new \WP_User( $importer->ID, '', $b_id );
+
+                                                        $current_blog_id = function_exists( 'get_current_blog_id' ) ? (int) \get_current_blog_id() : 0;
+                                                        if ( $b_id !== $current_blog_id && ! empty( $target_on_blog->roles ) ) {
+                                                                // Non-super-admins are strictly blocked from modifying users holding roles on other network blogs.
+                                                                return true;
+                                                        }
+
+                                                        if ( \user_can( $target_on_blog, 'administrator' ) || \user_can( $target_on_blog, 'manage_options' ) ) {
+                                                                if ( ! \user_can( $importer_on_blog, 'administrator' ) && ! \user_can( $importer_on_blog, 'manage_options' ) ) {
+                                                                        return true;
+                                                                }
+                                                        }
+
+                                                        if ( ! empty( $target_on_blog->allcaps ) && is_array( $target_on_blog->allcaps ) ) {
+                                                                foreach ( $target_on_blog->allcaps as $cap => $grant ) {
+                                                                        if ( $grant && ! \user_can( $importer_on_blog, $cap ) ) {
+                                                                                return true;
+                                                                        }
+                                                                }
+                                                        }
+                                                } finally {
+                                                        \restore_current_blog();
+                                                }
+                                        }
+                                }
                         }
                 }
 
@@ -103,6 +153,10 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                 $importer = $this->get_importer();
                 if ( ! $importer ) {
                         return true;
+                }
+
+                if ( \is_multisite() && \is_super_admin( $importer->ID ) ) {
+                        return false;
                 }
 
                 $role_obj = \get_role( $role_slug );
@@ -148,12 +202,12 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                         'session_tokens',
                         'primary_blog',
                         'source_domain',
-                        'wp_user_avatar',
                         'default_password_nag',
-                        'account_status',
                         'user_pass',
                         'user_activation_key'
                 );
+
+                $blocked_keys = apply_filters( 'wpie_blocked_user_meta_keys', $blocked_keys );
 
                 if ( in_array( $clean_key, $blocked_keys, true ) ) {
                         return false;
