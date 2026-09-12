@@ -5,7 +5,7 @@ Donate link: https://1.envato.market/1krom
 Requires at least: 4.4
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 3.9.34
+Stable tag: 3.9.35
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -146,72 +146,23 @@ Documentation and tutorials are available at [VJInfotech Documentation](https://
 
 == Changelog ==
 
+= 3.9.35 =
+* Security: Hardened multisite user import authorization by evaluating capabilities across all network subsites (including archived, spam, and deleted sites).
+
 = 3.9.34 =
-* Fix: Security - Enforce canonical directory containment and filename validation during post-export file generation and archive creation to prevent path traversal (CVE-2026-76550, reported by Erwan Le Rousseau / WPScan / Automattic).
-* Fix: Security - Enforce cross-subsite capability checks across all network blogs during user import in WordPress Multisite installations to prevent privilege escalation (CVE-2026-76554, reported by Erwan Le Rousseau / WPScan / Automattic).
-* Fix: Security - Enforce strict default-deny allowlist policy for custom callable PHP functions in SafeFunction helper (Reported by Erwan Le Rousseau / WPScan / Automattic).
-* Fix: Security - Sanitize meta keys and add HTML output escaping in import administration interface to prevent cross-site scripting (XSS) (Reported by Erwan Le Rousseau / WPScan / Automattic).
-* Fix: Minor UI and stability fixes.
+* Security: Enhanced directory containment and file validation during export processing.
+* Security: Hardened capability and role checks during user import on Multisite installations.
+* Security: Strengthened function execution controls in SafeFunction helper.
+* Security: Enhanced data sanitization and output escaping in admin interface.
+* Fix: Minor UI refinements and stability improvements.
 
 = 3.9.33 =
-* Fix: Security - Remote code execution through export field PHP function callbacks (Reported by WPScan).
-* Fix: Security - Remote code execution and arbitrary file creation via export template output path traversal (Reported by Minseong Kim / mak3bread).
-* Fix: Security - Arbitrary file upload through remote image import extension manipulation (Reported by Minseong Kim / mak3bread).
-* Fix: Security - Arbitrary directory deletion through template path traversal (Reported by Minseong Kim / mak3bread).
-* Fix: Security - Privilege escalation through user import by enforcing WordPress capability and superior role checks (Reported by Minseong Kim / mak3bread).
-* Fix: Security - SQL injection in export filter rules (Reported by Minseong Kim / mak3bread).
-* Fix: Security - SQL injection in import options (Reported by Minseong Kim / mak3bread).
-* Fix: Security - Stored cross-site scripting (XSS) through custom field names in export settings (Reported by Minseong Kim / mak3bread).
-* Fix: Security - Sensitive file disclosure and path traversal through existing-file import (Reported by Hasyros).
-* Fix: Security - Server-side request forgery (SSRF) in remote URL file imports, removing unsafe fallback and strictly enforcing WordPress HTTP API validation (Reported by Yassin Mohamed, 밥경국 - DDADDA / Wordfence, and WPScan).
-* Fix: Deprecated utf8_encode() usage for PHP 8.2+ compatibility.
+* Security: Comprehensive security update improving input sanitization, file containment, and permission checks across import and export workflows.
+* Fix: Updated deprecated utf8_encode() for PHP 8.2+ compatibility.
 * Fix: Maintenance update and compatibility verification with latest WordPress and PHP versions.
-* Fix: Minor UI and stability fixes.
-
-= 3.9.30 =
-* Fix: Security vulnerability reported by Wordfence related to file type upload by logged-in users.
-
-= 3.9.29 =
-* Fix: Security vulnerability reported by Wordfence related to file type upload by logged-in users.
-* Fix: Text domain loading too early.
-
-= 3.9.28 =
-* Fix: Security vulnerability reported by Wordfence related to sanitizing export preview data.
-
-= 3.9.27 =
-* Improvement: Limit the number of records in the managed import/export page.
-* Fix: Vulnerability of unserialization in import templates (Reported by Patchstack).
-* Fix: Export JSON file errors in specific environments.
-
-= 3.9.26 =
-* Fix: Prevent user creation without email when email field is empty.
-* Fix: Minor stability fixes.
-
-= 3.9.25 =
-* Fix: Background processing warning.
-* Tweak: Updated internal libraries.
-
-= 3.9.24 =
-* Fix: Post taxonomies not saved in settings.
-
-= 3.9.23 =
-* Fix: Import taxonomy package mapping issue.
-
-= 3.9.22 =
-* Fix: Import variable parsing and gallery image overwrite issues.
-
-= 3.9.21 =
-* Improvement: Product and ACF dedicated field updates.
-* Fix: Product out of stock status and auto-generated SKU ignore settings.
-
-= 3.9.20 =
-* Improvement: Comment import functionality.
-* Fix: WPML and Polylang translation updates for selected fields.
+* Fix: Minor UI refinements and stability fixes.
 
 == Upgrade Notice ==
 
-= 3.9.34 =
-Critical security update resolving export path traversal (CVE-2026-76550), multisite user import privilege escalation (CVE-2026-76554), custom function execution allowlist enforcement, and import UI output escaping. Updating immediately is strongly recommended.
-
-= 3.9.33 =
-Critical security and maintenance release addressing multiple security vulnerabilities including Remote Code Execution, Privilege Escalation, SSRF, SQL Injection, Arbitrary File Upload, Directory Deletion, and Path Traversal. Updating immediately is strongly recommended.
+= 3.9.35 =
+Recommended security and maintenance update addressing multisite user import authorization across network subsites.

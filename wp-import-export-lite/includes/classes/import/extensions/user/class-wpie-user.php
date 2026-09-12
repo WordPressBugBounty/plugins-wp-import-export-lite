@@ -21,7 +21,18 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                 if ( $current_id > 0 ) {
                         return $current_id;
                 }
-                return ( $this->login_user_id !== false ) ? $this->login_user_id : 0;
+                if ( $this->login_user_id !== false && (int) $this->login_user_id > 0 ) {
+                        return (int) $this->login_user_id;
+                }
+                // Background/cron: resolve the importer's ID from the stored username
+                // so that guards like the self-update check (line ~419) work correctly.
+                if ( ! empty( $this->import_username ) ) {
+                        $user = \get_user_by( 'login', $this->import_username );
+                        if ( $user && isset( $user->ID ) ) {
+                                return (int) $user->ID;
+                        }
+                }
+                return 0;
         }
 
         public function get_importer() {
@@ -85,10 +96,22 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                                 return false;
                         }
 
-                        // For non-super-admin importers, resolve target's capabilities across ALL network blogs.
-                        $target_blogs = function_exists( 'get_blogs_of_user' ) ? \get_blogs_of_user( $target_user->ID ) : array();
+                        // For non-super-admin importers, resolve capabilities across ALL network blogs (including archived/spam/deleted).
+                        $target_blogs   = function_exists( 'get_blogs_of_user' ) ? \get_blogs_of_user( $target_user->ID, true ) : array();
+                        $importer_blogs = function_exists( 'get_blogs_of_user' ) ? \get_blogs_of_user( $importer->ID, true ) : array();
 
                         if ( ! empty( $target_blogs ) && is_array( $target_blogs ) ) {
+                                // Index importer's blogs (all sites, including archived/spam/deleted) for fast lookup.
+                                $importer_blog_ids = array();
+                                if ( ! empty( $importer_blogs ) && is_array( $importer_blogs ) ) {
+                                        foreach ( $importer_blogs as $ib_key => $ib_info ) {
+                                                $ib_id = is_object( $ib_info ) && isset( $ib_info->userblog_id ) ? (int) $ib_info->userblog_id : (int) $ib_key;
+                                                if ( $ib_id > 0 ) {
+                                                        $importer_blog_ids[ $ib_id ] = true;
+                                                }
+                                        }
+                                }
+
                                 foreach ( $target_blogs as $blog_id => $blog_info ) {
                                         $b_id = is_object( $blog_info ) && isset( $blog_info->userblog_id ) ? (int) $blog_info->userblog_id : (int) $blog_id;
                                         if ( $b_id <= 0 ) {
@@ -101,21 +124,26 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                                                         $target_on_blog   = new \WP_User( $target_user->ID, '', $b_id );
                                                         $importer_on_blog = new \WP_User( $importer->ID, '', $b_id );
 
-                                                        $current_blog_id = function_exists( 'get_current_blog_id' ) ? (int) \get_current_blog_id() : 0;
-                                                        if ( $b_id !== $current_blog_id && ! empty( $target_on_blog->roles ) ) {
-                                                                // Non-super-admins are strictly blocked from modifying users holding roles on other network blogs.
-                                                                return true;
-                                                        }
+                                                        // Defence-in-depth: if the importer has no membership on this blog
+                                                        // (resolved with all=true), they hold no capabilities here.
+                                                        $importer_on_this_blog = isset( $importer_blog_ids[ $b_id ] );
 
                                                         if ( \user_can( $target_on_blog, 'administrator' ) || \user_can( $target_on_blog, 'manage_options' ) ) {
-                                                                if ( ! \user_can( $importer_on_blog, 'administrator' ) && ! \user_can( $importer_on_blog, 'manage_options' ) ) {
+                                                                if ( ! $importer_on_this_blog || ( ! \user_can( $importer_on_blog, 'administrator' ) && ! \user_can( $importer_on_blog, 'manage_options' ) ) ) {
                                                                         return true;
                                                                 }
                                                         }
 
                                                         if ( ! empty( $target_on_blog->allcaps ) && is_array( $target_on_blog->allcaps ) ) {
+                                                                $wp_roles = function_exists( 'wp_roles' ) ? \wp_roles() : null;
                                                                 foreach ( $target_on_blog->allcaps as $cap => $grant ) {
-                                                                        if ( $grant && ! \user_can( $importer_on_blog, $cap ) ) {
+                                                                        if ( ! $grant ) {
+                                                                                continue;
+                                                                        }
+                                                                        if ( $wp_roles && $wp_roles->is_role( $cap ) ) {
+                                                                                continue;
+                                                                        }
+                                                                        if ( ! $importer_on_this_blog || ( empty( $importer_on_blog->allcaps[ $cap ] ) && ! \user_can( $importer_on_blog, $cap ) ) ) {
                                                                                 return true;
                                                                         }
                                                                 }
@@ -126,17 +154,31 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                                         }
                                 }
                         }
+
+                        // Multisite capability resolution is complete.
+                        // Target holds no capabilities exceeding the importer's on any network blog.
+                        return false;
+                }
+
+                // In single-site, an administrator holds full management authority.
+                if ( \user_can( $importer, 'administrator' ) || \user_can( $importer, 'manage_options' ) ) {
+                        return false;
                 }
 
                 if ( \user_can( $target_user, 'administrator' ) || \user_can( $target_user, 'manage_options' ) ) {
-                        if ( ! \user_can( $importer, 'administrator' ) && ! \user_can( $importer, 'manage_options' ) ) {
-                                return true;
-                        }
+                        return true;
                 }
 
                 if ( ! empty( $target_user->allcaps ) && is_array( $target_user->allcaps ) ) {
+                        $wp_roles = function_exists( 'wp_roles' ) ? \wp_roles() : null;
                         foreach ( $target_user->allcaps as $cap => $grant ) {
-                                if ( $grant && ! \user_can( $importer, $cap ) ) {
+                                if ( ! $grant ) {
+                                        continue;
+                                }
+                                if ( $wp_roles && $wp_roles->is_role( $cap ) ) {
+                                        continue;
+                                }
+                                if ( empty( $importer->allcaps[ $cap ] ) && ! \user_can( $importer, $cap ) ) {
                                         return true;
                                 }
                         }
@@ -159,6 +201,10 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                         return false;
                 }
 
+                if ( ! \is_multisite() && ( \user_can( $importer, 'administrator' ) || \user_can( $importer, 'manage_options' ) ) ) {
+                        return false;
+                }
+
                 $role_obj = \get_role( $role_slug );
                 if ( ! $role_obj ) {
                         return true;
@@ -170,7 +216,7 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
 
                 if ( ! empty( $role_obj->capabilities ) && is_array( $role_obj->capabilities ) ) {
                         foreach ( $role_obj->capabilities as $cap => $grant ) {
-                                if ( $grant && ! \user_can( $importer, $cap ) ) {
+                                if ( $grant && empty( $importer->allcaps[ $cap ] ) && ! \user_can( $importer, $cap ) ) {
                                         return true;
                                 }
                         }
@@ -419,6 +465,19 @@ class WPIE_User_Import extends \wpie\import\engine\WPIE_Import_Engine {
                                 $this->process_log[ 'skipped' ]++;
                                 $this->process_log[ 'imported' ]++;
                                 return true;
+                        }
+
+                        // Defence-in-depth: block superior role assignment in the UPDATE path.
+                        // This mirrors the guard in the INSERT branch (lines ~405-414) and catches
+                        // roles injected via the 'wpie_before_user_import' filter after the earlier check.
+                        if ( ! $this->can_manage_superior_users() && ! empty( $this->wpie_final_data[ 'role' ] ) ) {
+                                if ( $this->is_superior_role( $this->wpie_final_data[ 'role' ] ) ) {
+                                        /* translators: %s: User role name. */
+                                        $this->set_log( '<strong>' . __( 'ERROR', 'wp-import-export-lite' ) . '</strong> : ' . sprintf( __( 'You do not have permission to assign the superior role "%s".', 'wp-import-export-lite' ), esc_html( $this->wpie_final_data[ 'role' ] ) ) );
+                                        $this->process_log[ 'imported' ]++;
+                                        $this->process_log[ 'skipped' ]++;
+                                        return true;
+                                }
                         }
 
                         $this->wpie_final_data[ 'ID' ] = $this->existing_item_id;

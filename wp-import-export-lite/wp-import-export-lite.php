@@ -3,7 +3,7 @@
  * Plugin Name:       WP Import Export Lite
  * Plugin URI:        https://www.vjinfotech.com/
  * Description:       The Advanced and powerful solution for importing and exporting data to WordPress. Import and Export to Posts, Pages, and Custom Post Types. Ability to update existing data, and much more.
- * Version:           3.9.34
+ * Version:           3.9.35
  * Requires at least: 4.4
  * Tested up to:      7.1
  * Requires PHP:      5.6
@@ -27,7 +27,7 @@ if ( file_exists( dirname( __FILE__ ) . '/deactivate-plugins.php' ) ) {
 
 // Plugin version.
 if ( ! defined( 'WPIE_PLUGIN_VERSION' ) ) {
-	define( 'WPIE_PLUGIN_VERSION', '3.9.34' );
+	define( 'WPIE_PLUGIN_VERSION', '3.9.35' );
 }
 
 // Database schema version.
